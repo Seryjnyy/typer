@@ -1,14 +1,10 @@
-import React, { useMemo } from "react";
-import QueueControl from "./queue-control";
+import { CaretUpIcon } from "@radix-ui/react-icons";
+import { useMemo } from "react";
+import { Button } from "./components/ui/button";
 import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
-import { Button } from "./components/ui/button";
-import {
-  CaretUpIcon,
-  FileTextIcon,
-  GearIcon,
-  KeyboardIcon,
-} from "@radix-ui/react-icons";
+import QueueControl from "./queue-control";
+import WindowControls from "./window-controls";
 
 export default function BottomNav() {
   const queue = useQueueStore();
@@ -19,7 +15,7 @@ export default function BottomNav() {
   }, [queue.current, songList]);
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-background p-3 flex justify-between border">
+    <div className="w-full bg-background p-3 flex justify-between border h-16">
       <QueueControl />
       <div className="flex flex-col">
         <span>{songData?.title}</span>
@@ -28,17 +24,7 @@ export default function BottomNav() {
         </span>
       </div>
       <div className="flex gap-8">
-        <div>
-          <Button size={"icon"}>
-            <KeyboardIcon />
-          </Button>
-          <Button size={"icon"}>
-            <FileTextIcon />
-          </Button>
-          <Button size={"icon"}>
-            <GearIcon />
-          </Button>
-        </div>
+        <WindowControls />
         <Button size={"icon"}>
           <CaretUpIcon />
         </Button>

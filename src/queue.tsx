@@ -1,11 +1,10 @@
+import { Cross1Icon, PlayIcon } from "@radix-ui/react-icons";
 import { useMemo } from "react";
+import { Button } from "./components/ui/button";
 import { ScrollArea } from "./components/ui/scroll-area";
 import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
-import { Button } from "./components/ui/button";
 import { cn } from "./lib/utils";
-import QueueControl from "./queue-control";
-import { Cross1Icon, PlayIcon } from "@radix-ui/react-icons";
 export default function Queue() {
   const queue = useQueueStore();
   const songList = useSongStore.use.songs();
@@ -27,8 +26,8 @@ export default function Queue() {
   };
 
   return (
-    <div>
-      <ScrollArea className="h-screen w-[250px] border p-4">
+    <div className="h-full">
+      <ScrollArea className="h-full w-[250px] border p-4">
         {songs.map((song) => (
           <div
             className={cn("border p-4", {

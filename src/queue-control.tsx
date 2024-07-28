@@ -1,11 +1,5 @@
-import React from "react";
+import { TrackNextIcon, TrackPreviousIcon } from "@radix-ui/react-icons";
 import { Button } from "./components/ui/button";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  TrackNextIcon,
-  TrackPreviousIcon,
-} from "@radix-ui/react-icons";
 import { useQueueStore } from "./lib/store/queue-store";
 
 export default function QueueControl() {

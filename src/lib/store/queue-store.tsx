@@ -3,27 +3,107 @@ import { createSelectors } from "./create-selectors";
 
 type Store = {
   songs: string[];
-  addSong: (songId: string) => void;
+  enqueue: (songId: string, position?: number) => void;
+  playNow: (songId: string) => void;
+  playNext: (songId: string) => void;
   removeSong: (songId: string) => void;
   current: string | null;
   setCurrent: (newCurrentSong: string) => void;
 };
+
+const insertIntoList = (list: string[], position: number) => {};
 
 // TODO : Idk If I like having queue logic everywhere
 const useQueueStoreBase = create<Store>((set) => ({
   current: null,
   setCurrent: (newCurrentSong) => set((state) => ({ current: newCurrentSong })),
   songs: [],
-  addSong: (songId) =>
+  enqueue: (songId, position) =>
     set((state) => {
+      // Already in queue
       if (state.songs.find((x) => x == songId) != null) {
         return { songs: state.songs };
       }
 
+      // If no songs in queue set this new one as current
       const current = state.songs.length == 0 ? songId : state.current;
 
+      // Insert in position or else just append
+      if (position && position >= 0 && position) {
+        // Check if position is valid
+
+        const currentIndex = state.songs.findIndex((x) => x == current);
+
+        //
+        // if(position ==  currentIndex){
+
+        // }
+
+        return {};
+      } else {
+        return { songs: [...state.songs, songId], current: current };
+      }
+    }),
+  playNow: (songId) =>
+    set((state) => {
+      // Already in queue
+      if (state.songs.find((x) => x == songId) != null) {
+        return { songs: state.songs };
+      }
+
+      // If empty
+      if (state.songs.length == 0) {
+      } else {
+      }
+      // If no songs in queue set this new one as current
+      const current = state.songs.length == 0 ? songId : state.current;
+
+      // Insert in position or else just append
+      // if(position && position >= 0 && position){
+      //   // Check if position is valid
+
+      //   state.
+      //   const currentIndex = state.songs.findIndex(x => x == current)
+
+      //   //
+      //   if(position ==  currentIndex){
+
+      //   }
+
+      //   return {}
+      // }else{
+
+      // }
       return { songs: [...state.songs, songId], current: current };
     }),
+  playNext: (songId) =>
+    set((state) => {
+      // Already in queue
+      if (state.songs.find((x) => x == songId) != null) {
+        return { songs: state.songs };
+      }
+
+      // If no songs in queue set this new one as current
+      const current = state.songs.length == 0 ? songId : state.current;
+
+      // Insert in position or else just append
+      // if(position && position >= 0 && position){
+      //   // Check if position is valid
+
+      //   const currentIndex = state.songs.findIndex(x => x == current)
+
+      //   //
+      //   if(position ==  currentIndex){
+
+      //   }
+
+      //   return {}
+      // }else{
+
+      // }
+      return { songs: [...state.songs, songId], current: current };
+    }),
+
   removeSong: (songId) =>
     set((state) => {
       const songIndex = state.songs.findIndex((x) => x == songId);
@@ -45,12 +125,8 @@ const useQueueStoreBase = create<Store>((set) => ({
           newIndex = songIndex - 1;
         }
 
-        console.log("🚀 ~ set ~ songIndex:", songIndex);
-        console.log("🚀 ~ set ~ newIndex:", newIndex);
         current = newIndex != -1 ? songs[newIndex] : null;
       }
-
-      console.log("remaining", songs, "current", current);
 
       return { songs: songs, current: current };
     }),
