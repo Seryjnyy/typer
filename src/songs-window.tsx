@@ -3,7 +3,7 @@ import SongsList from "./songs-list";
 
 export default function SongsWindow() {
   return (
-    <div className="w-full h-full bg-orange-300">
+    <div className="w-full h-full">
       <SongsList />
     </div>
   );

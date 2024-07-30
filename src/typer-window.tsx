@@ -1,27 +1,59 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
+import { useStopwatch } from "react-timer-hook";
+import { Button } from "./components/ui/button";
 
 export default function TyperWindow() {
   const queue = useQueueStore();
   const songList = useSongStore.use.songs();
+  const {
+    totalSeconds,
+    seconds,
+    minutes,
+    hours,
+    days,
+    isRunning,
+    start,
+    pause,
+    reset,
+  } = useStopwatch({ autoStart: false });
+  const [playing, setPlaying] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [userInput, setUserInput] = useState<string>("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const song = useMemo(
     () => songList.find((x) => x.id == queue.current),
     [songList, queue.current]
   );
 
-  const [userInput, setUserInput] = useState<string>("");
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const canPlay = song != undefined;
 
   const focus = () => {
-    inputRef.current?.focus();
+    if (canPlay && !completed) {
+      inputRef.current?.focus();
+    }
   };
 
   useHotkeys("*", (k, handler) => {
-    // focus();
+    focus();
+    if (canPlay && !playing) {
+      setPlaying(true);
+      start();
+    }
   });
+
+  useEffect(() => {
+    if (!playing) pause();
+  }, [playing]);
+
+  useEffect(() => {
+    if (completed) {
+      pause();
+    }
+  }, [completed]);
 
   const res = useMemo(() => {
     let accuracy = 0;
@@ -134,15 +166,35 @@ export default function TyperWindow() {
     };
   }, [song, userInput]);
 
+  const onStopPlaying = () => {
+    setPlaying(false);
+  };
+
+  const onUserInput = (input: string) => {
+    const finished = userInput.length == song?.content.length;
+    if (finished) {
+      setCompleted(true);
+    }
+
+    if (completed) return;
+    setUserInput(input);
+  };
+
   return (
     <div className="w-full h-full px-24 p-24 bg-green-200">
+      <div>
+        <span>{totalSeconds}</span> seconds
+      </div>
+      <div>{completed && "good"}</div>
+      <Button onClick={onStopPlaying}>Stop</Button>
       <div className="w-full h-full bg-red-200 relative">
         <textarea
           value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
+          onChange={(e) => onUserInput(e.target.value)}
           placeholder="what"
           className=" border opacity-0 absolute"
           ref={inputRef}
+          disabled={completed}
         />
 
         <div className="border p-4  border-black space-y-2">

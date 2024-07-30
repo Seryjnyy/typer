@@ -6,7 +6,13 @@ export default function Window() {
   const currentWindow = useUiStateStore.use.currentWindow();
 
   if (currentWindow == "typer") {
-    return <TyperWindow />;
+    return (
+      <div className="relative overflow-y-scroll h-full w-full">
+        <div className="absolute top-0 right-0 w-full h-full">
+          <TyperWindow />
+        </div>
+      </div>
+    );
   }
 
   if (currentWindow == "song_list") {

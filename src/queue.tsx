@@ -5,7 +5,10 @@ import { ScrollArea } from "./components/ui/scroll-area";
 import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
 import { cn } from "./lib/utils";
+import { useUiStateStore } from "./lib/store/ui-state-store";
 export default function Queue() {
+  const uiState = useUiStateStore();
+
   const queue = useQueueStore();
   const songList = useSongStore.use.songs();
   const songs = useMemo(() => {
@@ -23,7 +26,12 @@ export default function Queue() {
 
   const onPlay = (songId: string) => {
     queue.setCurrent(songId);
+    if (uiState.currentWindow != "typer") {
+      uiState.setCurrentWindow("typer");
+    }
   };
+
+  if (!uiState.queueWindowOpen) return <></>;
 
   return (
     <div className="h-full">

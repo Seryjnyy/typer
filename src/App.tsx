@@ -2,23 +2,29 @@ import BottomNav from "./bottom-nav";
 import Window from "./window";
 import Queue from "./queue";
 import TyperWindow from "./typer-window";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   return (
     <>
-      <div className="flex flex-col h-screen bg-violet-100 justify-end">
-        <div className="h-full w-full  flex justify-between z-0">
-          <Window />
-          <div className="z-20">
-            <Queue />
-          </div>
+      <div className="h-screen">
+        <div className="sm:hidden flex justify-center h-full items-center">
+          Sorry site not responsive yet :/
         </div>
-        <div className="z-20">
-          <BottomNav />
+        <div className="hidden sm:flex flex-col h-full justify-end">
+          <main className="flex-grow w-full  flex justify-between z-0">
+            <Window />
+            <div className="z-20">
+              <Queue />
+            </div>
+          </main>
+          <nav className="z-20 h-[4rem] ">
+            <BottomNav />
+          </nav>
         </div>
       </div>
 
-      <div className="fixed right-0 top-0 h-[92vh] bg-background"></div>
+      <Toaster />
     </>
   );
 }

@@ -1,8 +1,9 @@
 import { TrackNextIcon, TrackPreviousIcon } from "@radix-ui/react-icons";
 import { Button } from "./components/ui/button";
 import { useQueueStore } from "./lib/store/queue-store";
+import { ReactNode } from "react";
 
-export default function QueueControl() {
+export default function QueueControl({ children }: { children?: ReactNode }) {
   const queue = useQueueStore();
 
   const onNext = () => {
@@ -54,6 +55,7 @@ export default function QueueControl() {
       <Button onClick={onPrev}>
         <TrackPreviousIcon />
       </Button>
+      {children}
       <Button onClick={onNext}>
         <TrackNextIcon />
       </Button>

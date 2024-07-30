@@ -10,6 +10,7 @@ import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
 import { useSongs } from "./lib/use-songs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CreateSongForm from "./create-song-form";
 
 const AllSongs = () => {
   const songStore = useSongStore();
@@ -22,10 +23,10 @@ const AllSongs = () => {
   const onAddNext = (songId: string) => {};
 
   return (
-    <div>
-      <h2 className="p-2 border w-fit">{songStore.songs.length} songs</h2>
-      <ScrollArea className="w-full bg-blue-200 h-[80vh]">
-        {/* <Button
+    <div className="pl-8 ">
+      {/* <h2 className="p-2 border w-fit">{songStore.songs.length} songs</h2> */}
+      {/* <ScrollArea className="w-full bg-blue-200 h-[80vh]"> */}
+      {/* <Button
         onClick={() =>
           songStore.addSong({
             id: "test" + Date.now().toString(),
@@ -37,54 +38,64 @@ const AllSongs = () => {
       >
         Add
       </Button> */}
-        {/* <Button>Add all to queue</Button> */}
-        <div className="bg-red-200 h-full">
-          {songStore.songs.map((song) => (
-            <div className="border p-4  group" key={song.id}>
-              <div className="flex flex-col">
-                <span>{song.title}</span>
-                <span className="text-muted-foreground text-sm">
-                  {song.source}
-                </span>
-              </div>
+      {/* <Button>Add all to queue</Button> */}
+      <div>
+        {songStore.songs.map((song) => (
+          <div className="border p-4  group " key={song.id}>
+            <div className="flex flex-col  pb-4">
+              <span className="text-ellipsis overflow-hidden ">
+                {song.title}
+              </span>
+              <span className="text-muted-foreground text-sm text-ellipsis overflow-hidden">
+                {song.source}
+              </span>
+            </div>
 
-              <div className="flex justify-between">
-                <div className="flex gap-2">
-                  <Button size={"icon"}>
-                    <PlayIcon className="group-hover:text-blue-400" />
-                  </Button>
-                  <div>
-                    <Button
-                      className="space-x-2"
-                      onClick={() => onAddToQueue(song.id)}
-                    >
-                      <PlusIcon />
-                      <span> Queue</span>
-                    </Button>
-                    <Button className="space-x-2">
-                      <PlusIcon />
-                      <span> Next</span>
-                    </Button>
-                  </div>
-                </div>
-
+            <div className="flex justify-between">
+              <div className="flex gap-2">
+                <Button size={"icon"}>
+                  <PlayIcon className="group-hover:text-blue-400" />
+                </Button>
                 <div>
+                  <Button
+                    className="space-x-2"
+                    onClick={() => onAddToQueue(song.id)}
+                  >
+                    <PlusIcon />
+                    <span> Queue</span>
+                  </Button>
                   <Button className="space-x-2">
                     <PlusIcon />
-                    <span> Playlist</span>
-                  </Button>
-                  <Button>
-                    <Pencil1Icon />
-                  </Button>
-                  <Button onClick={() => songStore.removeSong(song.id)}>
-                    <TrashIcon />
+                    <span> Next</span>
                   </Button>
                 </div>
               </div>
+
+              <div>
+                <Button className="space-x-2">
+                  <PlusIcon />
+                  <span> Playlist</span>
+                </Button>
+                <Button>
+                  <Pencil1Icon />
+                </Button>
+                <Button onClick={() => songStore.removeSong(song.id)}>
+                  <TrashIcon />
+                </Button>
+              </div>
             </div>
-          ))}
-        </div>
-      </ScrollArea>
+          </div>
+        ))}
+      </div>
+      {/* </ScrollArea> */}
+    </div>
+  );
+};
+
+const AddSong = () => {
+  return (
+    <div className="px-8">
+      <CreateSongForm />
     </div>
   );
 };
@@ -92,17 +103,24 @@ const AllSongs = () => {
 export default function SongsList() {
   const songStore = useSongStore();
   return (
-    <Tabs defaultValue="all-songs" className="p-8 h-full">
-      <TabsList>
+    <Tabs defaultValue="all-songs" className="py-8 h-full ">
+      <TabsList className="mx-8">
         <TabsTrigger value="all-songs">All songs</TabsTrigger>
-        <TabsTrigger value="playlists">Playlists</TabsTrigger>
+        {/* <TabsTrigger value="playlists">Playlists</TabsTrigger> */}
         <TabsTrigger value="add-song">Add song</TabsTrigger>
       </TabsList>
-      <TabsContent value="all-songs" className="h-full">
-        <AllSongs />
+      <TabsContent
+        value="all-songs"
+        className="relative overflow-y-scroll h-full"
+      >
+        <div className="absolute top-0 left-0 h-full w-full">
+          <AllSongs />
+        </div>
       </TabsContent>
-      <TabsContent value="playlists">playlists</TabsContent>
-      <TabsContent value="add-song">add song</TabsContent>
+      {/* <TabsContent value="playlists">playlists</TabsContent> */}
+      <TabsContent value="add-song">
+        <AddSong />
+      </TabsContent>
     </Tabs>
   );
 }
