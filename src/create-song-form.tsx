@@ -16,7 +16,21 @@ import { Textarea } from "./components/ui/textarea";
 import { useSongStore } from "./lib/store/song-store";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "./components/ui/use-toast";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
+import { Song } from "./lib/types";
+import {
+    Command,
+    CommandDialog,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandSeparator,
+    CommandShortcut,
+} from "@/components/ui/command";
+import { Test } from "./components/test";
+import Autocomplete from "./components/autocomplete";
 
 const formSchema = z.object({
     source: z
@@ -43,6 +57,11 @@ export default function CreateSongForm({
     const songStore = useSongStore();
     const { toast } = useToast();
     const formRef = useRef<HTMLInputElement>(null);
+    const artists = useMemo(() => {
+        const artistSet = new Set<string>();
+        songStore.songs.forEach((x) => artistSet.add(x.source));
+        return Array.from(artistSet.values());
+    }, [songStore.songs]);
 
     const form = useForm<formSchemaType>({
         resolver: zodResolver(formSchema),
@@ -77,7 +96,9 @@ export default function CreateSongForm({
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* <Autocomplete /> */}
+            {/* <Test /> */}
+            {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <FormField
                     control={form.control}
                     name="title"
@@ -101,7 +122,32 @@ export default function CreateSongForm({
                         <FormItem>
                             <FormLabel>Source</FormLabel>
                             <FormControl>
-                                <Input {...field} />
+                                <Command>
+                                    <CommandInput
+                                        placeholder="Type a command or search..."
+                                        {...field}
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty>
+                                            No results found.
+                                        </CommandEmpty>
+                                        <CommandGroup heading="Suggestions">
+                                            <CommandItem>Calendar</CommandItem>
+                                            <CommandItem>
+                                                Search Emoji
+                                            </CommandItem>
+                                            <CommandItem>
+                                                Calculator
+                                            </CommandItem>
+                                        </CommandGroup>
+                                        <CommandSeparator />
+                                        <CommandGroup heading="Settings">
+                                            <CommandItem>Profile</CommandItem>
+                                            <CommandItem>Billing</CommandItem>
+                                            <CommandItem>Settings</CommandItem>
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
                             </FormControl>
                             <FormDescription className="sr-only">
                                 This is the name of the source of the song.
@@ -128,7 +174,7 @@ export default function CreateSongForm({
                     )}
                 />
                 <Button type="submit">Submit</Button>
-            </form>
+            </form> */}
         </Form>
     );
 }
