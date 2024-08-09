@@ -18,62 +18,58 @@ export function calculateAccuracy(correct: number, total: number) {
     return round((correct / total) * 100, 2);
 }
 
-export function generateGradient() {
-    const dirOptions = [
-        "t",
-        "tr",
-        "r",
-        // "br",
-        // "b",
-        // "bl",
-        // "l",
-        // "tl"
-    ];
-    const colourOptions = [
-        // "red",
-        // "green",
-        // "blue",
-        // "purple",
-        // "indigo",
-        "orange",
-        "rose",
-        // "cyan",
-        "sky",
-        // "fuschia",
-        // "pink",
-        // "lime",
-        "emerald",
-        // "teal",
-        "violet",
-    ];
-    const stepOptions = [
-        // 50,
-        // 100,
-        200,
-        // 300,
-        400,
-        // 500,
-        // 600,
-        // 700,
-        800,
-        // 900,
-        950,
-    ];
+const dirOptions = [
+    "t",
+    "tr",
+    "r",
+    // "br",
+    // "b",
+    // "bl",
+    // "l",
+    // "tl"
+];
+const colourOptions = [
+    // "red",
+    // "green",
+    // "blue",
+    // "purple",
+    // "indigo",
+    "orange",
+    "rose",
+    // "cyan",
+    "sky",
+    // "fuschia",
+    // "pink",
+    // "lime",
+    "emerald",
+    // "teal",
+    "violet",
+];
+const stepOptions = [
+    // 50,
+    // 100,
+    200,
+    // 300,
+    400,
+    // 500,
+    // 600,
+    // 700,
+    800,
+    // 900,
+    950,
+];
 
+export function generateAllPossibleGradients() {
     const combinations = new Set<string>();
     dirOptions.forEach((dir) => {
         // colour one
         colourOptions.forEach((colourOption) => {
             stepOptions.forEach((stepOptionOne) => {
-                // colourOne + stepOption
-                // const a = "from-"+colourOption+"-"+stepOptionOne
-
                 // pick second colour
                 colourOptions
                     .filter((x) => x != colourOption)
                     .forEach((colourOptionTwo) => {
                         stepOptions.forEach((stepOptionTwo) => {
-                            // const b = "to-"+colourOptionTwo+"-"+stepOptionTwo
                             combinations.add(
                                 `bg-gradient-to-${dir} from-${colourOption}-${stepOptionOne} to-${colourOptionTwo}-${stepOptionTwo}`
                             );
@@ -81,17 +77,16 @@ export function generateGradient() {
                     });
             });
         });
-
-        // colour two
     });
 
     console.log(combinations.size);
-    console.log(
-        Array.from(combinations.values()).reduce(
-            (prev, curr) => prev + " " + curr
-        )
-    );
 
+    return Array.from(combinations.values()).reduce(
+        (prev, curr) => prev + " " + curr
+    );
+}
+
+export function generateGradient() {
     const dir = dirOptions[Math.floor(Math.random() * dirOptions.length)];
     const colourOne =
         colourOptions[Math.floor(Math.random() * colourOptions.length)];

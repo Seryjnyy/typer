@@ -23,7 +23,7 @@ import { useSongStore } from "./lib/store/song-store";
 import MusicPlaying from "./components/music-playing";
 import PlayButton from "./components/play-button";
 import { cn, generateGradient } from "./lib/utils";
-import TailwindGradientHack from "./components/tailwind-gradient-hack";
+import TailwindGradientHack from "./tailwind-gradient-hack/tailwind-gradient-hack";
 
 const AllSongs = () => {
     const songStore = useSongStore();
@@ -66,8 +66,8 @@ const AllSongs = () => {
                             <div
                                 className={cn(
                                     "h-12 w-12 rounded-md flex justify-center items-center",
-                                    // song.cover
-                                    "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                                    song.cover
+                                    // "bg-gradient-to-bl from-yellow-200 to-violet-800"
                                 )}
                             >
                                 <PlayButton songID={song.id} />
