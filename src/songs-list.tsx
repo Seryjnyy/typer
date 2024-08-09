@@ -51,12 +51,15 @@ const AllSongs = () => {
       </Button> */}
             {/* <Button>Add all to queue</Button> */}
             <div className="space-y-2  pr-2">
-                {songStore.songs.map((song) => (
+                {songStore.songs.map((song, index) => (
                     <div
                         className="border p-4  group hover:bg-secondary rounded-md flex justify-between items-center"
                         key={song.id}
                     >
                         <div className="flex gap-2 items-center">
+                            <div className="text-muted group-hover:text-foreground">
+                                {index + 1}
+                            </div>
                             <div className="flex gap-2">
                                 <PlayButton songID={song.id} />
                             </div>
@@ -70,8 +73,8 @@ const AllSongs = () => {
                             </div>
                         </div>
 
-                        <div className="flex justify-between items-center gap-12">
-                            <div className="flex gap-4">
+                        <div className="flex justify-between items-center gap-4">
+                            <div className="flex gap-4 border border-dashed p-2 rounded-lg">
                                 <span className="text-xs text-muted-foreground">
                                     98%
                                 </span>
@@ -82,6 +85,16 @@ const AllSongs = () => {
                                     {song.completion} completions
                                 </span>
                             </div>
+
+                            <Button
+                                className="space-x-1"
+                                size={"sm"}
+                                onClick={() => onAddToQueue(song.id)}
+                                variant={"outline"}
+                            >
+                                <PlusIcon />
+                                <span> Queue</span>
+                            </Button>
                             <div>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger>

@@ -11,7 +11,12 @@ export default function PlayButton({ songID }: { songID: string }) {
     const queue = useQueueStore();
 
     const onPlay = (songId: string) => {
-        queue.setCurrent(songId);
+        if (!queue.songs.includes(songId)) {
+            queue.enqueue(songId);
+        } else {
+            queue.setCurrent(songId);
+        }
+
         if (uiState.currentWindow != "typer") {
             uiState.setCurrentWindow("typer");
         }

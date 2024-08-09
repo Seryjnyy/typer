@@ -14,6 +14,10 @@ type Store = {
     setStarted: (started: boolean) => void;
     timeElapsed: number;
     setTimeElapsed: (timeElapsed: number) => void;
+    correct: number;
+    incorrect: number;
+    setCorrect: (value: number) => void;
+    setIncorrect: (value: number) => void;
 };
 
 const useSongProgressStoreBase = create<Store>(
@@ -31,6 +35,10 @@ const useSongProgressStoreBase = create<Store>(
             set(() => ({ timeElapsed: timeElapsed })),
         started: false,
         setStarted: (started) => set(() => ({ started: started })),
+        correct: 0,
+        incorrect: 0,
+        setCorrect: (value) => set(() => ({ correct: value })),
+        setIncorrect: (value) => set(() => ({ incorrect: value })),
     }))
 );
 

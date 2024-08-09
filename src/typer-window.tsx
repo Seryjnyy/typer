@@ -6,21 +6,20 @@ import { useStopwatch } from "react-timer-hook";
 import { Button } from "./components/ui/button";
 import { useSongProgressStore } from "./lib/store/song-progress-store";
 import { TrackNextIcon, TrackPreviousIcon } from "@radix-ui/react-icons";
+import { useUiStateStore } from "./lib/store/ui-state-store";
 
 export default function TyperWindow() {
+    const uiState = useUiStateStore();
     const queue = useQueueStore();
     const songList = useSongStore.use.songs();
     const {
         totalSeconds,
-        seconds,
-        minutes,
-        hours,
-        days,
-        isRunning,
-        start,
-        pause,
-        reset,
-    } = useStopwatch({ autoStart: false });
+        start: startStopwatch,
+        pause: pauseStopwatch,
+        reset: resetStopwatch,
+    } = useStopwatch({
+        autoStart: false,
+    });
     const [playing, setPlaying] = useState(false);
     const [userInput, setUserInput] = useState<string>("");
     const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -47,27 +46,30 @@ export default function TyperWindow() {
 
     const canPlay = song != undefined;
 
-    const focus = () => {
+    useHotkeys("*", (k, handler) => {
+        // focus
         if (canPlay && !songProgress.completed) {
             inputRef.current?.focus();
+            // uiState.setFocus(true);
         }
-    };
 
-    useHotkeys("*", (k, handler) => {
-        focus();
         if (canPlay && !playing) {
             setPlaying(true);
-            start();
+            startStopwatch();
         }
     });
 
+    useHotkeys("esc", () => {
+        uiState.setFocus(false);
+    });
+
     useEffect(() => {
-        if (!playing) pause();
+        if (!playing) pauseStopwatch();
     }, [playing]);
 
     useEffect(() => {
         if (songProgress.completed) {
-            pause();
+            pauseStopwatch();
         }
     }, [songProgress.completed]);
 
@@ -182,7 +184,16 @@ export default function TyperWindow() {
         };
     }, [song, userInput]);
 
-    const onStopPlaying = () => {
+    const onStartSong = () => {
+        setUserInput("");
+        songProgress.setCompleted(false);
+        songProgress.setSongTypedChar(0);
+        songProgress.setSongTotalChar(song?.content.length ?? 0);
+        songProgress.setTimeElapsed(0);
+        songProgress.setStarted(false);
+    };
+
+    const onCompletedSong = () => {
         setPlaying(false);
     };
 
@@ -190,6 +201,10 @@ export default function TyperWindow() {
         const finished = userInput.length + 1 == song?.content.length;
         if (finished) {
             songProgress.setCompleted(true);
+            if (queue.autoplay) {
+                queue.next();
+                onStartSong();
+            }
         }
 
         if (songProgress.completed) return;
@@ -199,7 +214,7 @@ export default function TyperWindow() {
     return (
         <div className="w-full h-full px-24 p-24 relative ">
             {/* <Button onClick={onStopPlaying}>Stop</Button> */}
-            {songProgress.completed && (
+            {songProgress.completed && !queue.autoplay && (
                 <div className="absolute backdrop-blur-lg left-[50%] -translate-x-[50%] w-[70%] h-[50%] z-20">
                     <div className="flex h-full flex-col justify-between">
                         <div className="mx-auto my-auto">
@@ -251,6 +266,7 @@ export default function TyperWindow() {
                     <div className=" whitespace-pre-wrap  p-8 rounded-md mx-auto w-fit text-lg tracking-wide leading-10 font-semibold">
                         {res.display}
                     </div>
+                    <Button>Restart</Button>
                 </div>
             </div>
         </div>

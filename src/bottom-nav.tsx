@@ -21,6 +21,7 @@ import { useUiStateStore } from "./lib/store/ui-state-store";
 import { ModeToggle } from "./components/mode-toggle";
 import { useSongProgressStore } from "./lib/store/song-progress-store";
 import MusicPlaying from "./components/music-playing";
+import AutoplayButton from "./components/autoplay-button";
 
 export default function BottomNav() {
     const uiState = useUiStateStore();
@@ -42,6 +43,8 @@ export default function BottomNav() {
             uiState.setCurrentWindow("typer");
         }
     };
+
+    if (uiState.focus) return <></>;
 
     return (
         <div className="w-full  flex flex-col justify-start border gap-2 h-full">
@@ -93,20 +96,7 @@ export default function BottomNav() {
                         <Button>
                             <ShuffleIcon />
                         </Button>
-                        <Button variant={"outline"}>
-                            {/* <div className=" flex gap-2  rounded-md">
-              <div className="bg-card p-1 rounded-lg">
-                <PauseIcon className="text-card-foreground" />
-              </div>
-              <div className="bg-card p-1 rounded-lg border">
-                <PlayIcon className="text-card-foreground  " />
-              </div>
-            </div> */}
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs">auto</span>{" "}
-                                <PlayIcon />
-                            </div>
-                        </Button>
+                        <AutoplayButton />
                     </div>
                     <ModeToggle />
                     <WindowControls />
