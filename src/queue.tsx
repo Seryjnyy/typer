@@ -12,6 +12,7 @@ import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
 import { useUiStateStore } from "./lib/store/ui-state-store";
 import { cn } from "./lib/utils";
+import AutoplayButton from "./components/autoplay-button";
 export default function Queue() {
     const uiState = useUiStateStore();
 
@@ -43,7 +44,10 @@ export default function Queue() {
 
     return (
         <div className="h-full border py-4 px-2 ">
-            <h3 className="font-semibold">Up next</h3>
+            <div className="flex justify-between">
+                <h3 className="font-semibold">Up next</h3>
+                <AutoplayButton />
+            </div>
 
             <div className="w-[14rem]">
                 <DragDropContext onDragEnd={onDragEnd}>
@@ -88,18 +92,37 @@ export default function Queue() {
                                                     </span>
                                                 </div>
                                                 <div className="w-full pl-3">
-                                                    <div className="flex flex-col leading-tight">
-                                                        <span>
-                                                            {song.title}
-                                                        </span>
-                                                        <span className="text-muted-foreground text-sm">
-                                                            {song.source}
-                                                        </span>
+                                                    <div className="flex gap-2">
+                                                        <div
+                                                            className={cn(
+                                                                "h-12 w-12 rounded-md flex justify-center items-center",
+                                                                // song.cover
+                                                                "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                                                            )}
+                                                        >
+                                                            <PlayButton
+                                                                songID={song.id}
+                                                            />
+                                                        </div>
+                                                        <div className="flex flex-col leading-tight">
+                                                            <span
+                                                                className={
+                                                                    queue.current ==
+                                                                    song.id
+                                                                        ? "text-accent"
+                                                                        : ""
+                                                                }
+                                                            >
+                                                                {song.title}
+                                                            </span>
+                                                            <span className="text-muted-foreground text-sm">
+                                                                {song.source}
+                                                            </span>
+                                                        </div>
                                                     </div>
+                                                </div>
+                                                <div className="flex items-center">
                                                     <div className="flex justify-between">
-                                                        <PlayButton
-                                                            songID={song.id}
-                                                        />
                                                         <Button
                                                             onClick={() =>
                                                                 onRemoveFromQueue(
@@ -107,6 +130,7 @@ export default function Queue() {
                                                                 )
                                                             }
                                                             size={"icon"}
+                                                            variant={"ghost"}
                                                         >
                                                             <Cross1Icon />
                                                         </Button>

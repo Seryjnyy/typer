@@ -5,7 +5,7 @@ import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
 import { useSongProgressStore } from "./lib/store/song-progress-store";
 import { useStopwatch } from "react-timer-hook";
-import { round } from "./lib/utils";
+import { calculateAccuracy, round } from "./lib/utils";
 
 // options
 // Can split into a certain amount of lines or
@@ -95,6 +95,16 @@ export default function LineTest() {
 
     const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
         useMemo(() => {
+            if (song == undefined) {
+                return {
+                    element: <></>,
+                    startOfLineIndexes: [],
+                    startOfLineRefs: [],
+                    correct: 0,
+                    incorrect: 0,
+                };
+            }
+
             const split = song?.content.split(/\r?\n/);
             let lineCounter = 0;
             let charIndex = 0;
@@ -103,8 +113,7 @@ export default function LineTest() {
 
             let correct = 0;
             let incorrect = 0;
-            songProgress.setCorrect(correct);
-            songProgress.setIncorrect(incorrect);
+
             return {
                 element: (
                     <div>
@@ -190,6 +199,11 @@ export default function LineTest() {
             };
         }, [song, userInput]);
 
+    useEffect(() => {
+        songProgress.setCorrect(correct);
+        songProgress.setIncorrect(incorrect);
+    }, [correct, incorrect]);
+
     return (
         <div className="flex justify-center pt-24">
             <div className="block fixed top-0">
@@ -197,9 +211,9 @@ export default function LineTest() {
                 {/* {userInput} */}
                 {`correct ${songProgress.correct} incorrect ${
                     songProgress.incorrect
-                } percentage ${round(
-                    (songProgress.correct / userInput.length) * 100,
-                    2
+                } percentage ${calculateAccuracy(
+                    songProgress.correct,
+                    userInput.length
                 )}`}
             </div>
             <div>{element}</div>

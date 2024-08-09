@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/command";
 import { Test } from "./components/test";
 import Autocomplete from "./components/autocomplete";
+import { generateGradient } from "./lib/utils";
 
 const formSchema = z.object({
     source: z
@@ -81,6 +82,7 @@ export default function CreateSongForm({
             content: values.content,
             source: values.source,
             completion: 0,
+            cover: generateGradient(),
         });
 
         form.reset();
@@ -98,7 +100,7 @@ export default function CreateSongForm({
         <Form {...form}>
             {/* <Autocomplete /> */}
             {/* <Test /> */}
-            {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <FormField
                     control={form.control}
                     name="title"
@@ -122,32 +124,7 @@ export default function CreateSongForm({
                         <FormItem>
                             <FormLabel>Source</FormLabel>
                             <FormControl>
-                                <Command>
-                                    <CommandInput
-                                        placeholder="Type a command or search..."
-                                        {...field}
-                                    />
-                                    <CommandList>
-                                        <CommandEmpty>
-                                            No results found.
-                                        </CommandEmpty>
-                                        <CommandGroup heading="Suggestions">
-                                            <CommandItem>Calendar</CommandItem>
-                                            <CommandItem>
-                                                Search Emoji
-                                            </CommandItem>
-                                            <CommandItem>
-                                                Calculator
-                                            </CommandItem>
-                                        </CommandGroup>
-                                        <CommandSeparator />
-                                        <CommandGroup heading="Settings">
-                                            <CommandItem>Profile</CommandItem>
-                                            <CommandItem>Billing</CommandItem>
-                                            <CommandItem>Settings</CommandItem>
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
+                                <Input {...field} />
                             </FormControl>
                             <FormDescription className="sr-only">
                                 This is the name of the source of the song.
@@ -174,7 +151,7 @@ export default function CreateSongForm({
                     )}
                 />
                 <Button type="submit">Submit</Button>
-            </form> */}
+            </form>
         </Form>
     );
 }

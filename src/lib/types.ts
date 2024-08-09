@@ -5,5 +5,6 @@ export type Song = {
     title: string;
     source: string;
     content: string;
+    cover: string;
     completion: number;
 };
