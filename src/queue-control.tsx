@@ -56,11 +56,21 @@ export default function QueueControl({ children }: { children?: ReactNode }) {
 
     return (
         <div className="space-x-2">
-            <Button onClick={onPrev} size={"icon"}>
+            <Button
+                onClick={onPrev}
+                size={"icon"}
+                variant={"ghost"}
+                className="rounded-full"
+            >
                 <TrackPreviousIcon />
             </Button>
             {children}
-            <Button onClick={onNext} size={"icon"}>
+            <Button
+                onClick={onNext}
+                size={"icon"}
+                variant={"ghost"}
+                className="rounded-full"
+            >
                 <TrackNextIcon />
             </Button>
         </div>

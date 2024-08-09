@@ -1,7 +1,8 @@
 import React from "react";
 import { Button } from "./ui/button";
-import { PlayIcon } from "@radix-ui/react-icons";
+import { PauseIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useQueueStore } from "@/lib/store/queue-store";
+import { cn } from "@/lib/utils";
 
 export default function AutoplayButton() {
     const queue = useQueueStore();
@@ -11,7 +12,7 @@ export default function AutoplayButton() {
     };
 
     return (
-        <Button variant={"outline"} onClick={onSwitchAutoplay}>
+        <Button variant={"ghost"} onClick={onSwitchAutoplay} size={"sm"}>
             {/* <div className=" flex gap-2  rounded-md">
 <div className="bg-card p-1 rounded-lg">
 <PauseIcon className="text-card-foreground" />
@@ -21,10 +22,25 @@ export default function AutoplayButton() {
 </div>
 </div> */}
             <div className="flex items-center gap-2">
-                <span className="text-xs">
+                {/* <span className="text-xs">
                     {queue.autoplay ? "auto" : "manual"}
-                </span>
-                <PlayIcon />
+                </span> */}
+                <div className="flex border rounded-md">
+                    <div
+                        className={cn("rounded-md", {
+                            invisible: queue.autoplay,
+                        })}
+                    >
+                        <PauseIcon />
+                    </div>
+                    <div
+                        className={cn("rounded-md", {
+                            invisible: !queue.autoplay,
+                        })}
+                    >
+                        <PlayIcon />
+                    </div>
+                </div>
             </div>
         </Button>
     );

@@ -22,6 +22,8 @@ import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
 import MusicPlaying from "./components/music-playing";
 import PlayButton from "./components/play-button";
+import { cn, generateGradient } from "./lib/utils";
+import TailwindGradientHack from "./components/tailwind-gradient-hack";
 
 const AllSongs = () => {
     const songStore = useSongStore();
@@ -50,19 +52,28 @@ const AllSongs = () => {
         Add
       </Button> */}
             {/* <Button>Add all to queue</Button> */}
+            <TailwindGradientHack />
             <div className="space-y-2  pr-2">
                 {songStore.songs.map((song, index) => (
                     <div
                         className="border p-4  group hover:bg-secondary rounded-md flex justify-between items-center"
                         key={song.id}
                     >
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-4 items-center">
                             <div className="text-muted group-hover:text-foreground">
                                 {index + 1}
                             </div>
-                            <div className="flex gap-2">
+                            <div
+                                className={cn(
+                                    "h-12 w-12 rounded-md flex justify-center items-center",
+                                    // song.cover
+                                    "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                                )}
+                            >
                                 <PlayButton songID={song.id} />
                             </div>
+                            {/* <div className="flex gap-2">
+                            </div> */}
                             <div className="flex flex-col justify-center leading-tight">
                                 <span className="text-ellipsis overflow-hidden ">
                                     {song.title}
@@ -94,6 +105,13 @@ const AllSongs = () => {
                             >
                                 <PlusIcon />
                                 <span> Queue</span>
+                            </Button>
+                            <Button
+                                onClick={() => songStore.removeSong(song.id)}
+                                className="space-x-1 text-destructive"
+                            >
+                                <TrashIcon />
+                                <span>Delete</span>
                             </Button>
                             <div>
                                 <DropdownMenu>
