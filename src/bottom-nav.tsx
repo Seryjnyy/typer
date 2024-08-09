@@ -94,8 +94,8 @@ const SongInfo = () => {
                 <div
                     className={cn(
                         "h-12 w-12 rounded-md",
-                        // songData?.cover
-                        "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                        songData?.cover
+                        // "bg-gradient-to-bl from-yellow-200 to-violet-800"
                     )}
                 ></div>
                 <div className="flex flex-col">

@@ -4,6 +4,8 @@ import Queue from "./queue";
 import TyperWindow from "./typer-window";
 import { Toaster } from "./components/ui/toaster";
 import { ThemeProvider } from "./components/theme-provider";
+import { useEffect } from "react";
+import TailwindGradientHack from "./tailwind-gradient-hack/tailwind-gradient-hack";
 
 function App() {
     return (
@@ -30,6 +32,7 @@ function App() {
 
                 <Toaster />
             </ThemeProvider>
+            <TailwindGradientHack />
         </>
     );
 }

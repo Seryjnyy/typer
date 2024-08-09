@@ -96,8 +96,8 @@ export default function Queue() {
                                                         <div
                                                             className={cn(
                                                                 "h-12 w-12 rounded-md flex justify-center items-center",
-                                                                // song.cover
-                                                                "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                                                                song.cover
+                                                                // "bg-gradient-to-bl from-yellow-200 to-violet-800"
                                                             )}
                                                         >
                                                             <PlayButton
