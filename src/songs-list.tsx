@@ -2,7 +2,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -10,20 +9,16 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     DotsHorizontalIcon,
-    DotsVerticalIcon,
     Pencil1Icon,
-    PlayIcon,
     PlusIcon,
     TrashIcon,
 } from "@radix-ui/react-icons";
+import PlayButton from "./components/play-button";
 import { Button } from "./components/ui/button";
 import CreateSongForm from "./create-song-form";
 import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
-import MusicPlaying from "./components/music-playing";
-import PlayButton from "./components/play-button";
-import { cn, generateGradient } from "./lib/utils";
-import TailwindGradientHack from "./tailwind-gradient-hack/tailwind-gradient-hack";
+import { cn } from "./lib/utils";
 
 const AllSongs = () => {
     const songStore = useSongStore();
@@ -33,26 +28,9 @@ const AllSongs = () => {
         queue.enqueue(songId);
     };
 
-    const onAddNext = (songId: string) => {};
-
     return (
         <div className="pl-8 pb-5 relative">
-            {/* <h2 className="p-2 border w-fit">{songStore.songs.length} songs</h2> */}
-            {/* <ScrollArea className="w-full bg-blue-200 h-[80vh]"> */}
-            {/* <Button
-        onClick={() =>
-          songStore.addSong({
-            id: "test" + Date.now().toString(),
-            content: "test" + Date.now().toString(),
-            source: "test" + Date.now().toString(),
-            title: "test" + Date.now().toString(),
-          })
-        }
-      >
-        Add
-      </Button> */}
             {/* <Button>Add all to queue</Button> */}
-            <TailwindGradientHack />
             <div className="space-y-2  pr-2">
                 {songStore.songs.map((song, index) => (
                     <div

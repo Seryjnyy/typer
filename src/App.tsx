@@ -1,18 +1,16 @@
 import BottomNav from "./bottom-nav";
-import Window from "./window";
-import Queue from "./queue";
-import TyperWindow from "./typer-window";
-import { Toaster } from "./components/ui/toaster";
 import { ThemeProvider } from "./components/theme-provider";
-import { useEffect } from "react";
+import { Toaster } from "./components/ui/toaster";
+import Queue from "./queue";
 import TailwindGradientHack from "./tailwind-gradient-hack/tailwind-gradient-hack";
+import Window from "./window";
 
 function App() {
     return (
         <>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <div className="h-screen">
-                    <div className="sm:hidden flex justify-center h-full items-center">
+                    <div className="md:hidden flex justify-center h-full items-center">
                         Sorry site not responsive yet :/
                     </div>
                     <div className="hidden sm:flex flex-col h-full justify-end">

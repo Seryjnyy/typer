@@ -4,11 +4,12 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { createSelectors } from "./create-selectors";
 import { Song } from "../types";
 
-type Store = {
+interface Store {
     songs: Song[];
     addSong: (song: Song) => void;
     removeSong: (songId: string) => void;
-};
+    getSongData: (songId: string) => Song | undefined;
+}
 
 const useSongStoreBase = create<Store>()(
     persist(
@@ -27,6 +28,9 @@ const useSongStoreBase = create<Store>()(
                     const filtered = get().songs.filter((x) => x.id != songId);
                     return { songs: filtered };
                 }),
+            getSongData: (songId) => {
+                return get().songs.find((song) => song.id == songId);
+            },
         }),
         {
             name: "typer-song-storage",
