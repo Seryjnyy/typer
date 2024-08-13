@@ -4,26 +4,21 @@ import {
     CaretDownIcon,
     CaretUpIcon,
     CheckIcon,
-    DividerHorizontalIcon,
     DividerVerticalIcon,
     LoopIcon,
-    PauseIcon,
     PlayIcon,
     ShuffleIcon,
-    SlashIcon,
 } from "@radix-ui/react-icons";
 import { useMemo } from "react";
 import { Button } from "./components/ui/button";
 import { useQueueStore } from "./lib/store/queue-store";
+import { useSongProgressStore } from "./lib/store/song-progress-store";
 import { useSongStore } from "./lib/store/song-store";
+import { useUiStateStore } from "./lib/store/ui-state-store";
+import { cn } from "./lib/utils";
 import QueueControl from "./queue-control";
 import WindowControls from "./window-controls";
-import { useUiStateStore } from "./lib/store/ui-state-store";
-import { ModeToggle } from "./components/mode-toggle";
-import { useSongProgressStore } from "./lib/store/song-progress-store";
-import MusicPlaying from "./components/music-playing";
-import AutoplayButton from "./components/autoplay-button";
-import { cn } from "./lib/utils";
+import ShuffleButton from "./components/shuffle-button";
 
 const MediaControl = () => {
     const uiState = useUiStateStore();
@@ -37,9 +32,7 @@ const MediaControl = () => {
 
     return (
         <div className="flex">
-            <Button variant={"ghost"} size={"icon"}>
-                <ShuffleIcon />
-            </Button>
+            <ShuffleButton variant={"ghost"} size={"icon"} />
             <QueueControl>
                 <Button
                     onClick={onPlaySong}
@@ -132,13 +125,12 @@ export default function BottomNav() {
                 className="w-full h-1"
             />
             <div className="px-3 h-full grid-cols-3 grid w-full">
-                <div className="w-fit">
+                <div className="w-fit flex gap-9">
                     <SongInfo />
+                    <SongProgressStats />
                 </div>
                 <div className="flex items-center gap-2 h-full  justify-center flex-col">
                     <MediaControl />
-
-                    {/* <SongProgressStats /> */}
                 </div>
                 <div className="flex gap-8 items-center  justify-end">
                     <WindowControls />

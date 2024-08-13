@@ -1,17 +1,237 @@
+import {
+    Cross1Icon,
+    HamburgerMenuIcon,
+    ReloadIcon,
+    TrackNextIcon,
+    TrackPreviousIcon,
+} from "@radix-ui/react-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useQueueStore } from "./lib/store/queue-store";
-import { useSongStore } from "./lib/store/song-store";
 import { useStopwatch } from "react-timer-hook";
 import { Button } from "./components/ui/button";
+import { useQueueStore } from "./lib/store/queue-store";
 import { useSongProgressStore } from "./lib/store/song-progress-store";
-import { TrackNextIcon, TrackPreviousIcon } from "@radix-ui/react-icons";
+import { useSongStore } from "./lib/store/song-store";
 import { useUiStateStore } from "./lib/store/ui-state-store";
+import { calculateAccuracy, cn, round } from "./lib/utils";
+import { Song } from "./lib/types";
+
+// options
+// Can split into a certain amount of lines or
+// can split using verses (using "")
+// can split using verses, then split by lines if needed
+
+// display
+// line by line
+// verse by verse
+// slide  verses, like show all text but the one your doing in the center
+
+const QueueControlButton = ({
+    song,
+    controlType,
+}: {
+    song: Song | undefined;
+    controlType: "next" | "prev";
+}) => {
+    return (
+        <Button
+            variant={"ghost"}
+            className="rounded-full group"
+            disabled={song == null}
+        >
+            {controlType == "prev" ?? <TrackPreviousIcon />}
+            <div className="flex flex-col max-w-[12rem] min-w-[2rem] pl-1">
+                {song != null && (
+                    <div className="flex gap-2 items-center">
+                        <div
+                            className={cn(
+                                "h-6 w-6 rounded-md",
+                                song.cover
+                                // "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                            )}
+                        ></div>
+                        <div className="flex flex-col">
+                            <span className="text-ellipsis overflow-hidden text-sm group-hover:text-accent-foreground">
+                                {song.title}
+                            </span>
+                            <span className="text-muted-foreground text-xs text-ellipsis overflow-hidden group-hover:text-accent-foreground">
+                                {song.source}
+                            </span>
+                        </div>
+                    </div>
+                )}
+            </div>
+            {controlType == "next" ?? <TrackNextIcon />}
+        </Button>
+    );
+};
+
+const EndScreen = ({
+    onRestart,
+    userInputLength,
+}: {
+    onRestart: () => void;
+    userInputLength: number;
+}) => {
+    const [open, setOpen] = useState(true);
+    const currentSongID = useQueueStore.use.current();
+    const getSongData = useSongStore.use.getSongData();
+
+    const getNextSong = useQueueStore.use.getNextSong();
+    const getPrevSong = useQueueStore.use.getPrevSong();
+
+    // const playNextSong = useQueueStore.use.();
+
+    const timeElapsed = useSongProgressStore.use.timeElapsed();
+
+    const typedChars = useSongProgressStore.use.songTypedChar();
+
+    const correct = useSongProgressStore.use.correct();
+
+    if (!currentSongID) return <></>;
+
+    const songData = getSongData(currentSongID);
+
+    const prevSongID = getPrevSong();
+    const prevSong = prevSongID ? getSongData(prevSongID) : undefined;
+
+    const nextSongID = getNextSong();
+    const nextSong = nextSongID ? getSongData(nextSongID) : undefined;
+
+    // TODO : The button is currently bigger than then the container when !open
+    return (
+        <div
+            className={cn(
+                "absolute w-[78%] h-[60vh] backdrop-blur-[6px] border rounded-xl  flex justify-center right-[2%]",
+                { "h-9 w-9 border-none": !open }
+            )}
+        >
+            <div className="w-full h-full relative">
+                <Button
+                    className={cn(
+                        "absolute right-0 top-0 rounded-l-none rounded-tr-xl",
+                        open ? "rounded-br-none" : "rounded-xl border"
+                    )}
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => setOpen((prev) => !prev)}
+                >
+                    {open ? <Cross1Icon /> : <HamburgerMenuIcon />}
+                </Button>
+                {open && (
+                    <div className="flex flex-col  justify-between items-center h-full p-8 ">
+                        <div className="text-center">
+                            <h2 className="text-2xl">{songData?.title}</h2>
+                            <span className="text-muted-foreground text-md">
+                                {songData?.source}
+                            </span>
+                        </div>
+                        <div className=" flex gap-12">
+                            <div className="flex flex-col">
+                                <span className="text-muted-foreground text-xl">
+                                    chpm
+                                </span>
+                                <span className="text-accent text-3xl">
+                                    {timeElapsed == 0
+                                        ? userInputLength
+                                        : round(
+                                              userInputLength /
+                                                  (timeElapsed / 60)
+                                          )}
+                                </span>
+                            </div>
+
+                            <div className="flex flex-col">
+                                <span className="text-muted-foreground text-xl">
+                                    acc
+                                </span>
+                                <span className="text-accent text-3xl">
+                                    {calculateAccuracy(
+                                        correct,
+                                        userInputLength
+                                    )}
+                                    %
+                                </span>
+                            </div>
+
+                            <div className="flex flex-col">
+                                <span className="text-muted-foreground text-xl">
+                                    ch
+                                </span>
+                                <span className="text-accent text-3xl">
+                                    {typedChars}
+                                </span>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-muted-foreground text-xl">
+                                    s
+                                </span>
+                                <span className="text-accent text-3xl">
+                                    {timeElapsed}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="w-full flex justify-between ">
+                            <QueueControlButton
+                                song={prevSong}
+                                controlType="prev"
+                            />
+
+                            <Button
+                                variant={"ghost"}
+                                size={"icon"}
+                                onClick={onRestart}
+                            >
+                                <ReloadIcon />
+                            </Button>
+
+                            <Button
+                                variant={"ghost"}
+                                className="rounded-full group flex gap-1 items-center"
+                                disabled={nextSong == null}
+                            >
+                                <div className="flex flex-col max-w-[12rem] min-w-[2rem] pl-1">
+                                    {nextSong != null && (
+                                        <div className="flex gap-2 items-center">
+                                            <div
+                                                className={cn(
+                                                    "h-6 w-6 rounded-md",
+                                                    nextSong.cover
+                                                    // "bg-gradient-to-bl from-yellow-200 to-violet-800"
+                                                )}
+                                            ></div>
+                                            <div className="flex flex-col items-start">
+                                                <span className="text-ellipsis overflow-hidden text-sm group-hover:text-accent-foreground">
+                                                    {nextSong.title}
+                                                </span>
+                                                <span className="text-muted-foreground text-xs text-ellipsis overflow-hidden group-hover:text-accent-foreground">
+                                                    {nextSong.source}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <TrackNextIcon />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default function TyperWindow() {
-    const uiState = useUiStateStore();
+    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const queue = useQueueStore();
     const songList = useSongStore.use.songs();
+    const song = useMemo(
+        () => songList.find((x) => x.id == queue.current),
+        [songList, queue.current]
+    );
+    const songProgress = useSongProgressStore();
+    const [userInput, setUserInput] = useState<string>("");
+    const inputRef = useRef<HTMLTextAreaElement>(null);
     const {
         totalSeconds,
         start: startStopwatch,
@@ -20,17 +240,26 @@ export default function TyperWindow() {
     } = useStopwatch({
         autoStart: false,
     });
-    const [playing, setPlaying] = useState(false);
-    const [userInput, setUserInput] = useState<string>("");
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-    const songProgress = useSongProgressStore();
-
-    const song = useMemo(
-        () => songList.find((x) => x.id == queue.current),
-        [songList, queue.current]
-    );
 
     useEffect(() => {
+        const currentLineIndex = startOfLineIndexes.findIndex(
+            (x) => x == userInput.length
+        );
+        if (currentLineIndex != -1) {
+            if (startOfLineRefs) {
+                startOfLineRefs[currentLineIndex].scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+                console.log("calling", currentLineIndex);
+            }
+        }
+    }, [userInput]);
+
+    useEffect(() => {
+        setUserInput("");
+        resetStopwatch();
+        pauseStopwatch();
         songProgress.setSongTotalChar(
             song != undefined ? song.content.length : 0
         );
@@ -45,229 +274,207 @@ export default function TyperWindow() {
     }, [totalSeconds]);
 
     const canPlay = song != undefined;
-
     useHotkeys("*", (k, handler) => {
         // focus
+        inputRef.current?.focus();
+
         if (canPlay && !songProgress.completed) {
             inputRef.current?.focus();
+            startStopwatch();
             // uiState.setFocus(true);
         }
-
-        if (canPlay && !playing) {
-            setPlaying(true);
-            startStopwatch();
-        }
     });
-
-    useHotkeys("esc", () => {
-        uiState.setFocus(false);
-    });
-
-    useEffect(() => {
-        if (!playing) pauseStopwatch();
-    }, [playing]);
-
-    useEffect(() => {
-        if (songProgress.completed) {
-            pauseStopwatch();
-        }
-    }, [songProgress.completed]);
-
-    const res = useMemo(() => {
-        let accuracy = 0;
-        let inputted = 0;
-        let correct = 0;
-        let wrong = 0;
-
-        if (song == undefined) {
-            return { display: "", inputChar: 0, totalChar: 0 };
-        }
-
-        const display = Array.from(song.content).map((ch, i) => {
-            if (i == userInput.length) {
-                inputted = i;
-                return (
-                    <span className="bg-yellow-200 p-1 rounded-md" key={i}>
-                        {ch}
-                    </span>
-                );
-            }
-
-            if (i > userInput.length)
-                return (
-                    <span key={i} className="rounded-md">
-                        {ch}
-                    </span>
-                );
-
-            if (ch == userInput.charAt(i)) {
-                correct += 1;
-                return (
-                    <span className="bg-green-200 " key={i}>
-                        {ch}
-                    </span>
-                );
-            } else {
-                wrong += 1;
-                return (
-                    <span className="bg-red-200 " key={i}>
-                        {ch}
-                    </span>
-                );
-            }
-
-            return ch;
-        });
-
-        const display2 = Array.from(song.content).map((ch, i) => {
-            if (i == userInput.length) {
-                inputted = i;
-                return (
-                    <span
-                        className="rounded-md relative before:content-[''] before:bg-yellow-300  before:px-[0.08rem] before:animate-pulse text-gray-600"
-                        key={i}
-                    >
-                        {ch}
-                        {/* <span className="absolute conte"></span> */}
-                    </span>
-                );
-            }
-
-            if (i > userInput.length)
-                return (
-                    <span key={i} className="rounded-md text-gray-600">
-                        {ch}
-                    </span>
-                );
-
-            if (ch == userInput.charAt(i)) {
-                correct += 1;
-                return (
-                    <span className="text-foreground " key={i}>
-                        {ch}
-                    </span>
-                );
-            } else {
-                wrong += 1;
-                if (ch == " " || ch == "\n") {
-                    return (
-                        <span className="text-red-400 " key={i}>
-                            {userInput.charAt(i)}
-                            {ch == " " ? " " : "\n"}
-                        </span>
-                    );
-                }
-
-                return (
-                    <span className="text-red-400 " key={i}>
-                        {ch}
-                    </span>
-                );
-            }
-
-            return ch;
-        });
-
-        // if (userInput.length === 0) {
-        //   console.log(100);
-        // } else {
-        //   accuracy = ((correct - wrong) / userInput.length) * 100;
-        //   console.log(accuracy);
-        // }
-
-        return {
-            display: display2,
-            // accuracy: 100,
-            totalChar: song.content.length,
-            inputChar: userInput.length,
-            // :
-        };
-    }, [song, userInput]);
-
-    const onStartSong = () => {
-        setUserInput("");
-        songProgress.setCompleted(false);
-        songProgress.setSongTypedChar(0);
-        songProgress.setSongTotalChar(song?.content.length ?? 0);
-        songProgress.setTimeElapsed(0);
-        songProgress.setStarted(false);
-    };
-
-    const onCompletedSong = () => {
-        setPlaying(false);
-    };
 
     const onUserInput = (input: string) => {
         const finished = userInput.length + 1 == song?.content.length;
         if (finished) {
             songProgress.setCompleted(true);
+            pauseStopwatch();
             if (queue.autoplay) {
                 queue.next();
-                onStartSong();
             }
+            setUserInput(input);
+        } else {
+            setUserInput(input);
         }
-
-        if (songProgress.completed) return;
-        setUserInput(input);
     };
 
-    return (
-        <div className="w-full h-full px-24 p-24 relative ">
-            {/* <Button onClick={onStopPlaying}>Stop</Button> */}
-            {songProgress.completed && !queue.autoplay && (
-                <div className="absolute backdrop-blur-lg left-[50%] -translate-x-[50%] w-[70%] h-[50%] z-20">
-                    <div className="flex h-full flex-col justify-between">
-                        <div className="mx-auto my-auto">
-                            <h2>Good job!</h2>
-                            <div>
-                                <span>56wpm</span>
-                                <span>425s</span>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <Button size={"icon"}>
-                                    <TrackPreviousIcon />
-                                </Button>
-                                <div className="flex flex-col leading-tight">
-                                    <span>{"song.title"}</span>
-                                    <span className="text-muted-foreground text-sm">
-                                        {"song.source"}
-                                    </span>
+    const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
+        useMemo(() => {
+            if (song == undefined) {
+                return {
+                    element: <></>,
+                    startOfLineIndexes: [],
+                    startOfLineRefs: [],
+                    correct: 0,
+                    incorrect: 0,
+                };
+            }
+
+            const split = song?.content.split(/\r?\n/);
+            let lineCounter = 0;
+            let charIndex = 0;
+            let startOfLineIndexes: number[] = [];
+            let startOfLineRefs: Record<number, HTMLDivElement> = {};
+
+            let correct = 0;
+            let incorrect = 0;
+
+            return {
+                element: (
+                    <div>
+                        {split?.map((line, i) => {
+                            if (line == "")
+                                return (
+                                    <div className="bg-blue-200" key={i}>
+                                        f
+                                    </div>
+                                );
+
+                            return (
+                                <div
+                                    key={i}
+                                    ref={(el) => {
+                                        if (!el) return null;
+
+                                        startOfLineRefs[lineCounter] = el;
+                                        lineCounter++;
+                                    }}
+                                >
+                                    {Array.from(line).map((ch, j) => {
+                                        let className = "";
+                                        // if (j == 0) {
+                                        //     className = "bg-red-300";
+                                        //     startOfLineIndexes.push(charIndex);
+                                        // }
+
+                                        if (charIndex > userInput.length) {
+                                            className = "text-muted-foreground";
+                                        } else if (
+                                            charIndex == userInput.length
+                                        ) {
+                                            charIndex++;
+
+                                            return (
+                                                <span
+                                                    className="rounded-md relative before:content-[''] before:bg-yellow-300  before:px-[0.08rem] before:animate-pulse text-muted-foreground"
+                                                    key={j}
+                                                >
+                                                    {ch}
+                                                </span>
+                                            );
+                                        } else {
+                                            if (
+                                                ch ==
+                                                userInput.charAt(charIndex)
+                                            ) {
+                                                className = "text-green-200";
+                                                correct++;
+                                            } else {
+                                                incorrect++;
+                                                if (ch == " " || ch == "\n") {
+                                                    charIndex++;
+                                                    return (
+                                                        <div
+                                                            className="rounded-md bg-red-300 inline-block max-h-[1px] min-h-[1px] w-1"
+                                                            key={j}
+                                                        >
+                                                            {ch}
+                                                        </div>
+                                                    );
+                                                }
+                                                className = "text-red-200";
+                                            }
+                                        }
+
+                                        charIndex++;
+                                        return (
+                                            <span key={j} className={className}>
+                                                {ch}
+                                            </span>
+                                        );
+                                    })}
                                 </div>
-                            </div>
-                            <Button>Retry</Button>
-                            <div className="flex items-center gap-2">
-                                <div className="flex flex-col leading-tight">
-                                    <span>{"song.title"}</span>
-                                    <span className="text-muted-foreground text-sm">
-                                        {"song.source"}
-                                    </span>
-                                </div>
-                                <Button size={"icon"}>
-                                    <TrackNextIcon />
-                                </Button>
-                            </div>
-                        </div>
+                            );
+                        })}
                     </div>
+                ),
+                startOfLineIndexes: startOfLineIndexes,
+                startOfLineRefs: startOfLineRefs,
+                correct: correct,
+                incorrect: incorrect,
+            };
+        }, [song, userInput]);
+
+    useEffect(() => {
+        songProgress.setCorrect(correct);
+        songProgress.setIncorrect(incorrect);
+    }, [correct, incorrect]);
+
+    const onRestart = () => {
+        songProgress.setCompleted(false);
+        // songProgress.setCorrect(0)
+        // songProgress.setIncorrect(0)
+        songProgress.setSongTypedChar(0);
+        songProgress.setStarted(false);
+        songProgress.setTimeElapsed(0);
+
+        setUserInput("");
+
+        resetStopwatch();
+        pauseStopwatch();
+    };
+
+    console.log("rerender");
+
+    return (
+        <div className="flex justify-start">
+            <div className="w-[18rem]  h-[92%] border-r flex flex-col pt-12 px-2 ">
+                <Button variant={"ghost"} size={"icon"} onClick={onRestart}>
+                    <ReloadIcon />
+                </Button>
+                <span>{queue.autoplay ? "autoplay" : "not-autoplay"}</span>
+                <div>
+                    {`correct ${songProgress.correct} incorrect ${
+                        songProgress.incorrect
+                    } percentage ${calculateAccuracy(
+                        songProgress.correct,
+                        userInput.length
+                    )} 
+                    ${songProgress.completed ? "completed" : "not-completed"}
+                    `}
+                    {}
                 </div>
-            )}
-            <div className="w-full h-full  relative">
+                <div className="flex flex-col gap-2 pt-8">
+                    <div>{`song length: ${song?.content.length}`}</div>
+                    <div>{`userInput length: ${userInput.length}`}</div>
+                </div>
+                {/* <div>
+                    <div>Best completions</div>
+                    <div>Best times</div>
+                    <div>times attempted</div>
+                </div> */}
+            </div>
+
+            <div className="flex justify-center w-full pt-24  ">
+                <div className={queueWindowOpen ? "" : "pr-[15.8rem]"}>
+                    {element}
+                </div>
+                {!queue.autoplay && songProgress.completed && (
+                    <EndScreen
+                        onRestart={onRestart}
+                        userInputLength={userInput.length}
+                    />
+                )}
+
                 <textarea
                     value={userInput}
                     onChange={(e) => onUserInput(e.target.value)}
                     placeholder="what"
-                    className=" border opacity-0 absolute"
+                    className=" border opacity-0 fixed w-0 h-0  "
                     ref={inputRef}
                     disabled={songProgress.completed}
                 />
-
-                <div className="border p-4  border-black space-y-2">
-                    <div className=" whitespace-pre-wrap  p-8 rounded-md mx-auto w-fit text-lg tracking-wide leading-10 font-semibold">
-                        {res.display}
-                    </div>
-                    <Button>Restart</Button>
-                </div>
             </div>
         </div>
     );

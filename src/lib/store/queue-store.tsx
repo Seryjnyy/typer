@@ -3,24 +3,34 @@ import { createSelectors } from "./create-selectors";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 // TODO : A lot of this should be off loaded from the store, maybe a hook
-type Store = {
+
+type State = {
     songs: string[];
+    current: string | null;
+    autoplay: boolean;
+};
+
+type Actions = {
     setSongs: (songs: string[]) => void;
     enqueue: (songId: string, position?: number) => void;
     playNow: (songId: string) => void;
-    playNext: (songId: string) => void;
+    queueNext: (songId: string) => void;
     removeSong: (songId: string) => void;
-    current: string | null;
     setCurrent: (newCurrentSong: string) => void;
-    autoplay: boolean;
     setAutoplay: (autoplay: boolean) => void;
     next: () => void;
+    prev: () => void;
+    getNextSong: () => string | null;
+    getPrevSong: () => string | null; // TODO : bad naming, previous means one that was played before but this function just gets the song that comes before in the list
 };
 
 // TODO : Idk If I like having queue logic everywhere
-const useQueueStoreBase = create<Store>(
+const useQueueStoreBase = create<State & Actions>()(
     persist(
         (set, get) => ({
+            current: null,
+            songs: [],
+            autoplay: false,
             next: () =>
                 set(() => {
                     const state = get();
@@ -29,6 +39,7 @@ const useQueueStoreBase = create<Store>(
                     );
 
                     if (currentId == -1) {
+                        return { ...state };
                     } else {
                         if (currentId + 1 >= state.songs.length) {
                             return { ...state };
@@ -37,12 +48,26 @@ const useQueueStoreBase = create<Store>(
                         }
                     }
                 }),
-            current: null,
+            prev: () =>
+                set(() => {
+                    const state = get();
+                    const currentId = state.songs.findIndex(
+                        (x) => x == state.current
+                    );
+
+                    if (currentId == -1) {
+                        return { ...state };
+                    } else {
+                        if (currentId - 1 < 0) {
+                            return { ...state };
+                        } else {
+                            return { current: state.songs[currentId - 1] };
+                        }
+                    }
+                }),
             setCurrent: (newCurrentSong) =>
                 set(() => ({ current: newCurrentSong })),
-            songs: [],
             setSongs: (songs) => set(() => ({ songs: songs })),
-            autoplay: false,
             setAutoplay: (autoplay) => set(() => ({ autoplay: autoplay })),
             enqueue: (songId, position) =>
                 set(() => {
@@ -114,7 +139,7 @@ const useQueueStoreBase = create<Store>(
                         current: current,
                     };
                 }),
-            playNext: (songId) =>
+            queueNext: (songId) =>
                 set(() => {
                     const state = get();
                     // Already in queue
@@ -174,6 +199,32 @@ const useQueueStoreBase = create<Store>(
 
                     return { songs: songs, current: current };
                 }),
+            getNextSong: () => {
+                const state = get();
+
+                const currentIndex = state.songs.findIndex(
+                    (songID) => songID == state.current
+                );
+
+                if (currentIndex == -1) return null;
+
+                if (currentIndex + 1 >= state.songs.length) return null;
+
+                return state.songs[currentIndex + 1];
+            },
+            getPrevSong: () => {
+                const state = get();
+
+                const currentIndex = state.songs.findIndex(
+                    (songID) => songID == state.current
+                );
+
+                if (currentIndex == -1) return null;
+
+                if (currentIndex - 1 < 0) return null;
+
+                return state.songs[currentIndex - 1];
+            },
         }),
         {
             name: "typer-queue-storage",

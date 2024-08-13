@@ -1,7 +1,8 @@
-import { generateAllPossibleGradients } from "@/lib/utils";
-import React from "react";
-// import from "./all-gradients-string.json"
-
+// tailwind generates the css for the gradients when it sees its being used
+// since gradients are used dynamically the code for it doesn't exist
+// therefore need to include it once before its used dynamically
+// idk if there is a better way to do this right now
+// hopefully there is because this a greatly limited amount of combinations and its already like 44kb
 export default function TailwindGradientHack() {
     return (
         <div
