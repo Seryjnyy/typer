@@ -19,6 +19,11 @@ import CreateSongForm from "./create-song-form";
 import { useQueueStore } from "./lib/store/queue-store";
 import { useSongStore } from "./lib/store/song-store";
 import { cn } from "./lib/utils";
+import {
+    SongBanner,
+    SongDetail,
+    SongHeader,
+} from "./components/ui/song-header";
 
 const AllSongs = () => {
     const songStore = useSongStore();
@@ -41,25 +46,14 @@ const AllSongs = () => {
                             <div className="text-muted group-hover:text-foreground">
                                 {index + 1}
                             </div>
-                            <div
-                                className={cn(
-                                    "h-12 w-12 rounded-md flex justify-center items-center",
-                                    song.cover
-                                    // "bg-gradient-to-bl from-yellow-200 to-violet-800"
-                                )}
-                            >
-                                <PlayButton songID={song.id} />
-                            </div>
-                            {/* <div className="flex gap-2">
-                            </div> */}
-                            <div className="flex flex-col justify-center leading-tight">
-                                <span className="text-ellipsis overflow-hidden ">
-                                    {song.title}
-                                </span>
-                                <span className="text-muted-foreground text-sm text-ellipsis overflow-hidden">
-                                    {song.source}
-                                </span>
-                            </div>
+                            <SongHeader>
+                                <SongBanner song={song} />
+                                <SongDetail
+                                    className="pl-3"
+                                    song={song}
+                                    isCurrent={song.id == queue.current}
+                                />
+                            </SongHeader>
                         </div>
 
                         <div className="flex justify-between items-center gap-4">
