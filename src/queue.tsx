@@ -13,6 +13,11 @@ import { useSongStore } from "./lib/store/song-store";
 import { useUiStateStore } from "./lib/store/ui-state-store";
 import { cn } from "./lib/utils";
 import AutoplayButton from "./components/autoplay-button";
+import {
+    SongHeader,
+    SongBanner,
+    SongDetail,
+} from "./components/ui/song-header";
 export default function Queue() {
     const uiState = useUiStateStore();
 
@@ -91,36 +96,16 @@ export default function Queue() {
                                                         {index + 1}
                                                     </span>
                                                 </div>
-                                                <div className="w-full pl-3">
-                                                    <div className="flex gap-2">
-                                                        <div
-                                                            className={cn(
-                                                                "h-12 w-12 rounded-md flex justify-center items-center",
-                                                                song.cover
-                                                                // "bg-gradient-to-bl from-yellow-200 to-violet-800"
-                                                            )}
-                                                        >
-                                                            <PlayButton
-                                                                songID={song.id}
-                                                            />
-                                                        </div>
-                                                        <div className="flex flex-col leading-tight">
-                                                            <span
-                                                                className={
-                                                                    queue.current ==
-                                                                    song.id
-                                                                        ? "text-accent"
-                                                                        : ""
-                                                                }
-                                                            >
-                                                                {song.title}
-                                                            </span>
-                                                            <span className="text-muted-foreground text-sm">
-                                                                {song.source}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <SongHeader className="pl-3">
+                                                    <SongBanner song={song} />
+                                                    <SongDetail
+                                                        song={song}
+                                                        isCurrent={
+                                                            song.id ==
+                                                            queue.current
+                                                        }
+                                                    />
+                                                </SongHeader>
                                                 <div className="flex items-center">
                                                     <div className="flex justify-between">
                                                         <Button

@@ -19,6 +19,11 @@ import { cn } from "./lib/utils";
 import QueueControl from "./queue-control";
 import WindowControls from "./window-controls";
 import ShuffleButton from "./components/shuffle-button";
+import {
+    SongBanner,
+    SongDetail,
+    SongHeader,
+} from "./components/ui/song-header";
 
 const MediaControl = () => {
     const uiState = useUiStateStore();
@@ -83,7 +88,16 @@ const SongInfo = () => {
 
     return (
         <div className="flex flex-col max-w-[12rem]">
-            <div className="flex gap-2">
+            {songData && (
+                <SongHeader>
+                    <SongBanner song={songData} />
+                    <SongDetail
+                        song={songData}
+                        isCurrent={songData.id == queue.current}
+                    />
+                </SongHeader>
+            )}
+            {/* <div className="flex gap-2">
                 <div
                     className={cn(
                         "h-12 w-12 rounded-md",
@@ -99,7 +113,7 @@ const SongInfo = () => {
                         {songData?.source}
                     </span>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };
