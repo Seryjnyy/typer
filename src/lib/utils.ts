@@ -12,6 +12,8 @@ export function round(num: number, decimalPlaces: number = 0) {
     return Number(num + "e" + -decimalPlaces);
 }
 
+// TODO : Maybe reshuffle again if shuffled array is the same as original
+// would have to check for array of length 1
 export function shuffleArray(array: any[]) {
     const cpy = [...array];
     for (var i = cpy.length - 1; i > 0; i--) {
@@ -20,6 +22,7 @@ export function shuffleArray(array: any[]) {
         cpy[i] = cpy[j];
         cpy[j] = temp;
     }
+
     return cpy;
 }
 

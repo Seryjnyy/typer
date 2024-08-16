@@ -13,31 +13,34 @@ import {
     PlusIcon,
     TrashIcon,
 } from "@radix-ui/react-icons";
-import PlayButton from "./components/play-button";
 import { Button } from "./components/ui/button";
-import CreateSongForm from "./create-song-form";
-import { useQueueStore } from "./lib/store/queue-store";
-import { useSongStore } from "./lib/store/song-store";
-import { cn } from "./lib/utils";
 import {
     SongBanner,
     SongDetail,
     SongHeader,
 } from "./components/ui/song-header";
+import CreateSongForm from "./create-song-form";
+import { useQueueStore } from "./lib/store/queue-store";
+import { useSongStore } from "./lib/store/song-store";
+import { ScrollArea } from "./components/ui/scroll-area";
 
 const AllSongs = () => {
-    const songStore = useSongStore();
-    const queue = useQueueStore();
+    const songs = useSongStore.use.songs();
+    const removeSong = useSongStore.use.removeSong();
+
+    const currentSong = useQueueStore.use.current();
+    const enqueue = useQueueStore.use.enqueue();
 
     const onAddToQueue = (songId: string) => {
-        queue.enqueue(songId);
+        enqueue(songId);
     };
 
     return (
-        <div className="pl-8 pb-5 relative">
+        <div className="pl-8  relative h-full">
             {/* <Button>Add all to queue</Button> */}
-            <div className="space-y-2  pr-2">
-                {songStore.songs.map((song, index) => (
+            <ScrollArea className="h-[calc(100%)] pr-3">
+                {/* <div className="space-y-2  pr-2"> */}
+                {songs.map((song, index) => (
                     <div
                         className="border p-4  group hover:bg-secondary rounded-md flex justify-between items-center"
                         key={song.id}
@@ -49,9 +52,10 @@ const AllSongs = () => {
                             <SongHeader>
                                 <SongBanner song={song} />
                                 <SongDetail
+                                    length={"extra-long"}
                                     className="pl-3"
                                     song={song}
-                                    isCurrent={song.id == queue.current}
+                                    isCurrent={song.id == currentSong}
                                 />
                             </SongHeader>
                         </div>
@@ -79,7 +83,7 @@ const AllSongs = () => {
                                 <span> Queue</span>
                             </Button>
                             <Button
-                                onClick={() => songStore.removeSong(song.id)}
+                                onClick={() => removeSong(song.id)}
                                 className="space-x-1 text-destructive"
                             >
                                 <TrashIcon />
@@ -114,9 +118,7 @@ const AllSongs = () => {
                                             <span>Edit</span>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
-                                            onClick={() =>
-                                                songStore.removeSong(song.id)
-                                            }
+                                            onClick={() => removeSong(song.id)}
                                             className="space-x-1 text-destructive"
                                         >
                                             <TrashIcon />
@@ -128,8 +130,8 @@ const AllSongs = () => {
                         </div>
                     </div>
                 ))}
-            </div>
-            {/* </ScrollArea> */}
+                {/* </div> */}
+            </ScrollArea>
         </div>
     );
 };
@@ -143,7 +145,6 @@ const AddSong = () => {
 };
 
 export default function SongsList() {
-    const songStore = useSongStore();
     return (
         <Tabs defaultValue="all-songs" className="py-8 h-full ">
             <TabsList className="mx-8">
@@ -153,9 +154,9 @@ export default function SongsList() {
             </TabsList>
             <TabsContent
                 value="all-songs"
-                className="relative overflow-y-scroll h-full"
+                className="relative h-[calc(100%-1rem)]"
             >
-                <div className="absolute top-0 left-0 h-full w-full">
+                <div className="h-full w-full">
                     <AllSongs />
                 </div>
             </TabsContent>

@@ -18,6 +18,13 @@ import {
     SongBanner,
     SongDetail,
 } from "./components/ui/song-header";
+import { ScrollArea } from "./components/ui/scroll-area";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 export default function Queue() {
     const uiState = useUiStateStore();
 
@@ -48,90 +55,97 @@ export default function Queue() {
     };
 
     return (
-        <div className="h-full border py-4 px-2 ">
-            <div className="flex justify-between">
+        <div className="h-full border py-4  w-[15rem]">
+            <div className="flex justify-between px-2">
                 <h3 className="font-semibold">Up next</h3>
                 <AutoplayButton />
             </div>
 
-            <div className="w-[14rem]">
-                <DragDropContext onDragEnd={onDragEnd}>
-                    {/* <ScrollArea className="h-full w-[250px]  "> */}
-                    <Droppable droppableId="queue">
-                        {(provided) => (
-                            <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                            >
-                                {songs.map((song, index) => (
-                                    <Draggable
-                                        draggableId={song.id}
-                                        index={index}
-                                        key={song.id}
-                                    >
-                                        {(provided) => (
+            <DragDropContext onDragEnd={onDragEnd}>
+                {/* <ScrollArea className="h-full w-[250px]  "> */}
+                <Droppable droppableId="queue">
+                    {(provided) => (
+                        <ScrollArea
+                            className=" h-[calc(100%-1rem)] pl-1 pr-3 pb-1"
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                        >
+                            {songs.map((song, index) => (
+                                <Draggable
+                                    draggableId={song.id}
+                                    index={index}
+                                    key={song.id}
+                                >
+                                    {(provided) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.dragHandleProps}
+                                            {...provided.draggableProps}
+                                            className={cn(
+                                                "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
+                                                {
+                                                    "bg-secondary":
+                                                        queue.current ==
+                                                        song.id,
+                                                }
+                                            )}
+                                        >
                                             <div
-                                                ref={provided.innerRef}
-                                                {...provided.dragHandleProps}
-                                                {...provided.draggableProps}
-                                                className={cn(
-                                                    "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
-                                                    {
-                                                        "bg-secondary":
-                                                            queue.current ==
-                                                            song.id,
-                                                    }
-                                                )}
+                                                className={
+                                                    "flex items-center " +
+                                                    (queue.current == song.id
+                                                        ? "text-foreground"
+                                                        : "text-muted")
+                                                }
                                             >
-                                                <div
-                                                    className={
-                                                        "flex items-center " +
-                                                        (queue.current ==
-                                                        song.id
-                                                            ? "text-foreground"
-                                                            : "text-muted")
+                                                <span className="">
+                                                    {index + 1}
+                                                </span>
+                                            </div>
+                                            <SongHeader className="pl-3">
+                                                <SongBanner song={song} />
+                                                <SongDetail
+                                                    song={song}
+                                                    isCurrent={
+                                                        song.id == queue.current
                                                     }
-                                                >
-                                                    <span className="">
-                                                        {index + 1}
-                                                    </span>
-                                                </div>
-                                                <SongHeader className="pl-3">
-                                                    <SongBanner song={song} />
-                                                    <SongDetail
-                                                        song={song}
-                                                        isCurrent={
-                                                            song.id ==
-                                                            queue.current
-                                                        }
-                                                    />
-                                                </SongHeader>
-                                                <div className="flex items-center">
-                                                    <div className="flex justify-between">
-                                                        <Button
-                                                            onClick={() =>
-                                                                onRemoveFromQueue(
-                                                                    song.id
-                                                                )
-                                                            }
-                                                            size={"icon"}
-                                                            variant={"ghost"}
-                                                        >
-                                                            <Cross1Icon />
-                                                        </Button>
-                                                    </div>
+                                                />
+                                            </SongHeader>
+                                            <div className="flex items-center">
+                                                <div className="flex justify-between">
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    onRemoveFromQueue(
+                                                                        song.id
+                                                                    )
+                                                                }
+                                                                size={"icon"}
+                                                                variant={
+                                                                    "ghost"
+                                                                }
+                                                            >
+                                                                <Cross1Icon />
+                                                            </Button>
+                                                        </TooltipTrigger>
+
+                                                        <TooltipContent>
+                                                            <p>Remove</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </div>
                                             </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                    {/* </ScrollArea> */}
-                </DragDropContext>
-            </div>
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </ScrollArea>
+                    )}
+                </Droppable>
+                {/* </ScrollArea> */}
+            </DragDropContext>
         </div>
     );
 }

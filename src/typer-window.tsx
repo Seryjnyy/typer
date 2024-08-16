@@ -1,5 +1,7 @@
 import {
+    CheckIcon,
     Cross1Icon,
+    DividerVerticalIcon,
     HamburgerMenuIcon,
     ReloadIcon,
     TrackNextIcon,
@@ -15,6 +17,7 @@ import { useSongStore } from "./lib/store/song-store";
 import { useUiStateStore } from "./lib/store/ui-state-store";
 import { calculateAccuracy, cn, round } from "./lib/utils";
 import { Song } from "./lib/types";
+import { start } from "repl";
 
 // options
 // Can split into a certain amount of lines or
@@ -185,34 +188,10 @@ const EndScreen = ({
                                 <ReloadIcon />
                             </Button>
 
-                            <Button
-                                variant={"ghost"}
-                                className="rounded-full group flex gap-1 items-center"
-                                disabled={nextSong == null}
-                            >
-                                <div className="flex flex-col max-w-[12rem] min-w-[2rem] pl-1">
-                                    {nextSong != null && (
-                                        <div className="flex gap-2 items-center">
-                                            <div
-                                                className={cn(
-                                                    "h-6 w-6 rounded-md",
-                                                    nextSong.cover
-                                                    // "bg-gradient-to-bl from-yellow-200 to-violet-800"
-                                                )}
-                                            ></div>
-                                            <div className="flex flex-col items-start">
-                                                <span className="text-ellipsis overflow-hidden text-sm group-hover:text-accent-foreground">
-                                                    {nextSong.title}
-                                                </span>
-                                                <span className="text-muted-foreground text-xs text-ellipsis overflow-hidden group-hover:text-accent-foreground">
-                                                    {nextSong.source}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                <TrackNextIcon />
-                            </Button>
+                            <QueueControlButton
+                                song={nextSong}
+                                controlType="next"
+                            />
                         </div>
                     </div>
                 )}
@@ -221,16 +200,40 @@ const EndScreen = ({
     );
 };
 
+const Stat = ({
+    title,
+    stat,
+}: {
+    title: string;
+    stat: string | number | boolean;
+}) => {
+    let statText = stat;
+
+    if (typeof stat === "boolean") {
+        statText = stat ? "true" : "false";
+    }
+
+    return (
+        <div className="flex justify-between">
+            <span>{title}</span>
+            <span className="text-muted-foreground">{statText}</span>
+        </div>
+    );
+};
+
 export default function TyperWindow() {
+    const [focusedOnInput, setFocusedOnInput] = useState(false);
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const queue = useQueueStore();
     const songList = useSongStore.use.songs();
-    const song = useMemo(
-        () => songList.find((x) => x.id == queue.current),
-        [songList, queue.current]
-    );
+    const [song, songContentNoNewLine] = useMemo(() => {
+        const s = songList.find((x) => x.id == queue.current);
+        if (!s) return [undefined, undefined];
+
+        return [s, s.content.replace(/(\r\n|\n|\r)/gm, "")];
+    }, [songList, queue.current]);
     const songProgress = useSongProgressStore();
-    const [userInput, setUserInput] = useState<string>("");
+
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const {
         totalSeconds,
@@ -240,64 +243,32 @@ export default function TyperWindow() {
     } = useStopwatch({
         autoStart: false,
     });
+    const resetProgressState = useSongProgressStore.use.resetState();
+    const userInput = useSongProgressStore.use.userInput();
+    const setUserInput = useSongProgressStore.use.setUserInput();
 
     useEffect(() => {
-        const currentLineIndex = startOfLineIndexes.findIndex(
-            (x) => x == userInput.length
-        );
-        if (currentLineIndex != -1) {
-            if (startOfLineRefs) {
-                startOfLineRefs[currentLineIndex].scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-                console.log("calling", currentLineIndex);
-            }
-        }
-    }, [userInput]);
+        resetProgressState();
+        console.log("reseting state and stopwatch");
 
-    useEffect(() => {
-        setUserInput("");
-        resetStopwatch();
-        pauseStopwatch();
+        // pauseStopwatch();
+        resetStopwatch(undefined, false);
         songProgress.setSongTotalChar(
-            song != undefined ? song.content.length : 0
+            songContentNoNewLine != undefined ? songContentNoNewLine.length : 0
         );
+        console.log(song);
     }, [song]);
 
-    useEffect(() => {
-        songProgress.setSongTypedChar(userInput.length);
-    }, [userInput]);
-
-    useEffect(() => {
-        songProgress.setTimeElapsed(totalSeconds);
-    }, [totalSeconds]);
-
-    const canPlay = song != undefined;
     useHotkeys("*", (k, handler) => {
         // focus
         inputRef.current?.focus();
 
-        if (canPlay && !songProgress.completed) {
+        if (song != undefined && !songProgress.completed) {
             inputRef.current?.focus();
             startStopwatch();
             // uiState.setFocus(true);
         }
     });
-
-    const onUserInput = (input: string) => {
-        const finished = userInput.length + 1 == song?.content.length;
-        if (finished) {
-            songProgress.setCompleted(true);
-            pauseStopwatch();
-            if (queue.autoplay) {
-                queue.next();
-            }
-            setUserInput(input);
-        } else {
-            setUserInput(input);
-        }
-    };
 
     const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
         useMemo(() => {
@@ -326,8 +297,11 @@ export default function TyperWindow() {
                         {split?.map((line, i) => {
                             if (line == "")
                                 return (
-                                    <div className="bg-blue-200" key={i}>
-                                        f
+                                    <div
+                                        className="bg-blue-200 opacity-5"
+                                        key={i}
+                                    >
+                                        {"- "}
                                     </div>
                                 );
 
@@ -343,10 +317,10 @@ export default function TyperWindow() {
                                 >
                                     {Array.from(line).map((ch, j) => {
                                         let className = "";
-                                        // if (j == 0) {
-                                        //     className = "bg-red-300";
-                                        //     startOfLineIndexes.push(charIndex);
-                                        // }
+                                        if (j == 0) {
+                                            // className = "bg-red-300";
+                                            startOfLineIndexes.push(charIndex);
+                                        }
 
                                         if (charIndex > userInput.length) {
                                             className = "text-muted-foreground";
@@ -411,44 +385,88 @@ export default function TyperWindow() {
         songProgress.setIncorrect(incorrect);
     }, [correct, incorrect]);
 
-    const onRestart = () => {
-        songProgress.setCompleted(false);
-        // songProgress.setCorrect(0)
-        // songProgress.setIncorrect(0)
-        songProgress.setSongTypedChar(0);
-        songProgress.setStarted(false);
-        songProgress.setTimeElapsed(0);
+    useEffect(() => {
+        songProgress.setTimeElapsed(totalSeconds);
+    }, [totalSeconds]);
 
-        setUserInput("");
+    const onUserInput = (input: string) => {
+        setUserInput(input);
 
-        resetStopwatch();
-        pauseStopwatch();
+        const finished = input.length == songContentNoNewLine?.length;
+        if (finished) {
+            songProgress.setCompleted(true);
+            pauseStopwatch();
+            if (queue.autoplay) {
+                queue.next();
+            }
+        }
+
+        songProgress.setSongTypedChar(input.length);
+
+        // Check if user is on the start of a line, if so get the index
+        const currentLineIndex = startOfLineIndexes.findIndex(
+            (x) => x == userInput.length
+        );
+
+        // console.log("🚀 ~ onUserInput ~ currentLineIndex:", currentLineIndex);
+
+        // Use the found index to index into parallel array to get the respective element and scroll to it
+        // TODO : this currentLineIndex and startOfLineRefs separate variables seems smelly
+        if (currentLineIndex != -1) {
+            if (startOfLineRefs) {
+                startOfLineRefs[currentLineIndex].scrollIntoView({
+                    block: "center",
+                });
+                console.log("SCROLLING INTO VIEW");
+            }
+        }
     };
 
-    console.log("rerender");
+    const onRestart = () => {
+        resetProgressState();
+
+        // pauseStopwatch();
+        resetStopwatch(undefined, false);
+    };
+
+    // console.log("rerender");
 
     return (
         <div className="flex justify-start">
-            <div className="w-[18rem]  h-[92%] border-r flex flex-col pt-12 px-2 ">
-                <Button variant={"ghost"} size={"icon"} onClick={onRestart}>
-                    <ReloadIcon />
-                </Button>
-                <span>{queue.autoplay ? "autoplay" : "not-autoplay"}</span>
-                <div>
-                    {`correct ${songProgress.correct} incorrect ${
-                        songProgress.incorrect
-                    } percentage ${calculateAccuracy(
+            <div className="w-[18rem]  h-[92%]  border-r flex flex-col pt-12 px-2 ">
+                <Stat title="focused" stat={focusedOnInput} />
+                <Stat title="correct" stat={songProgress.correct} />
+                <Stat title="incorrect" stat={songProgress.incorrect} />
+                <Stat
+                    title="correct%"
+                    stat={calculateAccuracy(
                         songProgress.correct,
                         userInput.length
-                    )} 
-                    ${songProgress.completed ? "completed" : "not-completed"}
-                    `}
-                    {}
+                    )}
+                />
+
+                <Stat title="time" stat={songProgress.timeElapsed + "s"} />
+                <Stat title="completed" stat={songProgress.completed} />
+                <Stat
+                    title="song-len"
+                    stat={songContentNoNewLine?.length ?? 0}
+                />
+                <Stat
+                    title="completion"
+                    stat={`${songProgress.songTypedChar}/${songProgress.songTotalChar}`}
+                />
+                <Stat title="user-input-len" stat={userInput.length ?? 0} />
+                <Stat title="autoplay" stat={queue.autoplay} />
+
+                <div className="flex flex-col gap-2 pt-4">
+                    <Button variant={"secondary"} onClick={onRestart}>
+                        reset song progress
+                    </Button>
+                    <Button onClick={resetProgressState} variant={"secondary"}>
+                        reset progress state
+                    </Button>
                 </div>
-                <div className="flex flex-col gap-2 pt-8">
-                    <div>{`song length: ${song?.content.length}`}</div>
-                    <div>{`userInput length: ${userInput.length}`}</div>
-                </div>
+
                 {/* <div>
                     <div>Best completions</div>
                     <div>Best times</div>
@@ -456,8 +474,8 @@ export default function TyperWindow() {
                 </div> */}
             </div>
 
-            <div className="flex justify-center w-full pt-24  ">
-                <div className={queueWindowOpen ? "" : "pr-[15.8rem]"}>
+            <div className="flex justify-center w-full py-24 ">
+                <div className={queueWindowOpen ? "" : "pr-[15.5rem]"}>
                     {element}
                 </div>
                 {!queue.autoplay && songProgress.completed && (
@@ -474,6 +492,8 @@ export default function TyperWindow() {
                     className=" border opacity-0 fixed w-0 h-0  "
                     ref={inputRef}
                     disabled={songProgress.completed}
+                    onFocus={() => setFocusedOnInput(true)}
+                    onBlur={() => setFocusedOnInput(false)}
                 />
             </div>
         </div>
