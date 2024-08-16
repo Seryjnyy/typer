@@ -3,42 +3,57 @@ import zustymiddlewarets from "zustymiddlewarets";
 
 import { createSelectors } from "./create-selectors";
 
-type Store = {
+type State = {
     songTotalChar: number;
-    setSongTotalChar: (charCount: number) => void;
     songTypedChar: number;
-    setSongTypedChar: (charCount: number) => void;
     completed: boolean;
-    setCompleted: (completed: boolean) => void;
     started: boolean;
-    setStarted: (started: boolean) => void;
     timeElapsed: number;
-    setTimeElapsed: (timeElapsed: number) => void;
     correct: number;
     incorrect: number;
+    userInput: string;
+};
+interface Actions {
+    setSongTotalChar: (charCount: number) => void;
+    setSongTypedChar: (charCount: number) => void;
+    setCompleted: (completed: boolean) => void;
+    setStarted: (started: boolean) => void;
+    setTimeElapsed: (timeElapsed: number) => void;
     setCorrect: (value: number) => void;
     setIncorrect: (value: number) => void;
+    setUserInput: (value: string) => void;
+    resetState: () => void;
+}
+
+const defaults: State = {
+    songTotalChar: 0,
+    songTypedChar: 0,
+    completed: false,
+    started: false,
+    timeElapsed: 0,
+    correct: 0,
+    incorrect: 0,
+    userInput: "",
 };
 
-const useSongProgressStoreBase = create<Store>(
+const useSongProgressStoreBase = create<State & Actions>(
     zustymiddlewarets((set) => ({
-        songTotalChar: 0,
+        ...defaults,
         setSongTotalChar: (charCount) =>
             set(() => ({ songTotalChar: charCount })),
-        songTypedChar: 0,
         setSongTypedChar: (charCount) =>
             set(() => ({ songTypedChar: charCount })),
-        completed: false,
         setCompleted: (completed) => set(() => ({ completed: completed })),
-        timeElapsed: 0,
         setTimeElapsed: (timeElapsed) =>
             set(() => ({ timeElapsed: timeElapsed })),
-        started: false,
         setStarted: (started) => set(() => ({ started: started })),
-        correct: 0,
-        incorrect: 0,
         setCorrect: (value) => set(() => ({ correct: value })),
         setIncorrect: (value) => set(() => ({ incorrect: value })),
+        setUserInput: (value) =>
+            set(() => {
+                return { userInput: value };
+            }),
+        resetState: () => set(() => defaults),
     }))
 );
 

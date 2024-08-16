@@ -24,6 +24,11 @@ import {
     SongDetail,
     SongHeader,
 } from "./components/ui/song-header";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const MediaControl = () => {
     const uiState = useUiStateStore();
@@ -36,20 +41,36 @@ const MediaControl = () => {
     };
 
     return (
-        <div className="flex">
+        <div className="flex items-center gap-3">
             <ShuffleButton variant={"ghost"} size={"icon"} />
             <QueueControl>
-                <Button
-                    onClick={onPlaySong}
-                    size={"icon"}
-                    className="rounded-full"
-                >
-                    <PlayIcon />
-                </Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            onClick={onPlaySong}
+                            size={"icon"}
+                            className="rounded-full"
+                        >
+                            <PlayIcon className="w-5 h-5" />
+                        </Button>
+                    </TooltipTrigger>
+
+                    <TooltipContent>
+                        <p>Play</p>
+                    </TooltipContent>
+                </Tooltip>
             </QueueControl>
-            <Button variant={"ghost"} size={"icon"}>
-                <LoopIcon />
-            </Button>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant={"ghost"} size={"icon"}>
+                        <LoopIcon />
+                    </Button>
+                </TooltipTrigger>
+
+                <TooltipContent>
+                    <p>Loop</p>
+                </TooltipContent>
+            </Tooltip>
         </div>
     );
 };
@@ -59,12 +80,12 @@ const SongProgressStats = () => {
     const queue = useQueueStore();
     return (
         <div className="flex items-center gap-1">
-            <span className="text-xs text-muted-foreground">
+            {/* <span className="text-xs text-muted-foreground">
                 {songProgress.songTypedChar}/{songProgress.songTotalChar}
             </span>
             <span className="text-xs text-muted-foreground">
                 {songProgress.timeElapsed}s
-            </span>
+            </span> */}
             <div className="border rounded-full">
                 {!songProgress.completed && queue.current != null && (
                     <DividerVerticalIcon className="w-3 h-3 animate-spin" />
@@ -92,28 +113,12 @@ const SongInfo = () => {
                 <SongHeader>
                     <SongBanner song={songData} />
                     <SongDetail
+                        length={"long"}
                         song={songData}
                         isCurrent={songData.id == queue.current}
                     />
                 </SongHeader>
             )}
-            {/* <div className="flex gap-2">
-                <div
-                    className={cn(
-                        "h-12 w-12 rounded-md",
-                        songData?.cover
-                        // "bg-gradient-to-bl from-yellow-200 to-violet-800"
-                    )}
-                ></div>
-                <div className="flex flex-col">
-                    <span className="text-ellipsis overflow-hidden">
-                        {songData?.title}
-                    </span>
-                    <span className="text-muted-foreground text-sm text-ellipsis overflow-hidden">
-                        {songData?.source}
-                    </span>
-                </div>
-            </div> */}
         </div>
     );
 };
@@ -130,7 +135,7 @@ export default function BottomNav() {
     if (uiState.focus) return <></>;
 
     return (
-        <div className="w-full  flex flex-col justify-start border gap-2 h-full">
+        <div className="w-full  flex flex-col justify-start border  h-full ">
             <Progress
                 value={
                     (songProgress.songTypedChar / songProgress.songTotalChar) *
@@ -138,7 +143,7 @@ export default function BottomNav() {
                 }
                 className="w-full h-1"
             />
-            <div className="px-3 h-full grid-cols-3 grid w-full">
+            <div className="px-3 h-full grid-cols-3 grid w-full bg-background  pt-1">
                 <div className="w-fit flex gap-9">
                     <SongInfo />
                     <SongProgressStats />
@@ -148,14 +153,29 @@ export default function BottomNav() {
                 </div>
                 <div className="flex gap-8 items-center  justify-end">
                     <WindowControls />
-                    <Button
-                        size={"icon"}
-                        onClick={onToggleQueueWindow}
-                        variant={"ghost"}
-                    >
-                        {!uiState.queueWindowOpen && <CaretUpIcon />}
-                        {uiState.queueWindowOpen && <CaretDownIcon />}
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size={"icon"}
+                                onClick={onToggleQueueWindow}
+                                variant={"ghost"}
+                            >
+                                {uiState.queueWindowOpen ? (
+                                    <CaretDownIcon />
+                                ) : (
+                                    <CaretUpIcon />
+                                )}
+                            </Button>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            <p>
+                                {uiState.queueWindowOpen
+                                    ? "Close queue"
+                                    : "Open queue"}
+                            </p>
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
             </div>
         </div>

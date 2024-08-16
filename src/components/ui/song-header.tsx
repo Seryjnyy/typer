@@ -26,12 +26,13 @@ const SongBanner = ({
 };
 
 const songDetailVariants = cva(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+    "text-ellipsis overflow-hidden whitespace-nowrap",
     {
         variants: {
             length: {
-                default: "max-w-[4rem]",
-                long: "max-w-[8rem]",
+                default: "max-w-[4rem] ",
+                long: "max-w-[8rem] ",
+                "extra-long": "max-w-[10rem] ",
             },
         },
         defaultVariants: {
@@ -46,26 +47,35 @@ interface SongDetailProps extends VariantProps<typeof songDetailVariants> {
     className?: string;
 }
 
-const SongDetail = ({ song, isCurrent, className }: SongDetailProps) => {
+const SongDetail = ({
+    song,
+    isCurrent,
+    className,
+    length,
+}: SongDetailProps) => {
     return (
         <div
             className={cn(
-                "flex flex-col leading-tight justify-center",
+                "flex flex-col leading-tight justify-center ",
                 className
             )}
         >
             <span
                 className={cn(
-                    "text-ellipsis overflow-hidden max-w-[4rem]",
-                    isCurrent ? "text-accent" : ""
+                    songDetailVariants({ length }),
+                    isCurrent ? "text-accent" : "text-foreground"
                 )}
             >
-                {(
-                    song.title +
-                    "fdsonfdsijfdisfnidosnfoinio fsdfdsfds fdsfsdf fdsfds"
-                ).substring(0, 14)}
+                {song.title}
             </span>
-            <span className="text-muted-foreground text-sm">{song.source}</span>
+            <span
+                className={cn(
+                    "text-muted-foreground text-sm",
+                    songDetailVariants({ length })
+                )}
+            >
+                {song.source}
+            </span>
         </div>
     );
 };

@@ -1,6 +1,11 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { shuffleArray } from "@/lib/utils";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { ShuffleIcon } from "@radix-ui/react-icons";
 import { Button, ButtonProps } from "./ui/button";
 
 interface ShuffleButtonProps extends ButtonProps {}
@@ -17,8 +22,15 @@ export default function ShuffleButton({
     };
 
     return (
-        <Button {...props} onClick={onShuffle}>
-            {children ? children : <ReloadIcon />}
-        </Button>
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button {...props} onClick={onShuffle}>
+                    {children ? children : <ShuffleIcon />}
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <p>Shuffle</p>
+            </TooltipContent>
+        </Tooltip>
     );
 }
