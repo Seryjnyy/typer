@@ -15,9 +15,10 @@ import { useQueueStore } from "./lib/store/queue-store";
 import { useSongProgressStore } from "./lib/store/song-progress-store";
 import { useSongStore } from "./lib/store/song-store";
 import { useUiStateStore } from "./lib/store/ui-state-store";
-import { calculateAccuracy, cn, round } from "./lib/utils";
+import { calculateAccuracy, chpm, cn, round } from "./lib/utils";
 import { Song } from "./lib/types";
 import { start } from "repl";
+import { ScrollArea } from "./components/ui/scroll-area";
 
 // options
 // Can split into a certain amount of lines or
@@ -42,7 +43,7 @@ const QueueControlButton = ({
             className="rounded-full group"
             disabled={song == null}
         >
-            {controlType == "prev" ?? <TrackPreviousIcon />}
+            {controlType == "prev" ? <TrackPreviousIcon /> : <></>}
             <div className="flex flex-col max-w-[12rem] min-w-[2rem] pl-1">
                 {song != null && (
                     <div className="flex gap-2 items-center">
@@ -64,7 +65,7 @@ const QueueControlButton = ({
                     </div>
                 )}
             </div>
-            {controlType == "next" ?? <TrackNextIcon />}
+            {controlType == "next" ? <TrackNextIcon /> : <></>}
         </Button>
     );
 };
@@ -137,10 +138,7 @@ const EndScreen = ({
                                 <span className="text-accent text-3xl">
                                     {timeElapsed == 0
                                         ? userInputLength
-                                        : round(
-                                              userInputLength /
-                                                  (timeElapsed / 60)
-                                          )}
+                                        : chpm(userInputLength, timeElapsed)}
                                 </span>
                             </div>
 
@@ -331,7 +329,7 @@ export default function TyperWindow() {
 
                                             return (
                                                 <span
-                                                    className="rounded-md relative before:content-[''] before:bg-yellow-300  before:px-[0.08rem] before:animate-pulse text-muted-foreground"
+                                                    className="rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] before:animate-pulse duration-100 text-muted-foreground"
                                                     key={j}
                                                 >
                                                     {ch}
@@ -432,70 +430,109 @@ export default function TyperWindow() {
     // console.log("rerender");
 
     return (
-        <div className="flex justify-start">
-            <div className="w-[18rem]  h-[92%]  border-r flex flex-col pt-12 px-2 ">
-                <Stat title="focused" stat={focusedOnInput} />
-                <Stat title="correct" stat={songProgress.correct} />
-                <Stat title="incorrect" stat={songProgress.incorrect} />
-                <Stat
-                    title="correct%"
-                    stat={calculateAccuracy(
-                        songProgress.correct,
-                        userInput.length
-                    )}
-                />
+        <div className="relative h-full w-full overflow-y-hidden">
+            <ScrollArea className="h-full  relative">
+                <div className="w-full h-full ">
+                    <div className="flex justify-start">
+                        <div className="w-[18rem]  h-[92%]  border-r flex flex-col pt-12 px-2 ">
+                            <Stat title="focused" stat={focusedOnInput} />
+                            <Stat title="correct" stat={songProgress.correct} />
+                            <Stat
+                                title="incorrect"
+                                stat={songProgress.incorrect}
+                            />
+                            <Stat
+                                title="correct%"
+                                stat={calculateAccuracy(
+                                    songProgress.correct,
+                                    userInput.length
+                                )}
+                            />
 
-                <Stat title="time" stat={songProgress.timeElapsed + "s"} />
-                <Stat title="completed" stat={songProgress.completed} />
-                <Stat
-                    title="song-len"
-                    stat={songContentNoNewLine?.length ?? 0}
-                />
-                <Stat
-                    title="completion"
-                    stat={`${songProgress.songTypedChar}/${songProgress.songTotalChar}`}
-                />
-                <Stat title="user-input-len" stat={userInput.length ?? 0} />
-                <Stat title="autoplay" stat={queue.autoplay} />
+                            <Stat
+                                title="time"
+                                stat={songProgress.timeElapsed + "s"}
+                            />
+                            <Stat
+                                title="chpm"
+                                stat={
+                                    songProgress.timeElapsed == 0
+                                        ? songProgress.userInput.length
+                                        : chpm(
+                                              songProgress.userInput.length,
+                                              songProgress.timeElapsed
+                                          )
+                                }
+                            />
+                            <Stat
+                                title="completed"
+                                stat={songProgress.completed}
+                            />
+                            <Stat
+                                title="song-len"
+                                stat={songContentNoNewLine?.length ?? 0}
+                            />
+                            <Stat
+                                title="completion"
+                                stat={`${songProgress.songTypedChar}/${songProgress.songTotalChar}`}
+                            />
+                            <Stat
+                                title="user-input-len"
+                                stat={userInput.length ?? 0}
+                            />
+                            <Stat title="autoplay" stat={queue.autoplay} />
 
-                <div className="flex flex-col gap-2 pt-4">
-                    <Button variant={"secondary"} onClick={onRestart}>
-                        reset song progress
-                    </Button>
-                    <Button onClick={resetProgressState} variant={"secondary"}>
-                        reset progress state
-                    </Button>
-                </div>
+                            <div className="flex flex-col gap-2 pt-4">
+                                <Button
+                                    variant={"secondary"}
+                                    onClick={onRestart}
+                                >
+                                    reset song progress
+                                </Button>
+                                <Button
+                                    onClick={resetProgressState}
+                                    variant={"secondary"}
+                                >
+                                    reset progress state
+                                </Button>
+                            </div>
 
-                {/* <div>
+                            {/* <div>
                     <div>Best completions</div>
                     <div>Best times</div>
                     <div>times attempted</div>
                 </div> */}
-            </div>
+                        </div>
 
-            <div className="flex justify-center w-full py-24 ">
-                <div className={queueWindowOpen ? "" : "pr-[15.5rem]"}>
-                    {element}
+                        <div className="flex justify-center w-full py-24 ">
+                            <div
+                                className={
+                                    queueWindowOpen ? "" : "pr-[15.5rem]"
+                                }
+                            >
+                                {element}
+                            </div>
+                            {!queue.autoplay && songProgress.completed && (
+                                <EndScreen
+                                    onRestart={onRestart}
+                                    userInputLength={userInput.length}
+                                />
+                            )}
+
+                            <textarea
+                                value={userInput}
+                                onChange={(e) => onUserInput(e.target.value)}
+                                placeholder="what"
+                                className=" border opacity-0 fixed w-0 h-0  "
+                                ref={inputRef}
+                                disabled={songProgress.completed}
+                                onFocus={() => setFocusedOnInput(true)}
+                                onBlur={() => setFocusedOnInput(false)}
+                            />
+                        </div>
+                    </div>
                 </div>
-                {!queue.autoplay && songProgress.completed && (
-                    <EndScreen
-                        onRestart={onRestart}
-                        userInputLength={userInput.length}
-                    />
-                )}
-
-                <textarea
-                    value={userInput}
-                    onChange={(e) => onUserInput(e.target.value)}
-                    placeholder="what"
-                    className=" border opacity-0 fixed w-0 h-0  "
-                    ref={inputRef}
-                    disabled={songProgress.completed}
-                    onFocus={() => setFocusedOnInput(true)}
-                    onBlur={() => setFocusedOnInput(false)}
-                />
-            </div>
+            </ScrollArea>
         </div>
     );
 }

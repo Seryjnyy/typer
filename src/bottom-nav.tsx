@@ -29,6 +29,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import LoopButton from "./components/loop-button";
 
 const MediaControl = () => {
     const uiState = useUiStateStore();
@@ -60,17 +61,7 @@ const MediaControl = () => {
                     </TooltipContent>
                 </Tooltip>
             </QueueControl>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button variant={"ghost"} size={"icon"}>
-                        <LoopIcon />
-                    </Button>
-                </TooltipTrigger>
-
-                <TooltipContent>
-                    <p>Loop</p>
-                </TooltipContent>
-            </Tooltip>
+            <LoopButton />
         </div>
     );
 };
