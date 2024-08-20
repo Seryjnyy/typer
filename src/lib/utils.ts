@@ -26,6 +26,32 @@ export function shuffleArray(array: any[]) {
     return cpy;
 }
 
+export function chpm(ch: number, seconds: number) {
+    return round(ch / (seconds / 60));
+}
+
+export function formatBytes(bytes: number, decimals = 2) {
+    if (!+bytes) return "0 Bytes";
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = [
+        "Bytes",
+        "KiB",
+        "MiB",
+        "GiB",
+        "TiB",
+        "PiB",
+        "EiB",
+        "ZiB",
+        "YiB",
+    ];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
 export function calculateAccuracy(correct: number, total: number) {
     if (total == 0) return 0;
 

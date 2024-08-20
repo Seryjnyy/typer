@@ -4,19 +4,17 @@ import { useUiStateStore } from "./lib/store/ui-state-store";
 import { Windows } from "./lib/types";
 import { ReactNode } from "react";
 import { cn } from "./lib/utils";
+import { Link, useLocation } from "react-router-dom";
 export default function WindowControls() {
-    const currentWindow = useUiStateStore.use.currentWindow();
-    const setCurrentWindow = useUiStateStore.use.setCurrentWindow();
+    const location = useLocation();
+    const locationSplit = location.pathname.split("/");
+    const currentLocation = locationSplit.length > 0 ? locationSplit[1] : "";
 
-    const options: { id: Windows; icon: ReactNode }[] = [
-        { id: "typer", icon: <KeyboardIcon /> },
-        { id: "song_list", icon: <FileTextIcon /> },
-        { id: "settings", icon: <GearIcon /> },
+    const options: { link: string; label: string; icon: ReactNode }[] = [
+        { link: "", label: "Typer", icon: <KeyboardIcon /> },
+        { link: "songs", label: "Songs", icon: <FileTextIcon /> },
+        { link: "settings", label: "Settings", icon: <GearIcon /> },
     ];
-
-    const onChangeWindow = (id: Windows) => {
-        setCurrentWindow(id);
-    };
 
     return (
         <div className="border rounded-md">
@@ -30,17 +28,19 @@ export default function WindowControls() {
                 }
 
                 return (
-                    <Button
-                        size={"icon"}
-                        key={option.id}
-                        variant={
-                            currentWindow == option.id ? "default" : "ghost"
-                        }
-                        className={cn("rounded-none", className)}
-                        onClick={() => onChangeWindow(option.id)}
-                    >
-                        {option.icon}
-                    </Button>
+                    <Link to={option.link} key={option.link}>
+                        <Button
+                            size={"icon"}
+                            variant={
+                                currentLocation == option.link
+                                    ? "default"
+                                    : "ghost"
+                            }
+                            className={cn("rounded-none", className)}
+                        >
+                            {option.icon}
+                        </Button>
+                    </Link>
                 );
             })}
         </div>

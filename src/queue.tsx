@@ -84,7 +84,7 @@ export default function Queue() {
                                             className={cn(
                                                 "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
                                                 {
-                                                    "bg-secondary":
+                                                    "bg-secondary ":
                                                         queue.current ==
                                                         song.id,
                                                 }

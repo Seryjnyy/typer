@@ -1,5 +1,6 @@
 import { ModeToggle } from "./components/mode-toggle";
 import { useUiStateStore } from "./lib/store/ui-state-store";
+import SettingsWindow from "./settings-window";
 
 import SongsWindow from "./songs-window";
 import TyperWindow from "./typer-window";
@@ -36,7 +37,7 @@ export default function Window() {
     if (currentWindow == "settings") {
         return (
             <div className="w-full h-full ">
-                <ModeToggle />
+                <SettingsWindow />
             </div>
         );
     }

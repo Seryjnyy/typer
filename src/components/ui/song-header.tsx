@@ -30,7 +30,7 @@ const songDetailVariants = cva(
     {
         variants: {
             length: {
-                default: "max-w-[4rem] ",
+                default: "max-w-[4.2rem] ",
                 long: "max-w-[8rem] ",
                 "extra-long": "max-w-[10rem] ",
             },
@@ -63,7 +63,7 @@ const SongDetail = ({
             <span
                 className={cn(
                     songDetailVariants({ length }),
-                    isCurrent ? "text-accent" : "text-foreground"
+                    isCurrent ? "text-secondary-foreground" : "text-foreground"
                 )}
             >
                 {song.title}
