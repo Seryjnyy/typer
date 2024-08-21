@@ -2,14 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
-import Root from "./routes/root";
 import ErrorPage from "./routes/error-page";
-import TempPage from "./routes/temp-page";
-import TyperWindow from "./typer-window";
-import SongsWindow from "./songs-window";
-import SettingsWindow from "./settings-window";
+import Root from "./routes/root";
 import Appearance from "./routes/settings/appearance";
 import Storage from "./routes/settings/storage";
+
+import SettingsWindow from "./settings-window";
+import SongsWindow from "./songs-window";
+import TyperWindow from "./typer-window";
+import VersePage from "./routes/typer/verse/verse-page";
+import TyperTestPage from "./routes/typer/typer-page-test";
 
 const router = createBrowserRouter([
     {
@@ -21,8 +23,9 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <TyperWindow />,
+                element: <TyperTestPage />,
             },
+            { path: "verse", element: <VersePage /> },
             {
                 path: "/songs",
                 element: <SongsWindow />,

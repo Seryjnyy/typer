@@ -47,7 +47,7 @@ export default function Storage() {
 
     return (
         <div>
-            <Card x-chunk="dashboard-04-chunk-1">
+            <Card>
                 <CardHeader>
                     <CardTitle>LocalStorage</CardTitle>
                     <CardDescription>

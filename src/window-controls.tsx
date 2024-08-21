@@ -10,10 +10,10 @@ export default function WindowControls() {
     const locationSplit = location.pathname.split("/");
     const currentLocation = locationSplit.length > 0 ? locationSplit[1] : "";
 
-    const options: { link: string; label: string; icon: ReactNode }[] = [
-        { link: "", label: "Typer", icon: <KeyboardIcon /> },
-        { link: "songs", label: "Songs", icon: <FileTextIcon /> },
-        { link: "settings", label: "Settings", icon: <GearIcon /> },
+    const options: { link: string[]; label: string; icon: ReactNode }[] = [
+        { link: ["", "verse"], label: "Typer", icon: <KeyboardIcon /> },
+        { link: ["songs"], label: "Songs", icon: <FileTextIcon /> },
+        { link: ["settings"], label: "Settings", icon: <GearIcon /> },
     ];
 
     return (
@@ -28,11 +28,11 @@ export default function WindowControls() {
                 }
 
                 return (
-                    <Link to={option.link} key={option.link}>
+                    <Link to={option.link[0]} key={option.link[0]}>
                         <Button
                             size={"icon"}
                             variant={
-                                currentLocation == option.link
+                                option.link.includes(currentLocation)
                                     ? "default"
                                     : "ghost"
                             }
