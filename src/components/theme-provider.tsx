@@ -1,6 +1,7 @@
+import { Theme, themeList } from "@/lib/themes";
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system";
+// type Theme = "dark" | "dark2" | "light" | "system";
 
 type ThemeProviderProps = {
     children: React.ReactNode;
@@ -14,7 +15,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-    theme: "system",
+    theme: "root",
     setTheme: () => null,
 };
 
@@ -22,7 +23,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
     children,
-    defaultTheme = "system",
+    defaultTheme = "root",
     storageKey = "vite-ui-theme",
     ...props
 }: ThemeProviderProps) {
@@ -32,19 +33,18 @@ export function ThemeProvider({
 
     useEffect(() => {
         const root = window.document.documentElement;
+        root.classList.remove(...themeList);
 
-        root.classList.remove("light", "dark");
+        // if (theme === "system") {
+        //     const systemTheme = window.matchMedia(
+        //         "(prefers-color-scheme: dark)"
+        //     ).matches
+        //         ? "dark2"
+        //         : "light";
 
-        if (theme === "system") {
-            const systemTheme = window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            ).matches
-                ? "dark"
-                : "light";
-
-            root.classList.add(systemTheme);
-            return;
-        }
+        //     root.classList.add(systemTheme);
+        //     return;
+        // }
 
         root.classList.add(theme);
     }, [theme]);
