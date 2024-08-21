@@ -7,7 +7,7 @@ import {
     TrackNextIcon,
     TrackPreviousIcon,
 } from "@radix-ui/react-icons";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useStopwatch } from "react-timer-hook";
 import { Button } from "./components/ui/button";
@@ -19,6 +19,9 @@ import { calculateAccuracy, chpm, cn, round } from "./lib/utils";
 import { Song } from "./lib/types";
 import { start } from "repl";
 import { ScrollArea } from "./components/ui/scroll-area";
+import Ch, { chVariant, chVariants } from "./components/ch";
+import { useNavigate } from "react-router";
+import { convertSongToElements } from "./routes/typer/verse/utils";
 
 // options
 // Can split into a certain amount of lines or
@@ -268,115 +271,20 @@ export default function TyperWindow() {
         }
     });
 
+    const navigate = useNavigate();
+
     const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
-        useMemo(() => {
-            if (song == undefined) {
-                return {
-                    element: <></>,
-                    startOfLineIndexes: [],
-                    startOfLineRefs: [],
-                    correct: 0,
-                    incorrect: 0,
-                };
-            }
-
-            const split = song?.content.split(/\r?\n/);
-            let lineCounter = 0;
-            let charIndex = 0;
-            let startOfLineIndexes: number[] = [];
-            let startOfLineRefs: Record<number, HTMLDivElement> = {};
-
-            let correct = 0;
-            let incorrect = 0;
-
-            return {
-                element: (
-                    <div>
-                        {split?.map((line, i) => {
-                            if (line == "")
-                                return (
-                                    <div
-                                        className="bg-blue-200 opacity-5"
-                                        key={i}
-                                    >
-                                        {"- "}
-                                    </div>
-                                );
-
-                            return (
-                                <div
-                                    key={i}
-                                    ref={(el) => {
-                                        if (!el) return null;
-
-                                        startOfLineRefs[lineCounter] = el;
-                                        lineCounter++;
-                                    }}
-                                >
-                                    {Array.from(line).map((ch, j) => {
-                                        let className = "";
-                                        if (j == 0) {
-                                            // className = "bg-red-300";
-                                            startOfLineIndexes.push(charIndex);
-                                        }
-
-                                        if (charIndex > userInput.length) {
-                                            className = "text-muted-foreground";
-                                        } else if (
-                                            charIndex == userInput.length
-                                        ) {
-                                            charIndex++;
-
-                                            return (
-                                                <span
-                                                    className="rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] before:animate-pulse duration-100 text-muted-foreground"
-                                                    key={j}
-                                                >
-                                                    {ch}
-                                                </span>
-                                            );
-                                        } else {
-                                            if (
-                                                ch ==
-                                                userInput.charAt(charIndex)
-                                            ) {
-                                                className = "text-green-200";
-                                                correct++;
-                                            } else {
-                                                incorrect++;
-                                                if (ch == " " || ch == "\n") {
-                                                    charIndex++;
-                                                    return (
-                                                        <div
-                                                            className="rounded-md bg-red-300 inline-block max-h-[1px] min-h-[1px] w-1"
-                                                            key={j}
-                                                        >
-                                                            {ch}
-                                                        </div>
-                                                    );
-                                                }
-                                                className = "text-red-200";
-                                            }
-                                        }
-
-                                        charIndex++;
-                                        return (
-                                            <span key={j} className={className}>
-                                                {ch}
-                                            </span>
-                                        );
-                                    })}
-                                </div>
-                            );
-                        })}
-                    </div>
+        useMemo(
+            () =>
+                convertSongToElements(
+                    song?.content ?? "",
+                    userInput,
+                    (verse: string) => {
+                        navigate("/verse", { state: { content: verse } });
+                    }
                 ),
-                startOfLineIndexes: startOfLineIndexes,
-                startOfLineRefs: startOfLineRefs,
-                correct: correct,
-                incorrect: incorrect,
-            };
-        }, [song, userInput]);
+            [song, userInput]
+        );
 
     useEffect(() => {
         songProgress.setCorrect(correct);
