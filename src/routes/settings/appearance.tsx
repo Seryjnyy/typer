@@ -9,12 +9,15 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { themes } from "@/lib/themes";
+import { themeList } from "@/lib/themes";
+import { cn } from "@/lib/utils";
 import React from "react";
 
+// TODO : Why did i do this ???? just add the class name to className
 export default function Appearance() {
-    const { setTheme } = useTheme();
+    const { setTheme, theme } = useTheme();
     return (
         <div>
             <Card>
@@ -26,21 +29,75 @@ export default function Appearance() {
                 </CardHeader>
                 <CardContent>
                     <div>
-                        <h3 className="text-sm font-semibold">Light</h3>
+                        {/* <h3 className="text-sm font-semibold">Light</h3> */}
                     </div>
                 </CardContent>
-                {themes.map((x) => {
-                    return (
-                        <Button onClick={() => setTheme(x.name)} key={x.name}>
-                            set {x.name}
-                        </Button>
-                    );
-                })}
-                <CardFooter className="border-t px-6 py-4">
-                    <Button>Save</Button>
-                </CardFooter>
+                <div className="flex w-full flex-wrap gap-2 px-6">
+                    {themeList
+                        .sort((x) => (x.split("-")[0] == "light" ? -1 : 1))
+                        .map((themeName) => {
+                            if (themeName == "root") return <></>;
+                            return (
+                                <div
+                                    key={themeName}
+                                    className={cn(
+                                        "p-4 border w-fit rounded-sm",
+                                        themeName
+                                    )}
+                                >
+                                    <div className="w-[12rem] h-[8rem] bg-background border rounded-md flex flex-col justify-between">
+                                        <div className="flex justify-between h-full">
+                                            <div className="w-full pl-6 pt-4 space-y-3">
+                                                <div className="space-y-1">
+                                                    <div className="w-[70%] h-1 bg-foreground rounded-md"></div>
+                                                    <div className="w-[50%] h-1 bg-foreground rounded-md"></div>
+                                                    <div className="w-[65%] h-1 bg-foreground rounded-md"></div>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <div className="w-[55%] h-1 bg-foreground rounded-md"></div>
+                                                    <div className="w-[70%] h-1 bg-foreground rounded-md"></div>
+                                                    <div className="w-[65%] h-1 bg-foreground rounded-md"></div>
+                                                </div>
+                                            </div>
+                                            <div className="w-11 border-l h-full space-y-1 px-1">
+                                                <div className="h-5 w-full border rounded-[3px] pt-1 pl-1 space-y-1 mt-3">
+                                                    <div className="h-1 w-[80%]  bg-secondary-foreground rounded-sm"></div>
+                                                    <div className="h-1 w-[40%] bg-muted-foreground rounded-sm"></div>
+                                                </div>
+                                                <div className="h-5 w-full bg-secondary rounded-[3px] pt-1 pl-1 space-y-1">
+                                                    <div className="h-1 w-[80%]  bg-secondary-foreground rounded-sm"></div>
+                                                    <div className="h-1 w-[40%] bg-muted-foreground rounded-sm"></div>
+                                                </div>
+                                                <div className="h-5 w-full border rounded-[3px] pt-1 pl-1 space-y-1">
+                                                    <div className="h-1 w-[80%]  bg-secondary-foreground rounded-sm"></div>
+                                                    <div className="h-1 w-[40%] bg-muted-foreground rounded-sm"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="border-t flex justify-center py-1">
+                                            <div className="bg-primary rounded-full h-3 w-3"></div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between pt-2">
+                                        <span className="text-muted-foreground">
+                                            {themeName}
+                                        </span>
+                                        <Checkbox
+                                            checked={themeName == theme}
+                                            onCheckedChange={(val) => {
+                                                if (val == "indeterminate")
+                                                    return;
+
+                                                if (val) setTheme(themeName);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                </div>
+                <CardFooter></CardFooter>
             </Card>
-            <ModeToggle />
         </div>
     );
 }

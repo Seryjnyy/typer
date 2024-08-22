@@ -24,15 +24,10 @@ export default function SettingsWindow() {
     ];
 
     return (
-        <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4  p-4 md:gap-8 md:p-10">
-            <div className="mx-auto grid w-full max-w-6xl gap-2">
+        <main className="min-h-[calc(100vh_-_theme(spacing.16))]  flex-1 flex gap-4   md:gap-8 ">
+            <div className="mx-auto w-fit max-w-6xl gap-2  p-8 md:p-16 space-y-8">
                 <h1 className="text-3xl font-semibold">Settings</h1>
-            </div>
-            <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
-                <nav
-                    className="grid gap-4 text-sm text-muted-foreground"
-                    x-chunk="dashboard-04-chunk-0"
-                >
+                <nav className="grid gap-4 text-sm text-muted-foreground ">
                     {links.map((link) => {
                         return (
                             <Link
@@ -49,8 +44,10 @@ export default function SettingsWindow() {
                         );
                     })}
                 </nav>
-                <ScrollArea className="h-[calc(100vh-10rem)] pb-4 w-full px-3 ">
-                    <div className="grid gap-6">
+            </div>
+            <div className="w-full max-w-6xl items-start gap-6 h-full ">
+                <ScrollArea className="h-[calc(100vh-4rem)] pb-4 w-full px-3  ">
+                    <div className="w-full py-12 md:px-18 lg:px-24">
                         <Outlet />
                     </div>
                 </ScrollArea>

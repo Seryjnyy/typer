@@ -30,15 +30,14 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import LoopButton from "./components/loop-button";
+import { useNavigate } from "react-router-dom";
 
 const MediaControl = () => {
-    const uiState = useUiStateStore();
+    const navigate = useNavigate();
 
     // TODO : might need to force rerender window
     const onPlaySong = () => {
-        if (uiState.currentWindow != "typer") {
-            uiState.setCurrentWindow("typer");
-        }
+        navigate("/");
     };
 
     return (

@@ -4,9 +4,10 @@ import { PlayIcon } from "@radix-ui/react-icons";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
 import { useQueueStore } from "@/lib/store/queue-store";
 import MusicPlaying from "./music-playing";
+import { useNavigate } from "react-router-dom";
 
 export default function PlayButton({ songID }: { songID: string }) {
-    const uiState = useUiStateStore();
+    const navigate = useNavigate();
 
     const queue = useQueueStore();
 
@@ -17,9 +18,7 @@ export default function PlayButton({ songID }: { songID: string }) {
             queue.setCurrent(songId);
         }
 
-        if (uiState.currentWindow != "typer") {
-            uiState.setCurrentWindow("typer");
-        }
+        navigate("/");
     };
 
     return (
