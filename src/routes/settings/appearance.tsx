@@ -1,6 +1,4 @@
-import { ModeToggle } from "@/components/mode-toggle";
 import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -10,10 +8,8 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { themeList } from "@/lib/themes";
 import { cn } from "@/lib/utils";
-import React from "react";
 
 // TODO : Why did i do this ???? just add the class name to className
 export default function Appearance() {
