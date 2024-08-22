@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -46,7 +47,7 @@ export default function Storage() {
     } satisfies ChartConfig;
 
     return (
-        <div>
+        <div className="space-y-12">
             <Card>
                 <CardHeader>
                     <CardTitle>LocalStorage</CardTitle>
@@ -69,7 +70,11 @@ export default function Storage() {
                                         />
                                     }
                                 />
-                                <Pie data={chartData} dataKey="bytes">
+                                <Pie
+                                    data={chartData}
+                                    dataKey="bytes"
+                                    isAnimationActive={false}
+                                >
                                     <LabelList
                                         dataKey="state"
                                         className="fill-background"
@@ -99,14 +104,32 @@ export default function Storage() {
                     </span>
                 </CardFooter>
             </Card>
-            <div>
-                chart - show split, songs/completion/playlists/preferences
+            <div className="space-y-2">
+                <h2 className="text-2xl font-semibold pb-2">Danger zone</h2>
+                <Card className="flex justify-between items-center border border-destructive">
+                    <CardHeader>
+                        <CardTitle>Clear songs</CardTitle>
+                        <CardDescription>
+                            This will remove ALL songs in localStorage.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="p-0 pr-4">
+                        <Button variant={"destructive"}>Clear</Button>
+                    </CardFooter>
+                </Card>
+                <Card className="flex justify-between items-center border border-destructive">
+                    <CardHeader>
+                        <CardTitle>Clear localStorage</CardTitle>
+                        <CardDescription>
+                            This will remove ALL data in localStorage stored by
+                            this app.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="p-0 pr-4">
+                        <Button variant={"destructive"}>Clear</Button>
+                    </CardFooter>
+                </Card>
             </div>
-            <div>completion - reset, delete data</div>
-            <div>completion - turn off, do not delete</div>
-            <div>completion - reset, delete data</div>
-            <div>stats - reset, delete data, etc.</div>
-            <div>playlist - delete data</div>
         </div>
     );
 }
