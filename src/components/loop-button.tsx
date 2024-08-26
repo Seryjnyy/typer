@@ -26,6 +26,7 @@ export default function LoopButton({ ...props }: LoopButtonProps) {
                     {...props}
                     onClick={onLoop}
                     className={cn("relative", props.className)}
+                    disabled
                 >
                     <LoopIcon />
                     {loop > 0 && (

@@ -13,16 +13,18 @@ import {
     PlusIcon,
     TrashIcon,
 } from "@radix-ui/react-icons";
-import { Button } from "./components/ui/button";
+import { Button } from "../../components/ui/button";
 import {
     SongBanner,
     SongDetail,
     SongHeader,
-} from "./components/ui/song-header";
+} from "../../components/ui/song-header";
+
+import { useQueueStore } from "../../lib/store/queue-store";
+import { useSongStore } from "../../lib/store/song-store";
+import { ScrollArea } from "../../components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 import CreateSongForm from "./create-song-form";
-import { useQueueStore } from "./lib/store/queue-store";
-import { useSongStore } from "./lib/store/song-store";
-import { ScrollArea } from "./components/ui/scroll-area";
 
 const AllSongs = () => {
     const songs = useSongStore.use.songs();
@@ -31,12 +33,14 @@ const AllSongs = () => {
     const currentSong = useQueueStore.use.current();
     const enqueue = useQueueStore.use.enqueue();
 
+    const navigate = useNavigate();
+
     const onAddToQueue = (songId: string) => {
         enqueue(songId);
     };
 
     return (
-        <div className="pl-8  relative h-full">
+        <div className="relative h-full">
             {/* <Button>Add all to queue</Button> */}
             <ScrollArea className="h-[calc(100%)] pr-3 ">
                 {/* <div className="space-y-2  pr-2"> */}
@@ -115,7 +119,12 @@ const AllSongs = () => {
                                                 <span> Next</span>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="space-x-1">
+                                            <DropdownMenuItem
+                                                className="space-x-1"
+                                                onClick={() =>
+                                                    navigate(`./${song.id}`)
+                                                }
+                                            >
                                                 <Pencil1Icon />
                                                 <span>Edit</span>
                                             </DropdownMenuItem>
@@ -141,18 +150,10 @@ const AllSongs = () => {
     );
 };
 
-const AddSong = () => {
-    return (
-        <div className="px-8">
-            <CreateSongForm />
-        </div>
-    );
-};
-
 export default function SongsList() {
     return (
-        <Tabs defaultValue="all-songs" className="py-8 h-full ">
-            <TabsList className="mx-8">
+        <Tabs defaultValue="all-songs" className="py-12 h-full ">
+            <TabsList className="mx-12">
                 <TabsTrigger value="all-songs">All songs</TabsTrigger>
                 {/* <TabsTrigger value="playlists">Playlists</TabsTrigger> */}
                 <TabsTrigger
@@ -165,15 +166,15 @@ export default function SongsList() {
             </TabsList>
             <TabsContent
                 value="all-songs"
-                className="relative h-[calc(100%-1rem)]"
+                className=" h-[calc(100%-1rem)] px-12"
             >
                 <div className="h-full w-full">
                     <AllSongs />
                 </div>
             </TabsContent>
             {/* <TabsContent value="playlists">playlists</TabsContent> */}
-            <TabsContent value="add-song">
-                <AddSong />
+            <TabsContent value="add-song" className="px-12 h-[calc(100%-1rem)]">
+                <CreateSongForm />
             </TabsContent>
         </Tabs>
     );

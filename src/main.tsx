@@ -8,10 +8,12 @@ import Appearance from "./routes/settings/appearance";
 import Storage from "./routes/settings/storage";
 
 import SettingsWindow from "./settings-window";
-import SongsWindow from "./songs-window";
+import SongsWindow from "./routes/song/songs-window";
 import TyperWindow from "./typer-window";
 import VersePage from "./routes/typer/verse/verse-page";
 import TyperTestPage from "./routes/typer/typer-page-test";
+import SongPage from "./routes/song/song-page";
+import SongsList from "./routes/song/songs-list";
 
 const router = createBrowserRouter([
     {
@@ -29,6 +31,16 @@ const router = createBrowserRouter([
             {
                 path: "/songs",
                 element: <SongsWindow />,
+                children: [
+                    {
+                        element: <SongsList />,
+                        index: true,
+                    },
+                    {
+                        path: "/songs/:songID",
+                        element: <SongPage />,
+                    },
+                ],
             },
             {
                 path: "/settings",

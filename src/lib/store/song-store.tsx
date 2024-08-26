@@ -9,6 +9,7 @@ interface Store {
     addSong: (song: Song) => void;
     removeSong: (songId: string) => void;
     getSongData: (songId: string) => Song | undefined;
+    editSongCompletion: (id: string, completion: number) => void;
 }
 
 const useSongStoreBase = create<Store>()(
@@ -31,6 +32,18 @@ const useSongStoreBase = create<Store>()(
             getSongData: (songId) => {
                 return get().songs.find((song) => song.id == songId);
             },
+            editSongCompletion: (id, completion) =>
+                set(() => {
+                    const song = get().songs.find((x) => x.id == id);
+
+                    if (!song) return {};
+
+                    const songs = get().songs.filter((x) => x.id != id);
+                    console.log(completion);
+                    return {
+                        songs: [...songs, { ...song, completion: completion }],
+                    };
+                }),
         }),
         {
             name: "typer-song-storage",

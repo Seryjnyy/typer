@@ -36,13 +36,13 @@ export const convertSongToElements = (
     let correct = 0;
     let incorrect = 0;
 
-    const element = verseSplit.map((verse) => {
+    const element = verseSplit.map((verse, i) => {
         const lines = verse.split(/\r?\n/);
 
-        const verseElements = lines.map((line, i) => {
+        const verseElements = lines.map((line, j) => {
             if (line == "") {
                 return (
-                    <div className="bg-blue-200 opacity-5" key={i}>
+                    <div className="bg-blue-200 opacity-5" key={"" + i + j}>
                         {"- "}
                     </div>
                 );
@@ -50,7 +50,7 @@ export const convertSongToElements = (
 
             const formatedLine = (
                 <div
-                    key={i}
+                    key={"" + i + j}
                     ref={(el) => {
                         if (!el) return null;
 
@@ -58,10 +58,10 @@ export const convertSongToElements = (
                         lineCounter++;
                     }}
                 >
-                    {Array.from(line).map((ch, j) => {
+                    {Array.from(line).map((ch, k) => {
                         let variant: chVariant = "not-covered";
 
-                        if (j == 0) {
+                        if (k == 0) {
                             variant = "start-of-line";
                             startOfLineIndexes.push(charIndex);
                         }
@@ -85,7 +85,7 @@ export const convertSongToElements = (
 
                         charIndex++;
                         return (
-                            <Ch key={j} variant={variant}>
+                            <Ch key={"" + i + j + k} variant={variant}>
                                 {ch}
                             </Ch>
                         );
@@ -98,6 +98,7 @@ export const convertSongToElements = (
 
         return (
             <div
+                key={i}
                 className={cn(" mb-4 p-2 rounded-md relative group/verse", {
                     "hover:outline": tryVerseOption,
                 })}
@@ -110,7 +111,7 @@ export const convertSongToElements = (
                             <TooltipTrigger asChild>
                                 <Button className="absolute -bottom-4 right-0 group-hover/verse:flex group-hover/verse:bg-primary hidden gap-2 group/button">
                                     <KeyboardIcon />
-                                    <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform" />
+                                    <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform opacity-60" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent className="group-hover/verse:block hidden">

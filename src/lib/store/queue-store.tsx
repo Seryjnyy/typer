@@ -8,9 +8,11 @@ type State = {
     songs: string[];
     current: string | null;
     autoplay: boolean;
+    // loop: number;
 };
 
 type Actions = {
+    // setLoop:(val:number)=>void;
     setSongs: (songs: string[]) => void;
     enqueue: (songId: string, position?: number) => void;
     playNow: (songId: string) => void;
@@ -24,13 +26,19 @@ type Actions = {
     getPrevSong: () => string | null; // TODO : bad naming, previous means one that was played before but this function just gets the song that comes before in the list
 };
 
+const defaults: State = {
+    current: null,
+    songs: [],
+    autoplay: false,
+    // loop: 0,
+};
+
 // TODO : Idk If I like having queue logic everywhere
 const useQueueStoreBase = create<State & Actions>()(
     persist(
         (set, get) => ({
-            current: null,
-            songs: [],
-            autoplay: false,
+            ...defaults,
+            // setLoop: (val) => set(() => ({loop:val})),
             next: () =>
                 set(() => {
                     const state = get();

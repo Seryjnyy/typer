@@ -7,9 +7,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 const SongBanner = ({
     song,
     className,
+    playButton,
 }: {
     song: Song;
     className?: string;
+    playButton?: boolean;
 }) => {
     return (
         <div
@@ -20,7 +22,7 @@ const SongBanner = ({
                 // "bg-gradient-to-bl from-yellow-200 to-violet-800"
             )}
         >
-            <PlayButton songID={song.id} />
+            {playButton && <PlayButton songID={song.id} />}
         </div>
     );
 };

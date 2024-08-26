@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
-import React, { HTMLAttributes } from "react";
+import React, { forwardRef, HTMLAttributes } from "react";
 
 // TODO : Better way to get type?
 export type chVariant =
@@ -33,8 +33,16 @@ interface ChProps
     extends HTMLAttributes<HTMLSpanElement>,
         VariantProps<typeof chVariants> {}
 
-export default function Ch({ className, variant, ...props }: ChProps) {
-    return (
-        <span className={cn(chVariants({ variant, className }))} {...props} />
-    );
-}
+const Ch = forwardRef<HTMLSpanElement, ChProps>(
+    ({ className, variant, ...props }, ref) => {
+        return (
+            <span
+                ref={ref}
+                className={cn(chVariants({ variant, className }))}
+                {...props}
+            />
+        );
+    }
+);
+
+export default Ch;

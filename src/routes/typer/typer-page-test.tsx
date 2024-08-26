@@ -16,27 +16,13 @@ import { calculateAccuracy, chpm, cn } from "@/lib/utils";
 import Typing, { Handlers, ProgressManager, SongData } from "./typing";
 import { Song } from "@/lib/types";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
-
-const Stat = ({
-    title,
-    stat,
-}: {
-    title: string;
-    stat: string | number | boolean;
-}) => {
-    let statText = stat;
-
-    if (typeof stat === "boolean") {
-        statText = stat ? "true" : "false";
-    }
-
-    return (
-        <div className="flex justify-between">
-            <span>{title}</span>
-            <span className="text-muted-foreground">{statText}</span>
-        </div>
-    );
-};
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Stat from "./stat";
 
 const QueueControlButton = ({
     song,
@@ -228,7 +214,7 @@ const Stats = ({ children }: { children?: ReactNode }) => {
     }, [currentSongInQueue]);
 
     return (
-        <div className="w-[18rem]  h-[92%]  border-r flex flex-col pt-12 px-2 ">
+        <div className="w-[18rem]  h-[100%]  border-r flex flex-col pt-12 px-2 ">
             {/* <Stat title="focused" stat={focusedOnInput} /> */}
             <Stat title="correct" stat={correct} />
             <Stat title="incorrect" stat={incorrect} />
@@ -254,9 +240,20 @@ const Stats = ({ children }: { children?: ReactNode }) => {
 
             <div className="flex flex-col gap-2 pt-4">
                 {children}
-                <Button onClick={resetProgressState} variant={"secondary"}>
-                    reset progress state
-                </Button>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            onClick={resetProgressState}
+                            variant={"secondary"}
+                        >
+                            <ReloadIcon />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Restart</p>
+                    </TooltipContent>
+                </Tooltip>
             </div>
 
             {/* <div>
@@ -290,6 +287,8 @@ export default function TyperTestPage() {
 
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
 
+    const editSongCompletion = useSongStore.use.editSongCompletion();
+
     const {
         totalSeconds,
         start: startStopwatch,
@@ -299,15 +298,20 @@ export default function TyperTestPage() {
         autoStart: false,
     });
 
-    const songData: SongData = useMemo(() => {
-        const s = songList.find((x) => x.id == currentSongInQueue);
-        if (!s) return { song: "", songStripped: "" };
+    const { song, songData }: { song: Song | null; songData: SongData } =
+        useMemo(() => {
+            const s = songList.find((x) => x.id == currentSongInQueue);
+            if (!s)
+                return { song: null, songData: { song: "", songStripped: "" } };
 
-        return {
-            song: s.content,
-            songStripped: s.content.replace(/(\r\n|\n|\r)/gm, ""),
-        };
-    }, [songList, currentSongInQueue]);
+            return {
+                song: s,
+                songData: {
+                    song: s.content,
+                    songStripped: s.content.replace(/(\r\n|\n|\r)/gm, ""),
+                },
+            };
+        }, [songList, currentSongInQueue]);
 
     const progressManager: ProgressManager = {
         userInput: userInput,
@@ -336,9 +340,13 @@ export default function TyperTestPage() {
             if (autoplay) {
                 next();
             }
+
+            editSongCompletion(song?.id ?? "", song ? song.completion + 1 : 0);
         },
         onClickVerse: (verse: string) => {
-            navigate("/verse", { state: { content: verse } });
+            navigate("/verse", {
+                state: { content: verse, id: song?.id ?? "" },
+            });
         },
     };
 

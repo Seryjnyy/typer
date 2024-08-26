@@ -2,7 +2,7 @@ import { ModeToggle } from "./components/mode-toggle";
 import { useUiStateStore } from "./lib/store/ui-state-store";
 import SettingsWindow from "./settings-window";
 
-import SongsWindow from "./songs-window";
+import SongsWindow from "./routes/song/songs-window";
 import TyperWindow from "./typer-window";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
