@@ -21,6 +21,7 @@ import { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
+import { seeSizeOfStringInLocalStorage } from "../settings/storage";
 
 export default function CreateSongForm({
     onSuccess,
@@ -49,14 +50,33 @@ export default function CreateSongForm({
     function onSubmit(values: songSchemaType) {
         console.log(values);
 
-        songStore.addSong({
+        const song = {
             id: uuidv4(),
             title: values.title,
             content: values.content,
             source: values.source,
             completion: 0,
+            record: { accuracy: 0, chpm: 0 },
             cover: values.cover,
-        });
+        };
+
+        try {
+            songStore.addSong(song);
+        } catch (e) {
+            console.error("oh no this is not going to work");
+            console.log(
+                "SIZE::::::",
+                seeSizeOfStringInLocalStorage(JSON.stringify(song))
+            );
+            toast({
+                title: "Failed to add song.",
+                description: `It seems like storage is full or this song is too long. ${
+                    JSON.stringify(localStorage).length
+                }storage size ${JSON.stringify(song).length}`,
+                variant: "destructive",
+            });
+            return;
+        }
 
         form.reset({ cover: generateGradient() });
         toast({
@@ -71,7 +91,7 @@ export default function CreateSongForm({
 
     console.log(form.getValues().cover);
     return (
-        <ScrollArea className="h-[calc(100%)] pb-2">
+        <ScrollArea className="h-[calc(100%)] px-12 pb-2">
             <Form {...form}>
                 {/* <Autocomplete /> */}
                 {/* <Test /> */}

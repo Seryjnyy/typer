@@ -29,6 +29,8 @@ export default function Queue() {
     const uiState = useUiStateStore();
 
     const queue = useQueueStore();
+    const setQueueSongs = useQueueStore.use.setSongs();
+
     const songList = useSongStore.use.songs();
     const songs = useMemo(() => {
         const res = queue.songs.map((songId) =>
@@ -52,6 +54,10 @@ export default function Queue() {
         const [draggedItem] = newArr.splice(result.source.index, 1);
         newArr.splice(result.destination.index, 0, draggedItem);
         queue.setSongs(newArr.map((x) => x.id));
+    };
+
+    const onClearQueue = () => {
+        setQueueSongs([]);
     };
 
     return (
@@ -141,6 +147,16 @@ export default function Queue() {
                                 </Draggable>
                             ))}
                             {provided.placeholder}
+                            {queue.songs.length > 0 && (
+                                <Button
+                                    className="w-full mt-1 text-xs text-muted-foreground"
+                                    variant={"ghost"}
+                                    size={"sm"}
+                                    onClick={onClearQueue}
+                                >
+                                    Clear queue
+                                </Button>
+                            )}
                         </ScrollArea>
                     )}
                 </Droppable>

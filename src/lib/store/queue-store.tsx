@@ -75,7 +75,10 @@ const useQueueStoreBase = create<State & Actions>()(
                 }),
             setCurrent: (newCurrentSong) =>
                 set(() => ({ current: newCurrentSong })),
-            setSongs: (songs) => set(() => ({ songs: songs })),
+            setSongs: (songs) =>
+                set(() => {
+                    return { songs: songs, current: null };
+                }),
             setAutoplay: (autoplay) => set(() => ({ autoplay: autoplay })),
             enqueue: (songId, position) =>
                 set(() => {
@@ -236,7 +239,7 @@ const useQueueStoreBase = create<State & Actions>()(
         }),
         {
             name: "typer-queue-storage",
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => sessionStorage),
         }
     )
 );

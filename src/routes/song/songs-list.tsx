@@ -68,10 +68,10 @@ const AllSongs = () => {
                             <div className="flex justify-between items-center gap-4">
                                 <div className="flex gap-4 border border-dashed p-2 rounded-lg">
                                     <span className="text-xs text-muted-foreground">
-                                        98%
+                                        {song.record.accuracy}%
                                     </span>
                                     <span className="text-xs text-muted-foreground">
-                                        87 wpm
+                                        {song.record.chpm} chpm
                                     </span>
                                     <span className="text-xs text-muted-foreground">
                                         {song.completion} completions
@@ -93,7 +93,6 @@ const AllSongs = () => {
                                     variant={"destructive"}
                                 >
                                     <TrashIcon />
-                                    <span>Delete</span>
                                 </Button>
                                 <div>
                                     <DropdownMenu>
@@ -173,7 +172,7 @@ export default function SongsList() {
                 </div>
             </TabsContent>
             {/* <TabsContent value="playlists">playlists</TabsContent> */}
-            <TabsContent value="add-song" className="px-12 h-[calc(100%-1rem)]">
+            <TabsContent value="add-song" className=" h-[calc(100%-1rem)]">
                 <CreateSongForm />
             </TabsContent>
         </Tabs>

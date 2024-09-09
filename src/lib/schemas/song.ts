@@ -9,10 +9,8 @@ export const songSchema = z.object({
         .string()
         .min(1, "Title must be at least 1 character.")
         .max(150, "Title must be less than 150 characters."),
-    content: z
-        .string()
-        .min(1, "Content must be at least 1 character.")
-        .max(8000, "Content must be less than 8000 characters."),
+    content: z.string().min(1, "Content must be at least 1 character."),
+    // .max(8000, "Content must be less than 8000 characters."),
     cover: z.string(),
 });
 

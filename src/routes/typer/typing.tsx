@@ -58,6 +58,8 @@ export default function Typing({
         );
 
     const onUserInput = (input: string) => {
+        if (songData.song == "") return;
+
         progressManager.setUserInput(input);
 
         const finished = input.length == songData.songStripped.length;
@@ -99,7 +101,7 @@ export default function Typing({
         // focus
         inputRef.current?.focus();
 
-        if (songData.song != undefined && !progressManager.completed) {
+        if (songData.song != "" && !progressManager.completed) {
             inputRef.current?.focus();
             handlers.onStart?.();
         }
@@ -110,7 +112,7 @@ export default function Typing({
         progressManager.setIncorrect(incorrect);
     }, [correct, incorrect]);
 
-    console.log("rerender");
+    // console.log("rerender");
     return (
         <div className="relative h-full w-full overflow-y-hidden">
             <ScrollArea className="h-full  relative">
@@ -122,7 +124,7 @@ export default function Typing({
                             //     queueWindowOpen ? "" : "pr-[15.5rem]"
                             // }
                             >
-                                {element}
+                                {songData.song != "" && element}
                             </div>
 
                             {children}

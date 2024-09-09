@@ -8,8 +8,13 @@ interface Store {
     songs: Song[];
     addSong: (song: Song) => void;
     removeSong: (songId: string) => void;
+    setSongs: (songs: Song[]) => void;
     getSongData: (songId: string) => Song | undefined;
     editSongCompletion: (id: string, completion: number) => void;
+    editSongRecord: (
+        id: string,
+        record: { chpm: number; accuracy: number }
+    ) => void;
 }
 
 const useSongStoreBase = create<Store>()(
@@ -23,6 +28,10 @@ const useSongStoreBase = create<Store>()(
                     }
 
                     return { songs: [...get().songs, song] };
+                }),
+            setSongs: (songs) =>
+                set(() => {
+                    return { songs: songs };
                 }),
             removeSong: (songId) =>
                 set(() => {
@@ -42,6 +51,18 @@ const useSongStoreBase = create<Store>()(
                     console.log(completion);
                     return {
                         songs: [...songs, { ...song, completion: completion }],
+                    };
+                }),
+            editSongRecord: (id, record) =>
+                set(() => {
+                    const song = get().songs.find((x) => x.id == id);
+
+                    if (!song) return {};
+
+                    const songs = get().songs.filter((x) => x.id != id);
+
+                    return {
+                        songs: [...songs, { ...song, record: record }],
                     };
                 }),
         }),

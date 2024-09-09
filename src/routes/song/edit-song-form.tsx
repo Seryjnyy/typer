@@ -56,11 +56,12 @@ export default function EditSongForm({
             source: values.source,
             completion: 0,
             cover: generateGradient(),
+            record: { accuracy: 0, chpm: 0 },
         });
 
         form.reset();
         toast({
-            title: "Successfully added your song.",
+            title: "Successfully edited your song.",
             description: `${values.title} - ${values.source}`,
             variant: "success",
         });

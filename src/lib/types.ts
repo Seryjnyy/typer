@@ -7,4 +7,8 @@ export type Song = {
     content: string;
     cover: string;
     completion: number;
+    record: {
+        accuracy: number;
+        chpm: number;
+    };
 };

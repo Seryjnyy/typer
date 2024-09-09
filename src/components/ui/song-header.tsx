@@ -4,21 +4,37 @@ import PlayButton from "../play-button";
 import { Song } from "@/lib/types";
 import { cva, type VariantProps } from "class-variance-authority";
 
-const SongBanner = ({
-    song,
-    className,
-    playButton,
-}: {
+const songBannerVariants = cva("", {
+    variants: {
+        size: {
+            default: "h-12 w-12",
+            large: "h-[6rem] w-[6rem]",
+        },
+    },
+    defaultVariants: {
+        size: "default",
+    },
+});
+
+interface SongBannerProps extends VariantProps<typeof songBannerVariants> {
     song: Song;
     className?: string;
     playButton?: boolean;
-}) => {
+}
+
+const SongBanner = ({
+    song,
+    className,
+    size,
+    playButton = true,
+}: SongBannerProps) => {
     return (
         <div
             className={cn(
-                "h-12 w-12 rounded-md flex justify-center items-center",
+                songBannerVariants({ size: size }),
                 className,
-                song.cover
+                song.cover,
+                "rounded-md flex justify-center items-center"
                 // "bg-gradient-to-bl from-yellow-200 to-violet-800"
             )}
         >

@@ -91,9 +91,7 @@ export default function VersePage() {
     };
 
     return (
-        <div
-            className={cn("h-full flex", queueWindowOpen ? "" : "pr-[15.5rem]")}
-        >
+        <div className={cn("h-full flex", queueWindowOpen ? "" : "pr-[15rem]")}>
             {/* <Stats>
         {
             <Button variant={"secondary"} onClick={onRestart}>
@@ -101,7 +99,7 @@ export default function VersePage() {
             </Button>
         }
     </Stats> */}
-            <div className="flex flex-col">
+            <div className="flex flex-col border-r w-[15rem]">
                 <div className="p-12">
                     <BackButton link="/" />
                 </div>
