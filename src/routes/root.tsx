@@ -10,7 +10,7 @@ import Window from "../window";
 function Root() {
     return (
         <div>
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <ThemeProvider defaultTheme="dark-rose" storageKey="vite-ui-theme">
                 <TooltipProvider delayDuration={100}>
                     <div className="h-screen">
                         <div className="md:hidden flex justify-center h-full items-center">
@@ -31,7 +31,6 @@ function Root() {
                             </nav>
                         </div>
                     </div>
-
                     <Toaster />
                 </TooltipProvider>
             </ThemeProvider>

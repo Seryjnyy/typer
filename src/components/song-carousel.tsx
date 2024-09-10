@@ -15,10 +15,14 @@ interface SongCarouselProps {
 }
 
 export default function SongCarousel({ songs }: SongCarouselProps) {
-    const enqueu = useQueueStore.use.enqueue();
+    const enqueue = useQueueStore.use.enqueue();
 
     const onEnqueueAll = () => {
-        songs.forEach((song) => enqueu(song.id));
+        songs.forEach((song) => enqueue(song.id));
+    };
+
+    const onEnqueue = (song: Song) => {
+        enqueue(song.id);
     };
 
     return (
@@ -49,6 +53,7 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
                                 variant={"ghost"}
                                 size={"sm"}
                                 className="ml-3 self-end"
+                                onClick={() => onEnqueue(song)}
                             >
                                 Enqueue
                             </Button>

@@ -14,6 +14,7 @@ import VersePage from "./routes/typer/verse/verse-page";
 import TyperTestPage from "./routes/typer/typer-page-test";
 import SongPage from "./routes/song/song-page";
 import SongsList from "./routes/song/songs-list";
+import Test from "./test";
 
 const router = createBrowserRouter([
     {
@@ -25,7 +26,8 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <TyperTestPage />,
+                // element: <TyperTestPage />,
+                element: <Test />,
             },
             { path: "verse", element: <VersePage /> },
             {
@@ -33,6 +35,7 @@ const router = createBrowserRouter([
                 element: <SongsWindow />,
                 children: [
                     {
+                        path: "/songs",
                         element: <SongsList />,
                         index: true,
                     },

@@ -10,7 +10,7 @@ export default function SettingsWindow() {
     if (
         current != "storage" &&
         current != "appearance" &&
-        current != "progress" &&
+        // current != "progress" &&
         current != "" &&
         split.length != 2
     ) {
@@ -20,7 +20,7 @@ export default function SettingsWindow() {
     const links = [
         { link: "storage", label: "Storage" },
         { link: "appearance", label: "Appearance" },
-        { link: "progress", label: "Progress" },
+        // { link: "progress", label: "Progress" },
     ];
 
     return (

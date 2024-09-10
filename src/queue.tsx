@@ -24,10 +24,11 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useToast } from "./components/ui/use-toast";
 
 export default function Queue() {
     const uiState = useUiStateStore();
-
+    const { toast } = useToast();
     const queue = useQueueStore();
     const setQueueSongs = useQueueStore.use.setSongs();
 
@@ -61,7 +62,7 @@ export default function Queue() {
     };
 
     return (
-        <div className="h-full border py-4  w-[15rem]">
+        <div className="h-full border-l py-4  w-[15rem]">
             <div className="flex justify-between px-2">
                 <h3 className="font-semibold">Up next</h3>
                 <AutoplayButton />

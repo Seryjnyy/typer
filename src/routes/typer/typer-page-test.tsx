@@ -103,9 +103,12 @@ const Stats = ({
 
 const NoSongSelected = () => {
     const songs = useSongStore.use.songs();
-    const shuffled = shuffleArray(songs);
-    const shortened = shuffled.slice(0, Math.min(shuffled.length, 10));
     const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
+
+    const shortened = useMemo(() => {
+        const shuffled = shuffleArray(songs);
+        return shuffled.slice(0, Math.min(shuffled.length, 10));
+    }, [songs]);
 
     console.log(shortened.length);
 

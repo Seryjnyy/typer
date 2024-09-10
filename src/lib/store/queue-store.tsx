@@ -14,8 +14,12 @@ type State = {
 type Actions = {
     // setLoop:(val:number)=>void;
     setSongs: (songs: string[]) => void;
-    enqueue: (songId: string, position?: number) => void;
-    playNow: (songId: string) => void;
+    enqueue: (
+        songId: string,
+        setNewCurrent?: boolean,
+        position?: number
+    ) => void;
+    // playNow: (songId: string) => void;
     queueNext: (songId: string) => void;
     removeSong: (songId: string) => void;
     setCurrent: (newCurrentSong: string) => void;
@@ -33,7 +37,6 @@ const defaults: State = {
     // loop: 0,
 };
 
-// TODO : Idk If I like having queue logic everywhere
 const useQueueStoreBase = create<State & Actions>()(
     persist(
         (set, get) => ({
@@ -80,7 +83,7 @@ const useQueueStoreBase = create<State & Actions>()(
                     return { songs: songs, current: null };
                 }),
             setAutoplay: (autoplay) => set(() => ({ autoplay: autoplay })),
-            enqueue: (songId, position) =>
+            enqueue: (songId, setNewCurrent, position) =>
                 set(() => {
                     const state = get();
                     // Already in queue
@@ -89,8 +92,11 @@ const useQueueStoreBase = create<State & Actions>()(
                     }
 
                     // If no songs in queue set this new one as current
-                    const current =
-                        state.songs.length == 0 ? songId : state.current;
+                    let current = state.current;
+                    if (setNewCurrent) {
+                        current =
+                            state.songs.length == 0 ? songId : state.current;
+                    }
 
                     // Insert in position or else just append
                     if (position && position >= 0 && position) {
@@ -113,48 +119,37 @@ const useQueueStoreBase = create<State & Actions>()(
                         };
                     }
                 }),
-            playNow: (songId) =>
-                set(() => {
-                    const state = get();
-                    // Already in queue
-                    if (state.songs.find((x) => x == songId) != null) {
-                        return { songs: state.songs };
-                    }
+            // playNow: (songId) =>
+            //     set(() => {
+            //         const state = get();
 
-                    // If empty
-                    if (state.songs.length == 0) {
-                    } else {
-                    }
-                    // If no songs in queue set this new one as current
-                    const current =
-                        state.songs.length == 0 ? songId : state.current;
+            //         // Already in queue
+            //         if (state.songs.find((x) => x == songId) != null) {
+            //             return { songs: state.songs };
+            //         }
 
-                    // Insert in position or else just append
-                    // if(position && position >= 0 && position){
-                    //   // Check if position is valid
+            //         // If empty
+            //         if (state.songs.length == 0) {
+            //         } else {
+            //         }
+            //         // If no songs in queue set this new one as current
+            //         const current =
+            //             state.songs.length == 0 ? songId : state.current;
 
-                    //   state.
-                    //   const currentIndex = state.songs.findIndex(x => x == current)
-
-                    //   //
-                    //   if(position ==  currentIndex){
-
-                    //   }
-
-                    //   return {}
-                    // }else{
-
-                    // }
-                    return {
-                        songs: [...state.songs, songId],
-                        current: current,
-                    };
-                }),
+            //         return {
+            //             songs: [...state.songs, songId],
+            //             current: current,
+            //         };
+            //     }),
             queueNext: (songId) =>
                 set(() => {
                     const state = get();
                     // Already in queue
                     if (state.songs.find((x) => x == songId) != null) {
+                        // const filtered = state.songs.filter(
+                        //     (song) => song != songId
+                        // );
+
                         return { songs: state.songs };
                     }
 
@@ -162,21 +157,6 @@ const useQueueStoreBase = create<State & Actions>()(
                     const current =
                         state.songs.length == 0 ? songId : state.current;
 
-                    // Insert in position or else just append
-                    // if(position && position >= 0 && position){
-                    //   // Check if position is valid
-
-                    //   const currentIndex = state.songs.findIndex(x => x == current)
-
-                    //   //
-                    //   if(position ==  currentIndex){
-
-                    //   }
-
-                    //   return {}
-                    // }else{
-
-                    // }
                     return {
                         songs: [...state.songs, songId],
                         current: current,
@@ -213,6 +193,9 @@ const useQueueStoreBase = create<State & Actions>()(
             getNextSong: () => {
                 const state = get();
 
+                // If no current return null
+                if (state.current == null) return null;
+
                 const currentIndex = state.songs.findIndex(
                     (songID) => songID == state.current
                 );
@@ -226,10 +209,14 @@ const useQueueStoreBase = create<State & Actions>()(
             getPrevSong: () => {
                 const state = get();
 
+                // If no current return null
+                if (state.current == null) return null;
+
                 const currentIndex = state.songs.findIndex(
                     (songID) => songID == state.current
                 );
 
+                // Couldn't find current in list
                 if (currentIndex == -1) return null;
 
                 if (currentIndex - 1 < 0) return null;

@@ -125,7 +125,7 @@ export default function BottomNav() {
     if (uiState.focus) return <></>;
 
     return (
-        <div className="w-full  flex flex-col justify-start border  h-full ">
+        <div className="w-full  flex flex-col justify-start   h-full ">
             <Progress
                 value={
                     (songProgress.songTypedChar / songProgress.songTotalChar) *

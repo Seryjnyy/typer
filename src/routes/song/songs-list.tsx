@@ -23,7 +23,7 @@ import {
 import { useQueueStore } from "../../lib/store/queue-store";
 import { useSongStore } from "../../lib/store/song-store";
 import { ScrollArea } from "../../components/ui/scroll-area";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CreateSongForm from "./create-song-form";
 
 const AllSongs = () => {

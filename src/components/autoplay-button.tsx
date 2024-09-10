@@ -19,17 +19,6 @@ export default function AutoplayButton() {
 
     return (
         <Button variant={"ghost"} onClick={onSwitchAutoplay} size={"sm"}>
-            {/* <div className=" flex gap-2  rounded-md">
-<div className="bg-card p-1 rounded-lg">
-<PauseIcon className="text-card-foreground" />
-</div>
-<div className="bg-card p-1 rounded-lg border">
-<PlayIcon className="text-card-foreground  " />
-</div>
-</div> */}
-            {/* <span className="text-xs">
-                    {queue.autoplay ? "auto" : "manual"}
-                    </span> */}
             <Tooltip>
                 <TooltipTrigger asChild>
                     <div className="flex items-center gap-2">

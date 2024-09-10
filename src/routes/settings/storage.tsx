@@ -1,3 +1,15 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,6 +25,7 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { toast } from "@/components/ui/use-toast";
 import { useSongStore } from "@/lib/store/song-store";
 import { formatBytes } from "@/lib/utils";
 import { LabelList, Pie, PieChart } from "recharts";
@@ -63,10 +76,22 @@ export default function Storage() {
         },
     } satisfies ChartConfig;
 
-    // TODO : Should have confirm dialog
-    // TODO : Should have snackbar
     const onClearSongs = () => {
         setSongs([]);
+
+        toast({
+            title: "Cleared songs.",
+            description: `Successfully cleared all stored songs.`,
+        });
+    };
+
+    const onClearLocalStorage = () => {
+        localStorage.clear();
+
+        toast({
+            title: "Cleared localStorage.",
+            description: `Successfully removed everything the app stored in localStorage.`,
+        });
     };
 
     return (
@@ -153,9 +178,30 @@ export default function Storage() {
                         </CardDescription>
                     </CardHeader>
                     <CardFooter className="p-0 pr-4">
-                        <Button variant={"destructive"} onClick={onClearSongs}>
-                            Clear
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant={"destructive"}>Clear</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will
+                                        permanently delete your stored songs.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction onClick={onClearSongs}>
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </CardFooter>
                 </Card>
                 <Card className="flex justify-between items-center border border-destructive">
@@ -167,7 +213,33 @@ export default function Storage() {
                         </CardDescription>
                     </CardHeader>
                     <CardFooter className="p-0 pr-4">
-                        <Button variant={"destructive"}>Clear</Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant={"destructive"}>Clear</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will
+                                        permanently remove everything stored by
+                                        this app in localStorage.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={onClearLocalStorage}
+                                    >
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </CardFooter>
                 </Card>
             </div>
