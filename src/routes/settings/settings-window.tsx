@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router";
 import { Link } from "react-router-dom";
-import { ScrollArea } from "./components/ui/scroll-area";
+import { ScrollArea } from "../../components/ui/scroll-area";
 
 export default function SettingsWindow() {
     const location = useLocation();

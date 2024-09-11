@@ -9,7 +9,8 @@ export type chVariant =
     | "not-covered"
     | "correct"
     | "incorrect"
-    | "incorrect-space";
+    | "incorrect-space"
+    | "normal";
 
 export const chVariants = cva("", {
     variants: {
@@ -18,10 +19,11 @@ export const chVariants = cva("", {
             current:
                 "rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] before:animate-pulse duration-100 text-muted-foreground",
             "not-covered": "text-muted-foreground",
-            correct: "text-green-200",
-            incorrect: "text-red-200",
+            correct: "text-green-800",
+            incorrect: "text-red-800",
             "incorrect-space":
                 "rounded-md bg-red-300 inline-block max-h-[1px] min-h-[1px] w-1",
+            normal: "",
         },
     },
     defaultVariants: {

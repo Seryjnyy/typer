@@ -10,27 +10,23 @@ import {
     ShuffleIcon,
 } from "@radix-ui/react-icons";
 import { useMemo } from "react";
-import { Button } from "./components/ui/button";
-import { useQueueStore } from "./lib/store/queue-store";
-import { useSongProgressStore } from "./lib/store/song-progress-store";
-import { useSongStore } from "./lib/store/song-store";
-import { useUiStateStore } from "./lib/store/ui-state-store";
-import { cn } from "./lib/utils";
+import { Button } from "./ui/button";
+import { useQueueStore } from "../lib/store/queue-store";
+import { useSongProgressStore } from "../lib/store/song-progress-store";
+import { useSongStore } from "../lib/store/song-store";
+import { useUiStateStore } from "../lib/store/ui-state-store";
+import { cn } from "../lib/utils";
 import QueueControl from "./queue-control";
-import WindowControls from "./window-controls";
-import ShuffleButton from "./components/shuffle-button";
-import {
-    SongBanner,
-    SongDetail,
-    SongHeader,
-} from "./components/ui/song-header";
+import ShuffleButton from "./shuffle-button";
+import { SongBanner, SongDetail, SongHeader } from "./ui/song-header";
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import LoopButton from "./components/loop-button";
+import LoopButton from "./loop-button";
 import { useNavigate } from "react-router-dom";
+import WindowControls from "./window-controls";
 
 const MediaControl = () => {
     const navigate = useNavigate();
@@ -49,9 +45,9 @@ const MediaControl = () => {
                         <Button
                             onClick={onPlaySong}
                             size={"icon"}
-                            className="rounded-full"
+                            className="rounded-full w-11 h-11"
                         >
-                            <PlayIcon className="w-5 h-5" />
+                            <PlayIcon className="w-6 h-6" />
                         </Button>
                     </TooltipTrigger>
 

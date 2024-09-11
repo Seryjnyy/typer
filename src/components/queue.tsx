@@ -6,25 +6,21 @@ import {
 } from "@hello-pangea/dnd";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { useMemo } from "react";
-import PlayButton from "./components/play-button";
-import { Button } from "./components/ui/button";
-import { useQueueStore } from "./lib/store/queue-store";
-import { useSongStore } from "./lib/store/song-store";
-import { useUiStateStore } from "./lib/store/ui-state-store";
-import { cn } from "./lib/utils";
-import AutoplayButton from "./components/autoplay-button";
-import {
-    SongHeader,
-    SongBanner,
-    SongDetail,
-} from "./components/ui/song-header";
-import { ScrollArea } from "./components/ui/scroll-area";
+import PlayButton from "./play-button";
+import { Button } from "./ui/button";
+import { useQueueStore } from "../lib/store/queue-store";
+import { useSongStore } from "../lib/store/song-store";
+import { useUiStateStore } from "../lib/store/ui-state-store";
+import { cn } from "../lib/utils";
+import AutoplayButton from "./autoplay-button";
+import { SongHeader, SongBanner, SongDetail } from "./ui/song-header";
+import { ScrollArea } from "./ui/scroll-area";
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useToast } from "./components/ui/use-toast";
+import { useToast } from "./ui/use-toast";
 
 export default function Queue() {
     const uiState = useUiStateStore();
@@ -62,9 +58,9 @@ export default function Queue() {
     };
 
     return (
-        <div className="h-full border-l py-4  w-[15rem]">
+        <div className="h-full border rounded-md py-4  w-[15rem]">
             <div className="flex justify-between px-2">
-                <h3 className="font-semibold">Up next</h3>
+                <h3 className="font-semibold text-xl pl-1">Up next</h3>
                 <AutoplayButton />
             </div>
 

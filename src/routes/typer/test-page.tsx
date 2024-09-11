@@ -1,33 +1,21 @@
+import { Button } from "@/components/ui/button";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongProgressStore } from "@/lib/store/song-progress-store";
 import { useSongStore } from "@/lib/store/song-store";
-import {
-    Cross1Icon,
-    HamburgerMenuIcon,
-    PlusIcon,
-    ReloadIcon,
-    TrackNextIcon,
-    TrackPreviousIcon,
-} from "@radix-ui/react-icons";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useUiStateStore } from "@/lib/store/ui-state-store";
+import { Song } from "@/lib/types";
+import { calculateAccuracy, chpm, cn } from "@/lib/utils";
+import { Handlers, ProgressManager, SongData } from "@/routes/typer/typing";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { ReactNode, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-timer-hook";
-import { Button } from "@/components/ui/button";
-import { calculateAccuracy, chpm, cn, shuffleArray } from "@/lib/utils";
-import Typing, { Handlers, ProgressManager, SongData } from "./typing";
-import { Song } from "@/lib/types";
-import { useUiStateStore } from "@/lib/store/ui-state-store";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import Stat from "./stat";
 import EndScreen from "./end-screen";
-import BackButton from "@/components/ui/back-button";
+
+import Test from "./test";
+
 import { Progress } from "@/components/ui/progress";
-import SongCarousel from "@/components/song-carousel";
+import Stat from "./stat";
 
 const Stats = ({
     onRestart,
@@ -48,7 +36,7 @@ const Stats = ({
     return (
         <div
             className={cn(
-                "  border rounded-md flex flex-col  w-[15rem] pt-[8.3rem] h-full",
+                "  border-r flex flex-col  w-[15rem] pt-[8.3rem]",
                 className
             )}
         >
@@ -101,62 +89,7 @@ const Stats = ({
     );
 };
 
-const NoSongSelected = () => {
-    const songs = useSongStore.use.songs();
-    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
-
-    const shortened = useMemo(() => {
-        const shuffled = shuffleArray(songs);
-        return shuffled.slice(0, Math.min(shuffled.length, 10));
-    }, [songs]);
-
-    console.log(shortened.length);
-
-    return (
-        <div
-            className={cn(
-                "flex h-[calc(100vh-4rem)] w-full items-center pt-12 flex-col ",
-                isQueueWindowOpen ? "" : "pl-[15rem]"
-            )}
-        >
-            <h2 className="font-bold text-3xl">No song selected.</h2>
-            <div className="flex flex-col justify-center items-center pt-16">
-                {songs.length > 0 && (
-                    <div className="space-y-1">
-                        <h3 className=" text-muted-foreground mx-auto w-fit text-md">
-                            Here are some of your songs.
-                        </h3>
-
-                        <SongCarousel songs={shortened} />
-                    </div>
-                )}
-                {songs.length > 0 && (
-                    <div className="font-bold text-muted-foreground py-8">
-                        or
-                    </div>
-                )}
-                <div className="flex flex-col gap-3">
-                    {songs.length == 0 && (
-                        <div className="flex flex-col justify-center items-center">
-                            <span className="text-sm text-muted-foreground">
-                                Seems like you don't have any songs yet :/
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                                No worries you can add some.
-                            </span>
-                        </div>
-                    )}
-                    <Button className="space-x-2" variant={"secondary"}>
-                        <PlusIcon />
-                        <span>Add new song</span>
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default function TyperTestPage() {
+export default function TestPage() {
     const currentSongInQueue = useQueueStore.use.current();
     const songList = useSongStore.use.songs();
 
@@ -194,20 +127,21 @@ export default function TyperTestPage() {
         autoStart: false,
     });
 
-    const { song, songData }: { song: Song | null; songData: SongData } =
-        useMemo(() => {
-            const s = songList.find((x) => x.id == currentSongInQueue);
-            if (!s)
-                return { song: null, songData: { song: "", songStripped: "" } };
+    const songData: {
+        song: Song;
+        songContent: { full: string; stripped: string };
+    } | null = useMemo(() => {
+        const s = songList.find((x) => x.id == currentSongInQueue);
+        if (!s) return null;
 
-            return {
-                song: s,
-                songData: {
-                    song: s.content,
-                    songStripped: s.content.replace(/(\r\n|\n|\r)/gm, ""),
-                },
-            };
-        }, [songList, currentSongInQueue]);
+        return {
+            song: s,
+            songContent: {
+                full: s.content,
+                stripped: s.content.replace(/(\r\n|\n|\r)/gm, ""),
+            },
+        };
+    }, [songList, currentSongInQueue]);
 
     const progressManager: ProgressManager = {
         userInput: userInput,
@@ -237,9 +171,9 @@ export default function TyperTestPage() {
                 next();
             }
 
-            if (!song) return;
+            if (!songData) return;
 
-            editSongCompletion(song.id, song.completion + 1);
+            editSongCompletion(songData.song.id, songData.song.completion + 1);
 
             const resultChpm =
                 timeElapsed == 0
@@ -248,12 +182,12 @@ export default function TyperTestPage() {
 
             const resultAcc = calculateAccuracy(correct, userInput.length);
             if (
-                resultChpm > song.record.chpm ||
-                (resultChpm == song.record.chpm &&
-                    resultAcc > song.record.accuracy)
+                resultChpm > songData.song.record.chpm ||
+                (resultChpm == songData.song.record.chpm &&
+                    resultAcc > songData.song.record.accuracy)
             ) {
                 // TODO : Set song record
-                editSongRecord(song.id, {
+                editSongRecord(songData.song.id, {
                     chpm: resultChpm,
                     accuracy: resultAcc,
                 });
@@ -261,7 +195,7 @@ export default function TyperTestPage() {
         },
         onClickVerse: (verse: string) => {
             navigate("/verse", {
-                state: { content: verse, id: song?.id ?? "" },
+                state: { content: verse, id: songData?.song.id ?? "" },
             });
         },
     };
@@ -275,41 +209,21 @@ export default function TyperTestPage() {
         setTimeElapsed(totalSeconds);
     }, [totalSeconds]);
 
+    console.log(completed ? "song-completed" : "not-completed");
     return (
-        <div className={cn("h-full flex", queueWindowOpen ? "" : "pr-[15rem]")}>
-            {song != null && (
-                <div className="p-2">
-                    <Stats
-                        onRestart={onRestart}
-                        // className={song == null ? "invisible" : "visible"}
-                    >
-                        {/* {
-                <Button variant={"secondary"} onClick={onRestart}>
-                    reset song progress
-                </Button>
-            } */}
-                    </Stats>
-                </div>
+        <Test
+            songData={songData}
+            progressManager={progressManager}
+            handlers={handlers}
+            tryVerseOption={true}
+        >
+            <Stats onRestart={onRestart} className="absolute left-0" />
+            {!autoplay && completed && (
+                <EndScreen
+                    onRestart={onRestart}
+                    userInputLength={userInput.length}
+                />
             )}
-            {song != null && (
-                <div className="w-full p-2">
-                    <Typing
-                        songData={songData}
-                        progressManager={progressManager}
-                        handlers={handlers}
-                        tryVerseOption={true}
-                    >
-                        {!autoplay && completed && (
-                            <EndScreen
-                                onRestart={onRestart}
-                                userInputLength={userInput.length}
-                            />
-                        )}
-                    </Typing>
-                </div>
-            )}
-
-            {song == null && <NoSongSelected />}
-        </div>
+        </Test>
     );
 }

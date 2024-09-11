@@ -114,15 +114,16 @@ export default function Typing({
 
     // console.log("rerender");
     return (
-        <div className="relative h-full w-full overflow-y-hidden">
+        <div className="relative h-full w-full overflow-y-hidden border  rounded-md">
             <ScrollArea className="h-full  relative">
                 <div className="w-full h-full ">
                     <div className="flex justify-start">
                         <div className="flex justify-center w-full py-24 relative">
                             <div
-                            // className={
-                            //     queueWindowOpen ? "" : "pr-[15.5rem]"
-                            // }
+                                className="text-2xl font-semibold"
+                                // className={
+                                //     queueWindowOpen ? "" : "pr-[15.5rem]"
+                                // }
                             >
                                 {songData.song != "" && element}
                             </div>

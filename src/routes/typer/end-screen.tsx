@@ -98,7 +98,7 @@ export default function EndScreen({
     return (
         <div
             className={cn(
-                "absolute w-[98%] h-[60vh] backdrop-blur-[6px] border rounded-xl  flex justify-center right-[1%]",
+                "absolute w-[98%] h-[60vh] backdrop-blur-[6px] border rounded-xl  flex justify-center right-[1%] top-[10%] z-40",
                 { "h-9 w-9 border-none": !open }
             )}
         >

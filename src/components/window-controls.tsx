@@ -1,10 +1,9 @@
 import { FileTextIcon, GearIcon, KeyboardIcon } from "@radix-ui/react-icons";
-import { Button } from "./components/ui/button";
-import { useUiStateStore } from "./lib/store/ui-state-store";
-import { Windows } from "./lib/types";
 import { ReactNode } from "react";
-import { cn } from "./lib/utils";
+
 import { Link, useLocation } from "react-router-dom";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 export default function WindowControls() {
     const location = useLocation();
     const locationSplit = location.pathname.split("/");

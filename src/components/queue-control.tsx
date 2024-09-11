@@ -1,6 +1,6 @@
 import { TrackNextIcon, TrackPreviousIcon } from "@radix-ui/react-icons";
-import { Button } from "./components/ui/button";
-import { useQueueStore } from "./lib/store/queue-store";
+import { Button } from "./ui/button";
+import { useQueueStore } from "../lib/store/queue-store";
 import { ReactNode } from "react";
 import {
     Tooltip,
@@ -13,13 +13,13 @@ export default function QueueControl({ children }: { children?: ReactNode }) {
     const playPrev = useQueueStore.use.prev();
 
     return (
-        <div className="space-x-1">
+        <div className="space-x-1 flex items-center">
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
                         onClick={playPrev}
                         size={"icon"}
-                        variant={"outline"}
+                        variant={"secondary"}
                         className="rounded-full"
                     >
                         <TrackPreviousIcon />
@@ -36,7 +36,7 @@ export default function QueueControl({ children }: { children?: ReactNode }) {
                     <Button
                         onClick={playNext}
                         size={"icon"}
-                        variant={"outline"}
+                        variant={"secondary"}
                         className="rounded-full"
                     >
                         <TrackNextIcon />

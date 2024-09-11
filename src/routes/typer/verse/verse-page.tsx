@@ -92,89 +92,83 @@ export default function VersePage() {
 
     return (
         <div className={cn("h-full flex", queueWindowOpen ? "" : "pr-[15rem]")}>
-            {/* <Stats>
-        {
-            <Button variant={"secondary"} onClick={onRestart}>
-                reset song progress
-            </Button>
-        }
-    </Stats> */}
-            <div className="flex flex-col border-r w-[15rem]">
-                <div className="p-12">
-                    <BackButton link="/" />
-                </div>
-                <div className="mx-2 space-y-4">
-                    <div className="border p-2 rounded-md">
-                        <span className="font-semibold">Verse from:</span>
-                        {song ? (
-                            <SongHeader>
-                                <SongBanner
-                                    song={song}
-                                    playButton={false}
-                                ></SongBanner>
-                                <SongDetail isCurrent={true} song={song} />
-                            </SongHeader>
-                        ) : (
-                            <div className="bg-secondary rounded-md text-sm p-2">
-                                Missing data.
-                            </div>
-                        )}
+            <div className="p-2">
+                <div className="flex flex-col border rounded-md w-[15rem] h-full">
+                    <div className="p-12">
+                        <BackButton link="/" />
                     </div>
-                    <div className="border rounded-md  p-2">
-                        <Stat title="time" stat={totalSeconds} append="s" />
-                        <Stat
-                            title="chpm"
-                            stat={
-                                totalSeconds == 0
-                                    ? userInput.length
-                                    : chpm(userInput.length, totalSeconds)
-                            }
-                        />
-                        <Stat
-                            title="accuracy"
-                            stat={calculateAccuracy(correct, userInput.length)}
-                            append="%"
-                        />
-                        <Stat
-                            title="ch"
-                            stat={`${userInput.length}/${songData.songStripped.length}`}
-                        />
-                    </div>
-                    <Button
-                        className="w-full"
-                        variant={"outline"}
-                        onClick={onRestart}
-                    >
-                        <ReloadIcon />
-                    </Button>
-                    <div className="space-y-1">
-                        <Progress
-                            value={
-                                (userInput.length /
-                                    songData.songStripped.length) *
-                                100
-                            }
-                        />
-                        {userInput.length == songData.songStripped.length && (
-                            <div className="text-primary flex justify-center text-xs uppercase opacity-80">
-                                <span>complete</span>
-                            </div>
-                        )}
+                    <div className="mx-2 space-y-4">
+                        <div className="border p-2 rounded-md">
+                            <span className="font-semibold">Verse from:</span>
+                            {song ? (
+                                <SongHeader>
+                                    <SongBanner
+                                        song={song}
+                                        playButton={false}
+                                    ></SongBanner>
+                                    <SongDetail isCurrent={true} song={song} />
+                                </SongHeader>
+                            ) : (
+                                <div className="bg-secondary rounded-md text-sm p-2">
+                                    Missing data.
+                                </div>
+                            )}
+                        </div>
+                        <div className="border rounded-md  p-2">
+                            <Stat title="time" stat={totalSeconds} append="s" />
+                            <Stat
+                                title="chpm"
+                                stat={
+                                    totalSeconds == 0
+                                        ? userInput.length
+                                        : chpm(userInput.length, totalSeconds)
+                                }
+                            />
+                            <Stat
+                                title="accuracy"
+                                stat={calculateAccuracy(
+                                    correct,
+                                    userInput.length
+                                )}
+                                append="%"
+                            />
+                            <Stat
+                                title="ch"
+                                stat={`${userInput.length}/${songData.songStripped.length}`}
+                            />
+                        </div>
+                        <Button
+                            className="w-full"
+                            variant={"outline"}
+                            onClick={onRestart}
+                        >
+                            <ReloadIcon />
+                        </Button>
+                        <div className="space-y-1">
+                            <Progress
+                                value={
+                                    (userInput.length /
+                                        songData.songStripped.length) *
+                                    100
+                                }
+                            />
+                            {userInput.length ==
+                                songData.songStripped.length && (
+                                <div className="text-primary flex justify-center text-xs uppercase opacity-80">
+                                    <span>complete</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-            <Typing
-                songData={songData}
-                progressManager={progressManager}
-                handlers={handlers}
-            >
-                {/* {!autoplay && completed && (
-                    <EndScreen
-                        onRestart={onRestart}
-                        userInputLength={userInput.length}
-                    />
-                )} */}
-            </Typing>
+            <div className="p-2 w-full">
+                <Typing
+                    songData={songData}
+                    progressManager={progressManager}
+                    handlers={handlers}
+                ></Typing>
+            </div>
         </div>
     );
 }

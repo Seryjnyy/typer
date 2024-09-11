@@ -1,11 +1,10 @@
 import { Outlet } from "react-router";
-import BottomNav from "../bottom-nav";
+import BottomNav from "../components/bottom-nav";
 import { ThemeProvider } from "../components/theme-provider";
 import { Toaster } from "../components/ui/toaster";
 import { TooltipProvider } from "../components/ui/tooltip";
-import Queue from "../queue";
+import Queue from "../components/queue";
 import TailwindGradientHack from "../tailwind-gradient-hack/tailwind-gradient-hack";
-import Window from "../window";
 
 function Root() {
     return (
@@ -22,7 +21,7 @@ function Root() {
                                     {/* <Window /> */}
                                     <Outlet />
                                 </div>
-                                <div className="z-20 ">
+                                <div className="z-20 p-2">
                                     <Queue />
                                 </div>
                             </main>
