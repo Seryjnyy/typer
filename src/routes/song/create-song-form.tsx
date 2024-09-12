@@ -15,13 +15,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { songSchema, songSchemaType } from "@/lib/schemas/song";
 import { useSongStore } from "@/lib/store/song-store";
-import { cn, generateGradient } from "@/lib/utils";
+import {
+    cn,
+    generateGradient,
+    seeSizeOfStringInLocalStorage,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { seeSizeOfStringInLocalStorage } from "../settings/storage";
 
 export default function CreateSongForm({
     onSuccess,

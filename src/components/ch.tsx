@@ -6,24 +6,29 @@ import React, { forwardRef, HTMLAttributes } from "react";
 export type chVariant =
     | "start-of-line"
     | "current"
+    | "currentInvisible"
     | "not-covered"
     | "correct"
     | "incorrect"
     | "incorrect-space"
-    | "normal";
+    | "normal"
+    | "normalInvisible";
 
 export const chVariants = cva("", {
     variants: {
         variant: {
             "start-of-line": "bg-purple-400",
             current:
-                "rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] before:animate-pulse duration-100 text-muted-foreground",
+                "rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] animate-pulse duration-1500 text-muted-foreground",
+            currentInvisible:
+                "invisible before:visible rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] animate-pulse duration-1500 text-muted-foreground",
             "not-covered": "text-muted-foreground",
-            correct: "text-green-800",
-            incorrect: "text-red-800",
+            correct: "text-green-200",
+            incorrect: "text-red-200",
             "incorrect-space":
-                "rounded-md bg-red-300 inline-block max-h-[1px] min-h-[1px] w-1",
+                "rounded-md bg-red-300 inline-block max-h-[1px] min-h-[1px] w-2",
             normal: "",
+            normalInvisible: "invisible",
         },
     },
     defaultVariants: {

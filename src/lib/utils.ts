@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 
 import { twMerge } from "tailwind-merge";
+import { TextModificationOptions } from "./store/text-modifications-store";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -132,3 +133,35 @@ export function generateGradient() {
 
     return res;
 }
+
+export const seeSizeOfStringInLocalStorage = (some: string) => {
+    return some ? 3 + (some.length * 16) / (8 * 1024) + " KB" : "Empty (0 KB)";
+};
+
+// I think leave as strings for now so its extendable, like punctuation = ".,/"
+
+export const textModification = (
+    s: string,
+    options: TextModificationOptions
+) => {
+    // console.log(s);
+    let res = s;
+
+    if (options?.punctuation == "removed") {
+        res = res.replace(/[^a-zA-Z0-9 \r\n]/g, "");
+    }
+
+    if (options?.numbers == "removed") {
+        res = res.replace(/\d/g, "");
+    }
+
+    if (options?.letterCase == "lower") {
+        res = res.toLocaleLowerCase();
+    }
+
+    if (options?.letterCase == "upper") {
+        // console.log("being called");
+        res = res.toLocaleUpperCase();
+    }
+    return res;
+};

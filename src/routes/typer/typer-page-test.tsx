@@ -1,33 +1,19 @@
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongProgressStore } from "@/lib/store/song-progress-store";
 import { useSongStore } from "@/lib/store/song-store";
-import {
-    Cross1Icon,
-    HamburgerMenuIcon,
-    PlusIcon,
-    ReloadIcon,
-    TrackNextIcon,
-    TrackPreviousIcon,
-} from "@radix-ui/react-icons";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useUiStateStore } from "@/lib/store/ui-state-store";
+import { Song } from "@/lib/types";
+import { calculateAccuracy, chpm, cn } from "@/lib/utils";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { ReactNode, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-timer-hook";
-import { Button } from "@/components/ui/button";
-import { calculateAccuracy, chpm, cn, shuffleArray } from "@/lib/utils";
-import Typing, { Handlers, ProgressManager, SongData } from "./typing";
-import { Song } from "@/lib/types";
-import { useUiStateStore } from "@/lib/store/ui-state-store";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import Stat from "./stat";
 import EndScreen from "./end-screen";
-import BackButton from "@/components/ui/back-button";
-import { Progress } from "@/components/ui/progress";
-import SongCarousel from "@/components/song-carousel";
+import Stat from "./stat";
+import Typing, { Handlers, ProgressManager, SongData } from "./typing";
+import NoSongSelected from "./no-song-selected";
 
 const Stats = ({
     onRestart,
@@ -97,61 +83,6 @@ const Stats = ({
             </div>
 
             <div className="flex flex-col gap-2 pt-4">{children}</div>
-        </div>
-    );
-};
-
-const NoSongSelected = () => {
-    const songs = useSongStore.use.songs();
-    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
-
-    const shortened = useMemo(() => {
-        const shuffled = shuffleArray(songs);
-        return shuffled.slice(0, Math.min(shuffled.length, 10));
-    }, [songs]);
-
-    console.log(shortened.length);
-
-    return (
-        <div
-            className={cn(
-                "flex h-[calc(100vh-4rem)] w-full items-center pt-12 flex-col ",
-                isQueueWindowOpen ? "" : "pl-[15rem]"
-            )}
-        >
-            <h2 className="font-bold text-3xl">No song selected.</h2>
-            <div className="flex flex-col justify-center items-center pt-16">
-                {songs.length > 0 && (
-                    <div className="space-y-1">
-                        <h3 className=" text-muted-foreground mx-auto w-fit text-md">
-                            Here are some of your songs.
-                        </h3>
-
-                        <SongCarousel songs={shortened} />
-                    </div>
-                )}
-                {songs.length > 0 && (
-                    <div className="font-bold text-muted-foreground py-8">
-                        or
-                    </div>
-                )}
-                <div className="flex flex-col gap-3">
-                    {songs.length == 0 && (
-                        <div className="flex flex-col justify-center items-center">
-                            <span className="text-sm text-muted-foreground">
-                                Seems like you don't have any songs yet :/
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                                No worries you can add some.
-                            </span>
-                        </div>
-                    )}
-                    <Button className="space-x-2" variant={"secondary"}>
-                        <PlusIcon />
-                        <span>Add new song</span>
-                    </Button>
-                </div>
-            </div>
         </div>
     );
 };

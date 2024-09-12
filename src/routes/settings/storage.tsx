@@ -25,12 +25,17 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
+import {
+    QueueStorage as QueueStorageType,
+    usePreferenceStore,
+} from "@/lib/store/preferences-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { formatBytes } from "@/lib/utils";
 import { LabelList, Pie, PieChart } from "recharts";
 
-var localStorageSpace = function () {
+const localStorageSpace = () => {
     var allStrings = "";
     for (var key in window.localStorage) {
         if (window.localStorage.hasOwnProperty(key)) {
@@ -40,8 +45,75 @@ var localStorageSpace = function () {
     return allStrings ? 3 + allStrings.length * 16 : 0;
 };
 
-export const seeSizeOfStringInLocalStorage = (some: string) => {
-    return some ? 3 + (some.length * 16) / (8 * 1024) + " KB" : "Empty (0 KB)";
+const QueueStorage = () => {
+    const queueStoragePreference = usePreferenceStore.use.queueStorage();
+    const setQueueStoragePreference = usePreferenceStore.use.setQueueStorage();
+
+    const options: {
+        id: string;
+        title: string;
+        desc: string;
+        value: QueueStorageType;
+    }[] = [
+        {
+            id: "localStorage",
+            title: "localStorage",
+            value: "localStorage",
+            desc: "Items in the queue will persist even after closing the window. The queue will be the same across all instances of the app.",
+        },
+        {
+            id: "sessionStorage",
+            title: "sessionStorage",
+            value: "sessionStorage",
+            desc: "Items in the queue will persist only as long as the window is open. The queue will also be unique to each instance of the app.",
+        },
+    ];
+
+    return (
+        <div className="space-y-2">
+            <h2 className="text-2xl font-semibold pb-2">Queue</h2>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Queue storage</CardTitle>
+                    <CardDescription>How the queue is stored.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-2">
+                        {options.map((option) => (
+                            <div className="border rounded-md p-2 flex justify-between">
+                                <div className="flex flex-col" key={option.id}>
+                                    <span className="text-lg font-semibold">
+                                        {option.title}
+                                    </span>
+                                    <p className="text-muted-foreground text-sm md:pr-12 pl-2">
+                                        {option.desc}
+                                    </p>
+                                </div>
+                                <div className="flex justify-center items-center px-4 border-l ">
+                                    <Checkbox
+                                        checked={
+                                            queueStoragePreference ==
+                                            option.value
+                                        }
+                                        onCheckedChange={() => {
+                                            setQueueStoragePreference(
+                                                option.value
+                                            );
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+                <CardFooter className="border-t pt-4">
+                    <p className="text-xs text-muted-foreground">
+                        This will require a page refresh to take effect.
+                    </p>
+                </CardFooter>
+            </Card>
+        </div>
+    );
 };
 
 export default function Storage() {
@@ -156,18 +228,7 @@ export default function Storage() {
                     </CardFooter>
                 </Card>
             </div>
-            <div className="space-y-2">
-                <h2 className="text-2xl font-semibold pb-2">Queue</h2>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Queue stuff</CardTitle>
-                        <CardDescription>Some queue stuff.</CardDescription>
-                    </CardHeader>
-                    <CardFooter>
-                        {/* <Button variant={"destructive"}>Clear</Button> */}
-                    </CardFooter>
-                </Card>
-            </div>
+            <QueueStorage />
             <div className="space-y-2">
                 <h2 className="text-2xl font-semibold pb-2">Danger zone</h2>
                 <Card className="flex justify-between items-center border border-destructive">

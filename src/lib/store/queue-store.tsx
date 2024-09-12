@@ -37,6 +37,19 @@ const defaults: State = {
     // loop: 0,
 };
 
+// Check if user has a preference for the queue storage
+let preferredStorageType = "localStorage";
+const preferenceStore = localStorage.getItem("typer-preferences-storage");
+if (preferenceStore) {
+    const storedQueueStoragePreference =
+        JSON.parse(preferenceStore).state?.queueStorage;
+
+    if (storedQueueStoragePreference) {
+        preferredStorageType = storedQueueStoragePreference;
+    }
+    console.log(storedQueueStoragePreference);
+}
+
 const useQueueStoreBase = create<State & Actions>()(
     persist(
         (set, get) => ({
@@ -226,7 +239,11 @@ const useQueueStoreBase = create<State & Actions>()(
         }),
         {
             name: "typer-queue-storage",
-            storage: createJSONStorage(() => sessionStorage),
+            storage:
+                preferredStorageType == "localStorage"
+                    ? createJSONStorage(() => localStorage)
+                    : createJSONStorage(() => sessionStorage),
+            // storage: createJSONStorage(() => localStorage),
         }
     )
 );

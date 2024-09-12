@@ -64,7 +64,7 @@ const TyperTextDisplayOption = () => {
     return (
         <>
             {options.map((option) => (
-                <div className="w-fit">
+                <div className="w-fit" key={option.title}>
                     {option.element}
                     <div className="flex justify-between px-2 pt-1">
                         <span className="text-sm font-semibold ">
@@ -103,8 +103,8 @@ export default function Appearance() {
                                 .sort((x) =>
                                     x.split("-")[0] == "light" ? -1 : 1
                                 )
-                                .map((themeName) => {
-                                    if (themeName == "root") return <></>;
+                                .map((themeName, i) => {
+                                    if (themeName == "root") return null;
                                     return (
                                         <div
                                             key={themeName}
