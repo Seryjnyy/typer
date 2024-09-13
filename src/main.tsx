@@ -14,6 +14,7 @@ import SongsWindow from "./routes/song/songs-window";
 import TyperTestPage from "./routes/typer/typer-page-test";
 import VersePage from "./routes/typer/verse/verse-page";
 import TestPage from "./routes/typer/test-page";
+import EditSong from "./routes/song/edit-song";
 
 const router = createBrowserRouter([
     {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
                     {
                         path: "/songs/:songID",
                         element: <SongPage />,
+                    },
+                    {
+                        path: "/songs/:songID/edit",
+                        element: <EditSong />,
                     },
                 ],
             },

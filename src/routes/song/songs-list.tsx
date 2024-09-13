@@ -9,6 +9,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     DotsHorizontalIcon,
+    EyeOpenIcon,
     Pencil1Icon,
     PlusIcon,
     TrashIcon,
@@ -32,6 +33,7 @@ const AllSongs = () => {
 
     const currentSong = useQueueStore.use.current();
     const enqueue = useQueueStore.use.enqueue();
+    const queueNext = useQueueStore.use.queueNext();
 
     const navigate = useNavigate();
 
@@ -40,15 +42,16 @@ const AllSongs = () => {
     };
 
     return (
-        <div className="relative h-full">
+        <div className="relative h-full ">
             {/* <Button>Add all to queue</Button> */}
             <ScrollArea className="h-[calc(100%)] pr-3 ">
                 {/* <div className="space-y-2  pr-2"> */}
                 <div className="flex flex-col gap-2">
                     {songs.map((song, index) => (
                         <div
-                            className="border p-4  group hover:bg-secondary rounded-md flex justify-between items-center"
+                            className="border p-4  group hover:bg-secondary rounded-md flex justify-between items-center "
                             key={song.id}
+                            onClick={() => navigate(`/songs/${song.id}`)}
                         >
                             <div className="flex gap-4 items-center">
                                 <div className="text-muted group-hover:text-foreground">
@@ -66,7 +69,7 @@ const AllSongs = () => {
                             </div>
 
                             <div className="flex justify-between items-center gap-4">
-                                <div className="flex gap-4 border border-dashed p-2 rounded-lg">
+                                <div className="flex gap-4 border border-dashed  p-2 rounded-lg">
                                     <span className="text-xs text-muted-foreground">
                                         {song.record.accuracy}%
                                     </span>
@@ -81,14 +84,20 @@ const AllSongs = () => {
                                 <Button
                                     className="space-x-1"
                                     size={"sm"}
-                                    onClick={() => onAddToQueue(song.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onAddToQueue(song.id);
+                                    }}
                                     variant={"outline"}
                                 >
                                     <PlusIcon />
                                     <span> Queue</span>
                                 </Button>
                                 <Button
-                                    onClick={() => removeSong(song.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeSong(song.id);
+                                    }}
                                     className="space-x-1 "
                                     variant={"destructive"}
                                 >
@@ -96,41 +105,64 @@ const AllSongs = () => {
                                 </Button>
                                 <div>
                                     <DropdownMenu>
-                                        <DropdownMenuTrigger>
+                                        <DropdownMenuTrigger className="p-2">
                                             <DotsHorizontalIcon />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
                                             <DropdownMenuItem
                                                 className="space-x-1"
-                                                onClick={() =>
-                                                    onAddToQueue(song.id)
-                                                }
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onAddToQueue(song.id);
+                                                }}
                                             >
                                                 <PlusIcon />
                                                 <span> Queue</span>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="space-x-1">
+                                            {/* <DropdownMenuItem className="space-x-1">
                                                 <PlusIcon />
                                                 <span> Playlist</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="space-x-1">
+                                            </DropdownMenuItem> */}
+                                            <DropdownMenuItem
+                                                className="space-x-1"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    queueNext(song.id);
+                                                }}
+                                            >
                                                 <PlusIcon />
                                                 <span> Next</span>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem
                                                 className="space-x-1"
-                                                onClick={() =>
-                                                    navigate(`./${song.id}`)
-                                                }
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`./${song.id}`);
+                                                }}
+                                            >
+                                                <EyeOpenIcon />
+                                                <span>View more</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                className="space-x-1"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(
+                                                        `./${song.id}/edit`
+                                                    );
+                                                }}
                                             >
                                                 <Pencil1Icon />
                                                 <span>Edit</span>
                                             </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
                                             <DropdownMenuItem
-                                                onClick={() =>
-                                                    removeSong(song.id)
-                                                }
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    removeSong(song.id);
+                                                }}
                                                 className="space-x-1 text-destructive"
                                             >
                                                 <TrashIcon />
@@ -163,16 +195,13 @@ export default function SongsList() {
                     Add song
                 </TabsTrigger>
             </TabsList>
-            <TabsContent
-                value="all-songs"
-                className=" h-[calc(100%-1rem)] px-12"
-            >
+            <TabsContent value="all-songs" className=" h-[100%] px-12">
                 <div className="h-full w-full">
                     <AllSongs />
                 </div>
             </TabsContent>
             {/* <TabsContent value="playlists">playlists</TabsContent> */}
-            <TabsContent value="add-song" className=" h-[calc(100%-1rem)]">
+            <TabsContent value="add-song" className=" h-[100%] ">
                 <CreateSongForm />
             </TabsContent>
         </Tabs>

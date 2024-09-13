@@ -17,6 +17,7 @@ export type TextModificationOptions = {
 export type HarderOptions = {
     cantSeeAhead: boolean;
     cantSeeCurrent: boolean;
+    cantSeeUnderlines: boolean;
 };
 
 type State = {
@@ -27,6 +28,8 @@ type State = {
 type Actions = {
     setTextModifications: (val: TextModificationOptions) => void;
     setHarderOptions: (val: HarderOptions) => void;
+    resetTextModifications: () => void;
+    resetHarderOptions: () => void;
 };
 
 const defaults: State = {
@@ -38,6 +41,7 @@ const defaults: State = {
     harderOptions: {
         cantSeeAhead: false,
         cantSeeCurrent: false,
+        cantSeeUnderlines: false,
     },
 };
 
@@ -52,6 +56,14 @@ const useTextModificationsStoreBase = create<State & Actions>()(
             setHarderOptions: (val: HarderOptions) =>
                 set(() => {
                     return { harderOptions: val };
+                }),
+            resetHarderOptions: () =>
+                set(() => {
+                    return { harderOptions: defaults.harderOptions };
+                }),
+            resetTextModifications: () =>
+                set(() => {
+                    return { textModifications: defaults.textModifications };
                 }),
         }),
         {

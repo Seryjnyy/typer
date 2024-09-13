@@ -93,7 +93,15 @@ const useQueueStoreBase = create<State & Actions>()(
                 set(() => ({ current: newCurrentSong })),
             setSongs: (songs) =>
                 set(() => {
-                    return { songs: songs, current: null };
+                    let current = null;
+
+                    // If current song is in the new song list then make it still be current
+                    const state = get();
+                    if (songs.find((x) => x == state.current)) {
+                        current = state.current;
+                    }
+
+                    return { songs: songs, current: current };
                 }),
             setAutoplay: (autoplay) => set(() => ({ autoplay: autoplay })),
             enqueue: (songId, setNewCurrent, position) =>
@@ -156,6 +164,7 @@ const useQueueStoreBase = create<State & Actions>()(
             //     }),
             queueNext: (songId) =>
                 set(() => {
+                    // TODO : Doesn't work
                     const state = get();
                     // Already in queue
                     if (state.songs.find((x) => x == songId) != null) {

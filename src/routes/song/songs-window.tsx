@@ -4,7 +4,7 @@ import { Outlet, useParams } from "react-router";
 
 export default function SongsWindow() {
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full ">
             <Outlet />
         </div>
     );

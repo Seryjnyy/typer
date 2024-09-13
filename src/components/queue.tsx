@@ -4,7 +4,7 @@ import {
     Droppable,
     DropResult,
 } from "@hello-pangea/dnd";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { Cross1Icon, FileTextIcon } from "@radix-ui/react-icons";
 import { useMemo } from "react";
 import PlayButton from "./play-button";
 import { Button } from "./ui/button";
@@ -21,6 +21,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToast } from "./ui/use-toast";
+import { Icons } from "./icons";
+import { Link } from "react-router-dom";
 
 export default function Queue() {
     const uiState = useUiStateStore();
@@ -57,6 +59,10 @@ export default function Queue() {
         setQueueSongs([]);
     };
 
+    const onAddRandomSongs = () => {
+        console.error("Not implemented add random songs.");
+    };
+
     return (
         <div className="h-full border rounded-md py-4  w-[15rem]">
             <div className="flex justify-between px-2">
@@ -69,7 +75,7 @@ export default function Queue() {
                 <Droppable droppableId="queue">
                     {(provided) => (
                         <ScrollArea
-                            className=" h-[calc(100%-1rem)] pl-1 pr-3 pb-1"
+                            className=" h-[calc(100%-1rem)] pl-1 pr-3 pb-1 "
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                         >
@@ -144,6 +150,30 @@ export default function Queue() {
                                 </Draggable>
                             ))}
                             {provided.placeholder}
+                            {queue.songs.length == 0 && (
+                                <div className="mt-[72vh]">
+                                    <Link to={"/songs"}>
+                                        <Button
+                                            className="w-full mt-1 text-xs text-muted-foreground gap-2 flex justify-start"
+                                            variant={"ghost"}
+                                            size={"sm"}
+                                            onClick={onClearQueue}
+                                        >
+                                            <FileTextIcon />
+                                            <span>View song list</span>
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        className="w-full mt-1 text-xs text-muted-foreground gap-2 flex justify-start"
+                                        variant={"ghost"}
+                                        size={"sm"}
+                                        onClick={onAddRandomSongs}
+                                    >
+                                        <Icons.dice className="w-4 h-4" />
+                                        <span>Add random songs</span>
+                                    </Button>
+                                </div>
+                            )}
                             {queue.songs.length > 0 && (
                                 <Button
                                     className="w-full mt-1 text-xs text-muted-foreground"

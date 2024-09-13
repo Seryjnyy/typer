@@ -24,7 +24,7 @@ export default function SettingsWindow() {
     ];
 
     return (
-        <main className="min-h-[calc(100vh_-_theme(spacing.16))]  flex-1 flex gap-4   md:gap-8 ">
+        <main className="min-h-[calc(100vh-4rem)]  flex-1 flex gap-4   md:gap-8 ">
             <div className="mx-auto w-fit max-w-6xl gap-2  p-8 md:p-16 space-y-8">
                 <h1 className="text-3xl font-semibold">Settings</h1>
                 <nav className="grid gap-4 text-sm text-muted-foreground ">
@@ -46,7 +46,7 @@ export default function SettingsWindow() {
                 </nav>
             </div>
             <div className="w-full max-w-6xl items-start gap-6 h-full ">
-                <ScrollArea className="h-[calc(100vh-4rem)] pb-4 w-full px-3  ">
+                <ScrollArea className="h-[calc(100vh-5rem)] pb- w-full px-3  rounded-md">
                     <div className="w-full py-12 md:px-18 lg:px-24">
                         <Outlet />
                     </div>

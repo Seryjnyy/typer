@@ -17,7 +17,7 @@ function Root() {
                         </div>
                         <div className="hidden sm:flex flex-col h-full justify-end">
                             <main className="flex-grow w-full  flex justify-between z-0 h-[calc(100vh-4rem)]">
-                                <div className="z-0 w-full ">
+                                <div className="z-0 w-full border my-2 ml-2 rounded-md ">
                                     <Outlet />
                                 </div>
                                 <div className="z-20 p-2">

@@ -35,7 +35,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTextModificationsStore } from "@/lib/store/text-modifications-store";
 import { Toggle } from "@/components/ui/toggle";
-import Ch from "@/components/ch";
+import Ch, { chVariant } from "@/components/ch";
 
 const Stats = ({
     onRestart,
@@ -109,6 +109,51 @@ const Stats = ({
     );
 };
 
+const CurrentView = () => {
+    const harderOptions = useTextModificationsStore.use.harderOptions();
+    const txtMod = useTextModificationsStore.use.textModifications();
+
+    let before = textModification("Som", txtMod);
+    let current = textModification("e", txtMod);
+    let after = textModification("good song lyrics yeah!1", txtMod);
+    let currentChVariant: chVariant = "current";
+    let afterChVariant: chVariant = "normal";
+
+    console.log(harderOptions);
+
+    if (harderOptions.cantSeeAhead) {
+        after = after.replace(/[^ ]/g, "_");
+
+        if (!harderOptions.cantSeeUnderlines) {
+            afterChVariant = "normal";
+        } else {
+            afterChVariant = "normalInvisible";
+        }
+    }
+
+    if (harderOptions.cantSeeCurrent) {
+        current = current.replace(/[^ ]/g, "_");
+
+        if (!harderOptions.cantSeeUnderlines) {
+            currentChVariant = "current";
+        } else {
+            currentChVariant = "currentInvisible";
+        }
+    }
+
+    return (
+        <div className="w-full border rounded-md p-2 flex items-center flex-col">
+            <span className="text-sm font-bold pb-1 text-muted-foreground">
+                Your current view
+            </span>
+            <div className="border rounded p-2 w-full">
+                <Ch variant={"correct"}>{before}</Ch>
+                <Ch variant={currentChVariant}>{current}</Ch>{" "}
+                <Ch variant={afterChVariant}>{after}</Ch>
+            </div>
+        </div>
+    );
+};
 const TextModificationDialog = () => {
     const txtMod = useTextModificationsStore.use.textModifications();
     const setTxtMod = useTextModificationsStore.use.setTextModifications();
@@ -135,12 +180,17 @@ const TextModificationDialog = () => {
 
     const harderOptions = useTextModificationsStore.use.harderOptions();
     const setHarderOptions = useTextModificationsStore.use.setHarderOptions();
+    const resetHarderOptions =
+        useTextModificationsStore.use.resetHarderOptions();
+    const resetTextModifications =
+        useTextModificationsStore.use.resetTextModifications();
 
     const onChangeCantSeeAhead = (val: boolean) => {
         setHarderOptions({
             ...harderOptions,
             cantSeeAhead: val,
             cantSeeCurrent: !val ? false : harderOptions.cantSeeCurrent,
+            cantSeeUnderlines: !val ? false : harderOptions.cantSeeUnderlines,
         });
     };
 
@@ -148,29 +198,57 @@ const TextModificationDialog = () => {
         setHarderOptions({ ...harderOptions, cantSeeCurrent: val });
     };
 
+    const onChangeCantSeeUnderlines = (val: boolean) => {
+        setHarderOptions({ ...harderOptions, cantSeeUnderlines: val });
+    };
+
+    const onResetAll = () => {
+        resetHarderOptions();
+        resetTextModifications;
+    };
+
     const isHarderOptionsChanged =
-        harderOptions.cantSeeAhead || harderOptions.cantSeeCurrent;
+        harderOptions.cantSeeAhead ||
+        harderOptions.cantSeeCurrent ||
+        harderOptions.cantSeeUnderlines;
     return (
         <Dialog>
             <DialogTrigger className="group p-2">
                 <div className="relative ">
                     <GearIcon className="group-hover:text-primary" />
-                    {isTxtModificationChanged && isHarderOptionsChanged && (
-                        <span className="text-primary absolute bottom-0 left-3">
+                    {isTxtModificationChanged && (
+                        <span className="text-emerald-400 absolute bottom-0 left-2 font-bold">
+                            *
+                        </span>
+                    )}
+
+                    {isHarderOptionsChanged && (
+                        <span className="text-red-600 absolute bottom-0 right-2 font-bold">
                             *
                         </span>
                     )}
                 </div>
             </DialogTrigger>
-            <DialogContent className="h-[70vh] flex flex-col">
-                <DialogHeader>
-                    <DialogTitle>Text modification</DialogTitle>
-                    <DialogDescription>
-                        Change what is included in the text.
+            <DialogContent className="h-[72vh] flex flex-col">
+                <DialogHeader className="relative">
+                    <Button
+                        className="absolute -top-[1.17rem] right-4"
+                        size={"icon"}
+                        variant={"ghost"}
+                        onClick={onResetAll}
+                    >
+                        <ReloadIcon className="w-3 h-3" />
+                    </Button>
+                    <DialogTitle className="sr-only">
+                        Text modification
+                    </DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Make it easier by changing the text or make it harder by
+                        changing how things are displayed.
                     </DialogDescription>
                 </DialogHeader>
-                <Tabs defaultValue="easier" className="space-y-8">
-                    <TabsList className="w-full">
+                <Tabs defaultValue="easier" className="pt-4">
+                    <TabsList className="w-full mb-3">
                         <TabsTrigger value="easier" className="w-full">
                             Easier
                         </TabsTrigger>
@@ -178,7 +256,7 @@ const TextModificationDialog = () => {
                             Harder
                         </TabsTrigger>
                     </TabsList>
-                    <TabsContent value="easier">
+                    <TabsContent value="easier" className="">
                         <div className="p-2 space-y-2">
                             <div className="border rounded-sm p-2 space-y-2">
                                 <span className="text-xl font-bold">
@@ -298,72 +376,133 @@ const TextModificationDialog = () => {
                         </div>
                     </TabsContent>
                     <TabsContent value="harder">
-                        <div className="p-2">
-                            <div className="border rounded-sm p-2 space-y-2">
-                                <span className="text-xl font-bold">
-                                    Text
-                                    {harderOptions.cantSeeAhead ||
-                                    harderOptions.cantSeeCurrent ? (
-                                        <span className="text-primary">*</span>
-                                    ) : (
-                                        ""
-                                    )}{" "}
-                                    <span className="text-xs text-muted-foreground">
-                                        {"(Underlines not included.)"}
+                        <div className="p-2 space-y-8">
+                            <CurrentView />
+                            <div>
+                                {" "}
+                                <div className="border rounded-sm p-2 space-y-2">
+                                    <span className="text-xl font-bold">
+                                        Modifiers
+                                        {harderOptions.cantSeeAhead ||
+                                        harderOptions.cantSeeCurrent ? (
+                                            <span className="text-primary">
+                                                *
+                                            </span>
+                                        ) : (
+                                            ""
+                                        )}{" "}
+                                        <span className="text-xs text-muted-foreground">
+                                            {"(Pick and choose.)"}
+                                        </span>
                                     </span>
-                                </span>
-                                <div className="flex  items-center gap-1 ml-2">
-                                    <div>
-                                        <div className="flex flex-col justify-center items-center rounded-sm border p-2 w-fit space-y-1">
-                                            <div className="border rounded p-2 w-full">
-                                                <Ch variant={"correct"}>Som</Ch>
-                                                <Ch variant={"current"}>
-                                                    c
-                                                </Ch>{" "}
-                                                ____ __
-                                            </div>
-                                            <Toggle
-                                                pressed={
-                                                    harderOptions.cantSeeAhead
-                                                }
-                                                onPressedChange={(val) =>
-                                                    onChangeCantSeeAhead(val)
-                                                }
-                                            >
-                                                Can't see ahead
-                                            </Toggle>
-                                        </div>
-                                    </div>
-                                    <div className="h-full">
-                                        <ArrowRightIcon />
-                                    </div>
-
-                                    <div>
-                                        <div className="flex flex-col justify-center items-center rounded-sm border p-2 w-fit space-y-1">
-                                            <div className="border rounded p-2 w-full">
-                                                <Ch variant={"correct"}>Som</Ch>
-                                                <Ch
-                                                    variant={"currentInvisible"}
+                                    <div className="flex  items-center gap-1 ml-2">
+                                        <div>
+                                            <div className="flex flex-col justify-center items-center rounded-sm border p-2 w-fit space-y-1">
+                                                <div className="border rounded p-2 w-full">
+                                                    <Ch variant={"correct"}>
+                                                        Som
+                                                    </Ch>
+                                                    <Ch variant={"current"}>
+                                                        e
+                                                    </Ch>{" "}
+                                                    ____ __
+                                                </div>
+                                                <Toggle
+                                                    pressed={
+                                                        harderOptions.cantSeeAhead
+                                                    }
+                                                    onPressedChange={(val) =>
+                                                        onChangeCantSeeAhead(
+                                                            val
+                                                        )
+                                                    }
                                                 >
-                                                    c
-                                                </Ch>{" "}
-                                                ____ __
+                                                    Can't see ahead
+                                                </Toggle>
                                             </div>
-                                            <Toggle
-                                                pressed={
-                                                    harderOptions.cantSeeCurrent
-                                                }
-                                                onPressedChange={(val) =>
-                                                    onChangeCantSeeCurrent(val)
-                                                }
-                                                disabled={
-                                                    !harderOptions.cantSeeAhead
-                                                }
-                                            >
-                                                Can't see current
-                                            </Toggle>
+                                        </div>
+                                        <div className="h-full">
+                                            <ArrowRightIcon />
+                                        </div>
+
+                                        <div className="space-y-2 w-fit">
+                                            <div>
+                                                <div className="flex flex-col justify-center items-center rounded-sm border p-2 space-y-1 w-full">
+                                                    <div className="border rounded p-2 w-full">
+                                                        <Ch variant={"correct"}>
+                                                            Som
+                                                        </Ch>
+                                                        <Ch
+                                                            variant={
+                                                                "currentInvisible"
+                                                            }
+                                                        >
+                                                            e
+                                                        </Ch>{" "}
+                                                        ____ __
+                                                    </div>
+                                                    <Toggle
+                                                        pressed={
+                                                            harderOptions.cantSeeCurrent
+                                                        }
+                                                        onPressedChange={(
+                                                            val
+                                                        ) =>
+                                                            onChangeCantSeeCurrent(
+                                                                val
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !harderOptions.cantSeeAhead
+                                                        }
+                                                    >
+                                                        Can't see current
+                                                    </Toggle>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div className="flex flex-col justify-center items-center rounded-sm border p-2 w-full space-y-1">
+                                                    <div className="border rounded p-2 w-full">
+                                                        <Ch variant={"correct"}>
+                                                            Som
+                                                        </Ch>
+                                                        <Ch variant={"current"}>
+                                                            e
+                                                        </Ch>{" "}
+                                                    </div>
+                                                    <Toggle
+                                                        pressed={
+                                                            harderOptions.cantSeeUnderlines
+                                                        }
+                                                        onPressedChange={(
+                                                            val
+                                                        ) =>
+                                                            onChangeCantSeeUnderlines(
+                                                                val
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !harderOptions.cantSeeAhead
+                                                        }
+                                                    >
+                                                        Can't see underlines
+                                                    </Toggle>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div className="pt-2">
+                                    <Button
+                                        className=" space-x-2 text-muted-foreground "
+                                        size={"sm"}
+                                        variant={"ghost"}
+                                        onClick={resetHarderOptions}
+                                    >
+                                        <ReloadIcon className="w-3 h-3" />
+                                        <span>reset harder options</span>
+                                    </Button>
                                 </div>
                             </div>
                         </div>

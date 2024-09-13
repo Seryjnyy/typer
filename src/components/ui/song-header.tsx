@@ -9,6 +9,7 @@ const songBannerVariants = cva("", {
         size: {
             default: "h-12 w-12",
             large: "h-[6rem] w-[6rem]",
+            extraLarge: "h-[10rem] w-[10rem]",
         },
     },
     defaultVariants: {
@@ -34,11 +35,18 @@ const SongBanner = ({
                 songBannerVariants({ size: size }),
                 className,
                 song.cover,
-                "rounded-md flex justify-center items-center"
+                "rounded-md flex justify-center items-center relative"
                 // "bg-gradient-to-bl from-yellow-200 to-violet-800"
             )}
         >
-            {playButton && <PlayButton songID={song.id} />}
+            {playButton && (
+                <div className="z-40 peer">
+                    <PlayButton songID={song.id} />
+                </div>
+            )}
+            {playButton && (
+                <div className="w-full h-full hover:backdrop-brightness-75 absolute rounded-md z-20 peer-hover:backdrop-brightness-75"></div>
+            )}
         </div>
     );
 };
@@ -51,6 +59,7 @@ const songDetailVariants = cva(
                 default: "max-w-[4.2rem] ",
                 long: "max-w-[8rem] ",
                 "extra-long": "max-w-[10rem] ",
+                full: "w-full",
             },
         },
         defaultVariants: {

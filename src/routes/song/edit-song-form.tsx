@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -35,6 +35,7 @@ export default function EditSongForm({
     const { toast } = useToast();
     const formRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    const [coverForRerender, setCoverForRerender] = useState(song.cover);
 
     const form = useForm<songSchemaType>({
         resolver: zodResolver(songSchema),
@@ -49,14 +50,23 @@ export default function EditSongForm({
     function onSubmit(values: songSchemaType) {
         console.log(values);
 
-        songStore.addSong({
-            id: uuidv4(),
+        let completion = song.completion;
+        let record = { accuracy: song.record.accuracy, chpm: song.record.chpm };
+
+        if (values.content != song.content) {
+            completion = 0;
+            record = { accuracy: 0, chpm: 0 };
+        }
+
+        // TODO : I don't like this icl
+        songStore.editSong({
+            id: song.id,
             title: values.title,
             content: values.content,
             source: values.source,
-            completion: 0,
+            completion: completion,
             cover: generateGradient(),
-            record: { accuracy: 0, chpm: 0 },
+            record: record,
         });
 
         form.reset();
@@ -74,7 +84,52 @@ export default function EditSongForm({
         <Form {...form}>
             {/* <Autocomplete /> */}
             {/* <Test /> */}
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8 mt-8"
+            >
+                <FormField
+                    control={form.control}
+                    name="cover"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>
+                                Cover{" "}
+                                {field.value != song.cover ? (
+                                    <span className="text-primary">*</span>
+                                ) : (
+                                    ""
+                                )}
+                            </FormLabel>
+                            <FormControl>
+                                <div className="flex gap-2 items-end">
+                                    <div
+                                        className={cn(
+                                            field.value,
+                                            "w-20 h-20 rounded-md"
+                                        )}
+                                    ></div>
+                                    <Button
+                                        type="button"
+                                        variant={"outline"}
+                                        onClick={() => {
+                                            const newGradient =
+                                                generateGradient();
+                                            form.setValue("cover", newGradient);
+                                            setCoverForRerender(newGradient);
+                                        }}
+                                    >
+                                        <Icons.dice className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </FormControl>
+                            <FormDescription className="sr-only">
+                                This is the cover of the song.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <FormField
                     control={form.control}
                     name="title"
@@ -145,49 +200,8 @@ export default function EditSongForm({
                         </FormItem>
                     )}
                 />
-                <FormField
-                    control={form.control}
-                    name="cover"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Cover{" "}
-                                {field.value != song.cover ? (
-                                    <span className="text-primary">*</span>
-                                ) : (
-                                    ""
-                                )}
-                            </FormLabel>
-                            <FormControl>
-                                <div className="flex gap-2 items-end">
-                                    <div
-                                        className={cn(
-                                            field.value,
-                                            "w-20 h-20 rounded-md"
-                                        )}
-                                    ></div>
-                                    <Button
-                                        type="button"
-                                        variant={"outline"}
-                                        onClick={() =>
-                                            form.setValue(
-                                                "cover",
-                                                generateGradient()
-                                            )
-                                        }
-                                    >
-                                        <Icons.dice className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            </FormControl>
-                            <FormDescription className="sr-only">
-                                This is the cover of the song.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <div className="space-x-4 pt-8">
+
+                <div className="flex justify-between pt-8">
                     <Button
                         type="button"
                         variant={"ghost"}
@@ -197,6 +211,7 @@ export default function EditSongForm({
                     >
                         Cancel
                     </Button>
+
                     <Button
                         type="submit"
                         disabled={

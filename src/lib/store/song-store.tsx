@@ -15,6 +15,7 @@ interface Store {
         id: string,
         record: { chpm: number; accuracy: number }
     ) => void;
+    editSong: (song: Song) => void;
 }
 
 const useSongStoreBase = create<Store>()(
@@ -63,6 +64,13 @@ const useSongStoreBase = create<Store>()(
 
                     return {
                         songs: [...songs, { ...song, record: record }],
+                    };
+                }),
+            editSong: (song) =>
+                set(() => {
+                    const filtered = get().songs.filter((x) => x.id != song.id);
+                    return {
+                        songs: [...filtered, song],
                     };
                 }),
         }),

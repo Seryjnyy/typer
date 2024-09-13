@@ -92,16 +92,50 @@ export default function CreateSongForm({
         if (onSuccess) onSuccess();
     }
 
-    console.log(form.getValues().cover);
     return (
-        <ScrollArea className="h-[calc(100%)] px-12 pb-2">
+        <ScrollArea className="h-[100%] px-12 pb-2 rounded-md overflow-hidden">
             <Form {...form}>
                 {/* <Autocomplete /> */}
                 {/* <Test /> */}
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8"
+                    className="space-y-8 mt-8"
                 >
+                    <FormField
+                        control={form.control}
+                        name="cover"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Cover</FormLabel>
+                                <FormControl>
+                                    <div className="flex gap-2 items-end">
+                                        <div
+                                            className={cn(
+                                                field.value,
+                                                "w-20 h-20 rounded-md"
+                                            )}
+                                        ></div>
+                                        <Button
+                                            type="button"
+                                            variant={"outline"}
+                                            onClick={() =>
+                                                form.setValue(
+                                                    "cover",
+                                                    generateGradient()
+                                                )
+                                            }
+                                        >
+                                            <Icons.dice className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </FormControl>
+                                <FormDescription className="sr-only">
+                                    This is the cover of the song.
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <FormField
                         control={form.control}
                         name={"title"}
@@ -151,41 +185,7 @@ export default function CreateSongForm({
                             </FormItem>
                         )}
                     />
-                    <FormField
-                        control={form.control}
-                        name="cover"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Cover</FormLabel>
-                                <FormControl>
-                                    <div className="flex gap-2 items-end">
-                                        <div
-                                            className={cn(
-                                                field.value,
-                                                "w-20 h-20 rounded-md"
-                                            )}
-                                        ></div>
-                                        <Button
-                                            type="button"
-                                            variant={"outline"}
-                                            onClick={() =>
-                                                form.setValue(
-                                                    "cover",
-                                                    generateGradient()
-                                                )
-                                            }
-                                        >
-                                            <Icons.dice className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </FormControl>
-                                <FormDescription className="sr-only">
-                                    This is the cover of the song.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+
                     <Button type="submit">Submit</Button>
                 </form>
             </Form>

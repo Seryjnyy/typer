@@ -167,9 +167,29 @@ const convertStuff = (
 
                 if (chIndex > userInput.length) {
                     // not covered yet
+
+                    if (difficultyModifiers.cantSeeAhead) {
+                        if (ch != " ") {
+                            ch = "_";
+                        }
+
+                        if (!difficultyModifiers.cantSeeUnderlines) {
+                            variant = "normal";
+                        } else {
+                            variant = "normalInvisible";
+                        }
+                    }
                 } else if (chIndex == userInput.length) {
                     if (difficultyModifiers.cantSeeCurrent) {
-                        variant = "currentInvisible";
+                        if (ch != " ") {
+                            ch = "_";
+                        }
+
+                        if (!difficultyModifiers.cantSeeUnderlines) {
+                            variant = "current";
+                        } else {
+                            variant = "currentInvisible";
+                        }
                     } else {
                         variant = "current";
                     }
@@ -186,9 +206,9 @@ const convertStuff = (
                     }
                 }
 
-                if (variant == "normal" && difficultyModifiers.cantSeeAhead) {
-                    variant = "normalInvisible";
-                }
+                // if (variant == "normal" && difficultyModifiers.cantSeeAhead) {
+                //     variant = "normalInvisible";
+                // }
 
                 if (chIndex == userInput.length + 1) {
                     currentLine = -lineIndex;
