@@ -21,6 +21,7 @@ import { Progress } from "../../components/ui/progress";
 import { Song } from "../../lib/types";
 import { cn } from "../../lib/utils";
 import { HarderOptions } from "@/lib/store/text-modifications-store";
+import KeyboardButton from "@/components/keyboard-button";
 
 export interface ProgressManager {
     userInput: string;
@@ -266,15 +267,10 @@ const convertStuff = (
                         <TooltipProvider delayDuration={1200}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        className="absolute -bottom-4 right-0 group-hover/verse:flex group-hover/verse:bg-primary hidden gap-2 group/button"
-                                        onClick={() => {
-                                            onClickVerse?.(x.verse);
-                                        }}
-                                    >
-                                        <KeyboardIcon />
-                                        <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform opacity-60" />
-                                    </Button>
+                                    <KeyboardButton
+                                        onClick={() => onClickVerse?.(x.verse)}
+                                        variant={"verse"}
+                                    />
                                 </TooltipTrigger>
                                 <TooltipContent className="group-hover/verse:block hidden ">
                                     <p>Attempt this part only. </p>
@@ -633,6 +629,12 @@ export default function Test({
                 className="absolute rotate-90 w-[5rem] left-0 opacity-60"
             />
             {children}
+            {/* <div
+                className={`space-y-2 ${songData?.song.cover} p-12 rounded-md w-[90%] h-[60%] absolute opacity-35`}
+                
+            >
+                Maybe add this idk
+            </div> */}
             {elements}
             <textarea
                 value={progressManager.userInput}

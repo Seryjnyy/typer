@@ -1,3 +1,4 @@
+import { ComboboxDemo } from "@/components/combobox-demo";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -93,89 +94,110 @@ export default function CreateSongForm({
     }
 
     return (
-        <ScrollArea className="h-[100%] px-12 pb-2 rounded-md overflow-hidden">
+        <ScrollArea className="h-[100%] px-12 pb-2 rounded-md overflow-hidden border-t rounded-t-none">
             <Form {...form}>
-                {/* <Autocomplete /> */}
-                {/* <Test /> */}
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8 mt-8"
                 >
-                    <FormField
-                        control={form.control}
-                        name="cover"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Cover</FormLabel>
-                                <FormControl>
-                                    <div className="flex gap-2 items-end">
-                                        <div
-                                            className={cn(
-                                                field.value,
-                                                "w-20 h-20 rounded-md"
-                                            )}
-                                        ></div>
-                                        <Button
-                                            type="button"
-                                            variant={"outline"}
-                                            onClick={() =>
-                                                form.setValue(
-                                                    "cover",
-                                                    generateGradient()
-                                                )
-                                            }
-                                        >
-                                            <Icons.dice className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </FormControl>
-                                <FormDescription className="sr-only">
-                                    This is the cover of the song.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name={"title"}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Title </FormLabel>
-                                <FormControl>
-                                    <Input {...field} ref={formRef} />
-                                </FormControl>
-                                <FormDescription className="sr-only">
-                                    This is the name of the song.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="source"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Source</FormLabel>
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-                                <FormDescription className="sr-only">
-                                    This is the name of the source of the song.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    <div className="flex gap-16 items-end ">
+                        <FormField
+                            control={form.control}
+                            name="cover"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Cover</FormLabel>
+                                    <FormControl>
+                                        <div className="flex gap-2 items-end">
+                                            <div
+                                                className={cn(
+                                                    field.value,
+                                                    "w-20 h-20 rounded-md"
+                                                )}
+                                            ></div>
+                                            <Button
+                                                type="button"
+                                                variant={"outline"}
+                                                onClick={() =>
+                                                    form.setValue(
+                                                        "cover",
+                                                        generateGradient()
+                                                    )
+                                                }
+                                            >
+                                                <Icons.dice className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription className="sr-only">
+                                        This is the cover of the song.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="flex gap-8">
+                            <FormField
+                                control={form.control}
+                                name={"title"}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="space-x-1">
+                                            <span>Title</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                (Song name)
+                                            </span>{" "}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input {...field} ref={formRef} />
+                                        </FormControl>
+                                        <FormDescription className="sr-only">
+                                            This is the name of the song.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="source"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="space-x-1">
+                                            <span>Source</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                (Artist)
+                                            </span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                        <FormDescription className="sr-only">
+                                            This is the name of the source of
+                                            the song.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
                     <FormField
                         control={form.control}
                         name="content"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Content</FormLabel>
+                                <FormLabel className="space-x-1">
+                                    <span>Content</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        (Lyrics)
+                                    </span>
+                                </FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} />
+                                    <Textarea
+                                        className="min-h-[12rem]"
+                                        {...field}
+                                    />
                                 </FormControl>
                                 <FormDescription className="sr-only">
                                     This is the content of the song. It is what

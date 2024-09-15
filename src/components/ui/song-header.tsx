@@ -56,7 +56,7 @@ const songDetailVariants = cva(
     {
         variants: {
             length: {
-                default: "max-w-[4.2rem] ",
+                default: "max-w-[4.7rem]    ",
                 long: "max-w-[8rem] ",
                 "extra-long": "max-w-[10rem] ",
                 full: "w-full",

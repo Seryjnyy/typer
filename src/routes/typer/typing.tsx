@@ -114,7 +114,7 @@ export default function Typing({
 
     // console.log("rerender");
     return (
-        <div className="relative h-full w-full overflow-y-hidden border  rounded-md">
+        <div className="relative h-full w-full overflow-y-hidden  rounded-md">
             <ScrollArea className="h-full  relative">
                 <div className="w-full h-full ">
                     <div className="flex justify-start">

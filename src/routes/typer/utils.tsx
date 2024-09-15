@@ -1,4 +1,5 @@
 import Ch, { chVariant } from "@/components/ch";
+import KeyboardButton from "@/components/keyboard-button";
 import { Button } from "@/components/ui/button";
 import {
     Tooltip,
@@ -102,17 +103,15 @@ export const convertSongToElements = (
                 className={cn(" mb-4 p-2 rounded-md relative group/verse", {
                     "hover:outline": tryVerseOption,
                 })}
-                onClick={() => onClickVerse?.(verse)}
             >
                 {verseElements}
                 {tryVerseOption && (
                     <TooltipProvider delayDuration={1200}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button className="absolute -bottom-4 right-0 group-hover/verse:flex group-hover/verse:bg-primary hidden gap-2 group/button">
-                                    <KeyboardIcon />
-                                    <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform opacity-60" />
-                                </Button>
+                                <KeyboardButton
+                                    onClick={() => onClickVerse?.(verse)}
+                                />
                             </TooltipTrigger>
                             <TooltipContent className="group-hover/verse:block hidden">
                                 <p>Attempt this part only</p>

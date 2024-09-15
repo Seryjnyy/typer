@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { useQueueStore } from "../lib/store/queue-store";
 import { useSongStore } from "../lib/store/song-store";
 import { useUiStateStore } from "../lib/store/ui-state-store";
-import { cn } from "../lib/utils";
+import { cn, shuffleArray } from "../lib/utils";
 import AutoplayButton from "./autoplay-button";
 import { SongHeader, SongBanner, SongDetail } from "./ui/song-header";
 import { ScrollArea } from "./ui/scroll-area";
@@ -60,11 +60,15 @@ export default function Queue() {
     };
 
     const onAddRandomSongs = () => {
-        console.error("Not implemented add random songs.");
+        const randomSongs = shuffleArray(songList).slice(0, 5);
+
+        randomSongs.forEach((song) => {
+            queue.enqueue(song.id, true);
+        });
     };
 
     return (
-        <div className="h-full border rounded-md py-4  w-[15rem]">
+        <div className="h-full border rounded-md py-4  w-[15rem] ">
             <div className="flex justify-between px-2">
                 <h3 className="font-semibold text-xl pl-1">Up next</h3>
                 <AutoplayButton />
@@ -75,7 +79,7 @@ export default function Queue() {
                 <Droppable droppableId="queue">
                     {(provided) => (
                         <ScrollArea
-                            className=" h-[calc(100%-1rem)] pl-1 pr-3 pb-1 "
+                            className=" h-[calc(100%-1rem)]  pl-1 pr-3 pb-1 border-t"
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                         >

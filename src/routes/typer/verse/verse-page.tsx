@@ -21,7 +21,7 @@ export default function VersePage() {
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const songList = useSongStore.use.songs();
     const { state } = useLocation();
-    const { content, id } = state;
+    const { content, id, cameFrom } = state;
 
     const [userInput, setUserInput] = useState("");
     const [completed, setCompleted] = useState(false);
@@ -95,7 +95,7 @@ export default function VersePage() {
             <div className="p-2">
                 <div className="flex flex-col border rounded-md w-[15rem] h-full">
                     <div className="p-12">
-                        <BackButton link="/" />
+                        <BackButton link={cameFrom ?? "/"} />
                     </div>
                     <div className="mx-2 space-y-4">
                         <div className="border p-2 rounded-md">
@@ -162,7 +162,7 @@ export default function VersePage() {
                     </div>
                 </div>
             </div>
-            <div className="p-2 w-full">
+            <div className="w-full">
                 <Typing
                     songData={songData}
                     progressManager={progressManager}

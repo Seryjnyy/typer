@@ -9,13 +9,17 @@ import { useNavigate } from "react-router-dom";
 export default function PlayButton({ songID }: { songID: string }) {
     const navigate = useNavigate();
 
-    const queue = useQueueStore();
+    const songs = useQueueStore.use.songs();
+    const enqueue = useQueueStore.use.enqueue();
+    const current = useQueueStore.use.current();
+    const setCurrent = useQueueStore.use.setCurrent();
+    console.log(current);
 
     const onPlay = (songId: string) => {
-        if (!queue.songs.includes(songId)) {
-            queue.enqueue(songId);
+        if (!songs.includes(songId)) {
+            enqueue(songId, true);
         } else {
-            queue.setCurrent(songId);
+            setCurrent(songId);
         }
 
         navigate("/");
@@ -28,8 +32,8 @@ export default function PlayButton({ songID }: { songID: string }) {
             className="rounded-full hover:bg-background hover:text-foreground"
             variant={"ghost"}
         >
-            {queue.current == songID && <MusicPlaying />}
-            {queue.current != songID && <PlayIcon className="w-5 h-5" />}
+            {current == songID && <MusicPlaying />}
+            {current != songID && <PlayIcon className="w-5 h-5" />}
         </Button>
     );
 }

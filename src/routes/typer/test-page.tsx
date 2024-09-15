@@ -624,7 +624,11 @@ export default function TestPage() {
         },
         onClickVerse: (verse: string) => {
             navigate("/verse", {
-                state: { content: verse, id: songData?.song.id ?? "" },
+                state: {
+                    content: verse,
+                    id: songData?.song.id ?? "",
+                    cameFrom: `/`,
+                },
             });
         },
     };
