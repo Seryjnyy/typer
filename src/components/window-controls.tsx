@@ -4,7 +4,24 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
-export default function WindowControls() {
+import { cva, VariantProps } from "class-variance-authority";
+
+const windowControlVariants = cva("border flex justify-evenly flex-1 h-full", {
+    variants: {
+        variant: {
+            default: "rounded-md",
+            square: "rounded-none",
+        },
+    },
+    defaultVariants: {
+        variant: "default",
+    },
+});
+
+interface WindowControlsProps
+    extends VariantProps<typeof windowControlVariants> {}
+
+export default function WindowControls({ variant }: WindowControlsProps) {
     const location = useLocation();
     const locationSplit = location.pathname.split("/");
     const currentLocation = locationSplit.length > 0 ? locationSplit[1] : "";
@@ -16,7 +33,7 @@ export default function WindowControls() {
     ];
 
     return (
-        <div className="border rounded-md">
+        <div className={windowControlVariants({ variant })}>
             {options.map((option, index) => {
                 let className = "";
                 if (index == 0) {
@@ -27,7 +44,11 @@ export default function WindowControls() {
                 }
 
                 return (
-                    <Link to={option.link[0]} key={option.link[0]}>
+                    <Link
+                        to={option.link[0]}
+                        key={option.link[0]}
+                        className="w-full h-full"
+                    >
                         <Button
                             size={"icon"}
                             variant={
@@ -35,7 +56,10 @@ export default function WindowControls() {
                                     ? "default"
                                     : "ghost"
                             }
-                            className={cn("rounded-none", className)}
+                            className={cn(
+                                "rounded-none w-full h-full",
+                                className
+                            )}
                         >
                             {option.icon}
                         </Button>

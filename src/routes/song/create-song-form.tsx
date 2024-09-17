@@ -94,13 +94,13 @@ export default function CreateSongForm({
     }
 
     return (
-        <ScrollArea className="h-[100%] px-12 pb-2 rounded-md overflow-hidden border-t rounded-t-none">
+        <ScrollArea className="h-[100%] px-2 sm:px-6 md:px-12 pb-2  rounded-md overflow-hidden border-t rounded-t-none ">
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8 mt-8"
                 >
-                    <div className="flex gap-16 items-end ">
+                    <div className="flex gap-16 items-end flex-wrap">
                         <FormField
                             control={form.control}
                             name="cover"
@@ -136,7 +136,7 @@ export default function CreateSongForm({
                                 </FormItem>
                             )}
                         />
-                        <div className="flex gap-8">
+                        <div className="flex gap-8 flex-wrap">
                             <FormField
                                 control={form.control}
                                 name={"title"}

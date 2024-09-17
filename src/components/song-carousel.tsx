@@ -27,7 +27,7 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
 
     return (
         <Carousel
-            className={"w-[calc(100vw-15rem)]   h-fit  rounded-md"}
+            className={"w-[100%]  h-fit  overflow-hidden"}
             opts={{ loop: true }}
             plugins={[
                 AutoScroll({
@@ -39,8 +39,11 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
         >
             <CarouselContent className="h-full ">
                 {songs.map((song) => (
-                    <CarouselItem className="md:basis-1/2 lg:basis-1/3 h-full  px-8">
-                        <div className="bg-card flex justify-between rounded-md">
+                    <CarouselItem
+                        className="md:basis-2/3 xl:basis-1/3 h-full  px-2 sm:px-8 "
+                        key={song.id}
+                    >
+                        <div className="bg-card flex  rounded-md relative">
                             <SongHeader className="p-3  w-fit">
                                 <SongBanner size={"large"} song={song} />
                                 <SongDetail
@@ -49,14 +52,15 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
                                     isCurrent={false}
                                 />
                             </SongHeader>
-                            <Button
-                                variant={"ghost"}
-                                size={"sm"}
-                                className="ml-3 self-end"
-                                onClick={() => onEnqueue(song)}
-                            >
-                                Enqueue
-                            </Button>
+                            <div className="absolute bottom-0 right-0">
+                                <Button
+                                    variant={"ghost"}
+                                    size={"sm"}
+                                    onClick={() => onEnqueue(song)}
+                                >
+                                    Enqueue
+                                </Button>
+                            </div>
                         </div>
                     </CarouselItem>
                 ))}

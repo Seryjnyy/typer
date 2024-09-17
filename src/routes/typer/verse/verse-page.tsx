@@ -40,11 +40,11 @@ export default function VersePage() {
     }
 
     const songData: SongData = useMemo(() => {
-        if (!content) return { song: "", songStripped: "" };
+        if (!content) return { full: "", stripped: "" };
 
         return {
-            song: content,
-            songStripped: content.replace(/(\r\n|\n|\r)/gm, ""),
+            full: content,
+            stripped: content.replace(/(\r\n|\n|\r)/gm, ""),
         };
     }, [content]);
 
@@ -134,7 +134,7 @@ export default function VersePage() {
                             />
                             <Stat
                                 title="ch"
-                                stat={`${userInput.length}/${songData.songStripped.length}`}
+                                stat={`${userInput.length}/${songData.stripped.length}`}
                             />
                         </div>
                         <Button
@@ -148,12 +148,11 @@ export default function VersePage() {
                             <Progress
                                 value={
                                     (userInput.length /
-                                        songData.songStripped.length) *
+                                        songData.stripped.length) *
                                     100
                                 }
                             />
-                            {userInput.length ==
-                                songData.songStripped.length && (
+                            {userInput.length == songData.stripped.length && (
                                 <div className="text-primary flex justify-center text-xs uppercase opacity-80">
                                     <span>complete</span>
                                 </div>

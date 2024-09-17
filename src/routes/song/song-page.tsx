@@ -24,7 +24,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SongBanner, SongHeader } from "@/components/ui/song-header";
 import { Switch } from "@/components/ui/switch";
 import { useSongStore } from "@/lib/store/song-store";
-import { Song } from "@/lib/types";
+import { Song as SongType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
     Pencil1Icon,
@@ -45,14 +45,14 @@ import {
 import { useQueueStore } from "../../lib/store/queue-store";
 
 interface SongContentProps {
-    song: Song;
+    song: SongType;
     verseMode: boolean;
 }
 
 type Verse = { id: number; data: string };
 
 // TODO : Duplicate code with song list, but this popover has one less option 'view more' should do something about this
-const SongItemPopover = ({ song }: { song: Song }) => {
+const SongItemPopover = ({ song }: { song: SongType }) => {
     const queueNext = useQueueStore.use.queueNext();
     const removeSong = useSongStore.use.removeSong();
     const enqueue = useQueueStore.use.enqueue();
@@ -242,7 +242,8 @@ const SongContent = ({ song, verseMode }: SongContentProps) => {
     );
 };
 
-export default function SongPage() {
+// TODO : on smaller screens text will be too long fix that
+export default function Song() {
     const [verseMode, setVerseMode] = useState(false);
     const songs = useSongStore.use.songs();
     const { songID } = useParams();
@@ -261,14 +262,13 @@ export default function SongPage() {
             </div>
         );
 
-    console.log();
     return (
         <div
-            className={` h-[100%] bg-gradient-to-b  ${
+            className={` h-[100%]  bg-gradient-to-b  ${
                 song.cover.split(" ")[1]
             } rounded-md from-[5%] to-[30%]`}
         >
-            <ScrollArea className="h-[100%] px-12 pb-2 rounded-md">
+            <ScrollArea className="h-[100%] px-2 sm:px-12 pb-2 rounded-md">
                 <div className="flex flex-col items-start justify-start space-y-12 pt-12 w-full ">
                     <BackButton link="/songs" />
                     <div className="space-y-4 w-full">
@@ -289,7 +289,7 @@ export default function SongPage() {
                                 </div>
                             </SongHeader>
                         </div>
-                        <div className="flex items-center justify-between w-full ">
+                        <div className="flex items-center justify-between   w-full ">
                             <div className="flex gap-4 border border-dashed p-2 rounded-lg w-fit ">
                                 <span className="text-xs text-muted-foreground">
                                     {song.record.accuracy}%
@@ -318,8 +318,8 @@ export default function SongPage() {
                                     <span className="text-xs">Queue</span>
                                 </Button>
                             </div> */}
-                            <div className="flex gap-2">
-                                <div className=" flex items-center gap-1">
+                            <div className="flex gap-2  w-[9rem] ">
+                                <div className=" flex items-center gap-1 flex-col sm:flex-row">
                                     <Label
                                         htmlFor="verse-mode "
                                         className="text-xs text-muted-foreground"
@@ -341,6 +341,7 @@ export default function SongPage() {
                                         </Button>
                                     </Link>
                                 </div> */}
+
                                 <SongItemPopover song={song} />
                             </div>
                         </div>

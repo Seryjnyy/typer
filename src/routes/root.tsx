@@ -12,15 +12,12 @@ function Root() {
             <ThemeProvider defaultTheme="dark-rose" storageKey="vite-ui-theme">
                 <TooltipProvider delayDuration={100}>
                     <div className="h-screen overflow-hidden">
-                        <div className="md:hidden flex justify-center h-full items-center">
-                            Sorry site not responsive yet :/
-                        </div>
-                        <div className="hidden sm:flex flex-col h-full justify-end">
+                        <div className="flex flex-col h-full justify-end">
                             <main className="flex-grow w-full  flex justify-between z-0 h-[calc(100vh-4rem)]">
-                                <div className="z-0 w-full border my-2 ml-2 rounded-md ">
+                                <div className="z-0 w-full border-none sm:border sm:border-solid sm:my-2 pb-14 sm:pb-0 sm:ml-2 sm:rounded-md ">
                                     <Outlet />
                                 </div>
-                                <div className="z-20 p-2">
+                                <div className="z-20 p-2 hidden sm:block ">
                                     <Queue />
                                 </div>
                             </main>

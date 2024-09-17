@@ -11,7 +11,11 @@ import {
     textModification,
     TextModificationOptions,
 } from "@/lib/utils";
-import { Handlers, ProgressManager, SongData } from "@/routes/typer/typing";
+import Typing, {
+    Handlers,
+    ProgressManager,
+    SongData,
+} from "@/routes/typer/typing";
 import { ArrowRightIcon, GearIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +40,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTextModificationsStore } from "@/lib/store/text-modifications-store";
 import { Toggle } from "@/components/ui/toggle";
 import Ch, { chVariant } from "@/components/ch";
+import { usePreferenceStore } from "@/lib/store/preferences-store";
 
 const Stats = ({
     onRestart,
@@ -544,6 +549,7 @@ export default function TestPage() {
 
     const txtMods = useTextModificationsStore.use.textModifications();
     const difficultyModifiers = useTextModificationsStore.use.harderOptions();
+    const typerTextDisplay = usePreferenceStore.use.typerTextDisplay();
 
     const {
         totalSeconds,
@@ -615,11 +621,17 @@ export default function TestPage() {
                 (resultChpm == songData.song.record.chpm &&
                     resultAcc > songData.song.record.accuracy)
             ) {
-                // TODO : Set song record
-                editSongRecord(songData.song.id, {
-                    chpm: resultChpm,
-                    accuracy: resultAcc,
-                });
+                // Only save if text wasn't made easier.
+                if (
+                    txtMods.letterCase == "normal" &&
+                    txtMods.numbers == "normal" &&
+                    txtMods.punctuation == "normal"
+                ) {
+                    editSongRecord(songData.song.id, {
+                        chpm: resultChpm,
+                        accuracy: resultAcc,
+                    });
+                }
             }
         },
         onClickVerse: (verse: string) => {
@@ -651,7 +663,7 @@ export default function TestPage() {
             )}
         >
             {songData == null && <NoSongSelected />}
-            {songData != null && (
+            {songData != null && typerTextDisplay == "cylinder" && (
                 <Test
                     songData={songData}
                     progressManager={progressManager}
@@ -670,6 +682,23 @@ export default function TestPage() {
                         />
                     )}
                 </Test>
+            )}
+            {songData != null && typerTextDisplay == "flat" && (
+                <div className="w-full pb-4">
+                    <Typing
+                        songData={songData.songContent}
+                        progressManager={progressManager}
+                        handlers={handlers}
+                        tryVerseOption={true}
+                    >
+                        {!autoplay && completed && (
+                            <EndScreen
+                                onRestart={onRestart}
+                                userInputLength={userInput.length}
+                            />
+                        )}
+                    </Typing>
+                </div>
             )}
         </div>
     );

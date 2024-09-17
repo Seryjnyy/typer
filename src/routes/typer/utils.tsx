@@ -37,7 +37,7 @@ export const convertSongToElements = (
     let correct = 0;
     let incorrect = 0;
 
-    const element = verseSplit.map((verse, i) => {
+    const elements = verseSplit.map((verse, i) => {
         const lines = verse.split(/\r?\n/);
 
         const verseElements = lines.map((line, j) => {
@@ -100,9 +100,12 @@ export const convertSongToElements = (
         return (
             <div
                 key={i}
-                className={cn(" mb-4 p-2 rounded-md relative group/verse", {
-                    "hover:outline": tryVerseOption,
-                })}
+                className={cn(
+                    " mb-4 p-2 rounded-md relative group/verse sm:leading-8 leading-10",
+                    {
+                        "hover:outline": tryVerseOption,
+                    }
+                )}
             >
                 {verseElements}
                 {tryVerseOption && (
@@ -111,6 +114,7 @@ export const convertSongToElements = (
                             <TooltipTrigger asChild>
                                 <KeyboardButton
                                     onClick={() => onClickVerse?.(verse)}
+                                    variant={"verse"}
                                 />
                             </TooltipTrigger>
                             <TooltipContent className="group-hover/verse:block hidden">
@@ -124,7 +128,19 @@ export const convertSongToElements = (
     });
 
     return {
-        element: element,
+        element: elements.map((x, i) => {
+            if (i < elements.length - 1) {
+                return (
+                    <>
+                        {x}
+                        <span className="py-4 mx-auto opacity-50 text-md font-normal">
+                            {"𝆕"}
+                        </span>
+                    </>
+                );
+            }
+            return x;
+        }),
         startOfLineIndexes: startOfLineIndexes,
         startOfLineRefs: startOfLineRefs,
         correct: correct,

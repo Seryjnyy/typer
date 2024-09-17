@@ -7,9 +7,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 const songBannerVariants = cva("", {
     variants: {
         size: {
-            default: "h-12 w-12",
-            large: "h-[6rem] w-[6rem]",
-            extraLarge: "h-[10rem] w-[10rem]",
+            default: "min-h-12 min-w-12",
+            large: "min-h-[6rem] min-w-[6rem]",
+            extraLarge: "min-h-[10rem] min-w-[10rem]",
         },
     },
     defaultVariants: {

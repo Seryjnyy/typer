@@ -1,39 +1,58 @@
-import { Progress } from "@/components/ui/progress";
-
 import {
-    CaretDownIcon,
-    CaretUpIcon,
-    CheckIcon,
-    DividerVerticalIcon,
-    LoopIcon,
-    PlayIcon,
-    ShuffleIcon,
-} from "@radix-ui/react-icons";
-import { useMemo } from "react";
-import { Button } from "./ui/button";
-import { useQueueStore } from "../lib/store/queue-store";
-import { useSongProgressStore } from "../lib/store/song-progress-store";
-import { useSongStore } from "../lib/store/song-store";
-import { useUiStateStore } from "../lib/store/ui-state-store";
-import { cn } from "../lib/utils";
-import QueueControl from "./queue-control";
-import ShuffleButton from "./shuffle-button";
-import { SongBanner, SongDetail, SongHeader } from "./ui/song-header";
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Progress } from "@/components/ui/progress";
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+    CaretDownIcon,
+    CaretUpIcon,
+    CheckIcon,
+    DividerVerticalIcon,
+    PlayIcon,
+} from "@radix-ui/react-icons";
+import { useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useQueueStore } from "../lib/store/queue-store";
+import { useSongProgressStore } from "../lib/store/song-progress-store";
+import { useSongStore } from "../lib/store/song-store";
+import { useUiStateStore } from "../lib/store/ui-state-store";
+import { cn } from "../lib/utils";
 import LoopButton from "./loop-button";
-import { useNavigate } from "react-router-dom";
+import { MobileQueue } from "./queue";
+import QueueControl from "./queue-control";
+import ShuffleButton from "./shuffle-button";
+import { Button } from "./ui/button";
+import { SongBanner, SongDetail, SongHeader } from "./ui/song-header";
 import WindowControls from "./window-controls";
 
 const MediaControl = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const current = useQueueStore.use.current();
+    const setCurrent = useQueueStore.use.setCurrent();
+
+    const songs = useQueueStore.use.songs();
 
     // TODO : might need to force rerender window
     const onPlaySong = () => {
-        navigate("/");
+        // Route to typer if not on typer page
+        if (location.pathname != "/") {
+            navigate("/");
+        }
+
+        // If there is no current song but there are songs in the queue then play the first one
+        if (!current) {
+            if (songs.length > 0) {
+                setCurrent(songs[0]);
+            }
+        }
     };
 
     return (
@@ -62,8 +81,9 @@ const MediaControl = () => {
 };
 
 const SongProgressStats = () => {
-    const songProgress = useSongProgressStore();
-    const queue = useQueueStore();
+    const completed = useSongProgressStore.use.completed();
+    const current = useQueueStore.use.current();
+
     return (
         <div className="flex items-center gap-1">
             {/* <span className="text-xs text-muted-foreground">
@@ -73,10 +93,10 @@ const SongProgressStats = () => {
                 {songProgress.timeElapsed}s
             </span> */}
             <div className="border rounded-full">
-                {!songProgress.completed && queue.current != null && (
+                {!completed && current != null && (
                     <DividerVerticalIcon className="w-3 h-3 animate-spin" />
                 )}
-                {songProgress.completed && <CheckIcon />}
+                {completed && <CheckIcon />}
                 {/* {!songProgress.completed && queue.current == null && (
                             <DividerHorizontalIcon />
                         )} */}
@@ -86,12 +106,12 @@ const SongProgressStats = () => {
 };
 
 const SongInfo = () => {
-    const queue = useQueueStore();
+    const current = useQueueStore.use.current();
     const songList = useSongStore.use.songs();
 
     const songData = useMemo(() => {
-        return songList.find((x) => x.id == queue.current);
-    }, [queue.current, songList]);
+        return songList.find((x) => x.id == current);
+    }, [current, songList]);
 
     return (
         <div className="flex flex-col max-w-[12rem]">
@@ -101,7 +121,7 @@ const SongInfo = () => {
                     <SongDetail
                         length={"long"}
                         song={songData}
-                        isCurrent={songData.id == queue.current}
+                        isCurrent={songData.id == current}
                     />
                 </SongHeader>
             )}
@@ -109,59 +129,177 @@ const SongInfo = () => {
     );
 };
 
-export default function BottomNav() {
-    const uiState = useUiStateStore();
+const MobileMenu = ({ className }: { className?: string }) => {
+    const currSong = useQueueStore.use.current();
+    const song = useSongStore.use.songs().find((x) => x.id == currSong);
 
-    const songProgress = useSongProgressStore();
+    const focus = useUiStateStore.use.focus();
+    const songTypedChar = useSongProgressStore.use.songTypedChar();
+    const songTotalChar = useSongProgressStore.use.songTotalChar();
+    const [openQueue, setOpenQueue] = useState(false);
 
-    const onToggleQueueWindow = () => {
-        uiState.setQueueWindowOpen(!uiState.queueWindowOpen);
-    };
+    if (focus) return null;
 
-    if (uiState.focus) return <></>;
+    const from = song?.cover.split(" ")[1];
+    const to = song?.cover.split(" ")[2];
 
     return (
-        <div className="w-full  flex flex-col justify-start   h-full ">
-            <Progress
-                value={
-                    (songProgress.songTypedChar / songProgress.songTotalChar) *
-                    100
-                }
-                className="w-full h-1"
-            />
-            <div className="px-3 h-full grid-cols-3 grid w-full bg-background  pt-1">
-                <div className="w-fit flex gap-9">
-                    <SongInfo />
-                    <SongProgressStats />
-                </div>
-                <div className="flex items-center gap-2 h-full  justify-center flex-col">
-                    <MediaControl />
-                </div>
-                <div className="flex gap-8 items-center  justify-end">
-                    <WindowControls />
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                size={"icon"}
-                                onClick={onToggleQueueWindow}
-                                variant={"ghost"}
-                            >
-                                {uiState.queueWindowOpen ? (
-                                    <CaretDownIcon />
-                                ) : (
-                                    <CaretUpIcon />
-                                )}
-                            </Button>
-                        </TooltipTrigger>
+        <div
+            className={cn(
+                "w-full  flex flex-col justify-start   h-full bg-background",
+                className
+            )}
+        >
+            <div className={cn("w-full relative h-full ")}>
+                <div
+                    className={`h-14 w-full absolute -top-16 left-0 backdrop-blur-xl`}
+                >
+                    <Drawer>
+                        <DrawerTrigger className="w-full h-full px-2 flex items-center justify-between border-y ">
+                            <div className="w-fit flex gap-2 md:gap-9">
+                                <SongInfo />
+                                <SongProgressStats />
+                            </div>
+                            {/* <div className="w-[10rem]">
+                                <Progress
+                                    value={
+                                        (songTypedChar / songTotalChar) * 100
+                                    }
+                                    className="w-full h-1"
+                                />
+                            </div> */}
+                            <CaretUpIcon />
+                        </DrawerTrigger>
 
-                        <TooltipContent>
-                            <p>
-                                {uiState.queueWindowOpen
-                                    ? "Close queue"
-                                    : "Open queue"}
-                            </p>
-                        </TooltipContent>
-                    </Tooltip>
+                        <DrawerContent
+                            className={cn(
+                                "flex flex-col  ",
+                                openQueue ? "h-[90vh]" : "h-[50vh] ",
+                                from && `bg-gradient-to-b ${from} `
+                            )}
+                        >
+                            {/* <DrawerHeader>
+                                <DrawerTitle className="sr-only">
+                                    Extra details and queue card.
+                                </DrawerTitle>
+                            </DrawerHeader> */}
+
+                            <div className="space-y-2 mt-auto backdrop-brightness-50 pt-4 rounded-t-md">
+                                <div className="mx-2 sm:mx-12">
+                                    <div className="w-fit flex md:gap-9">
+                                        <SongInfo />
+                                        <SongProgressStats />
+                                    </div>
+                                </div>
+                                <div className="flex justify-center flex-col items-center gap-4 px-2 sm:mx-12">
+                                    <Progress
+                                        value={
+                                            (songTypedChar / songTotalChar) *
+                                            100
+                                        }
+                                        className="w-full h-1"
+                                    />
+                                    <MediaControl />
+                                </div>
+                                {/* <div className="flex justify-end p-1">
+                                    <Button
+                                        variant={"ghost"}
+                                        onClick={() =>
+                                            setOpenQueue((prev) => !prev)
+                                        }
+                                    >
+                                        {openQueue ? "Close" : "Open"} queue
+                                    </Button>
+                                </div> */}
+                                <Collapsible
+                                    open={openQueue}
+                                    onOpenChange={(val) => setOpenQueue(val)}
+                                >
+                                    <CollapsibleTrigger className="flex justify-between items-center w-full px-2 py-2 text-sm font-medium">
+                                        {openQueue ? (
+                                            <CaretUpIcon className="text-muted-foreground" />
+                                        ) : (
+                                            <CaretDownIcon className="text-muted-foreground" />
+                                        )}
+                                        <span>Open queue</span>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="h-[60vh] ">
+                                        <MobileQueue />
+                                    </CollapsibleContent>
+                                </Collapsible>
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
+                </div>
+
+                <div className="w-full h-full">
+                    <WindowControls variant={"square"} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// TODO : conditionally render mobile/pc menu
+export default function BottomNav() {
+    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
+    const focus = useUiStateStore.use.focus();
+    const setQueueWindowOpen = useUiStateStore.use.setQueueWindowOpen();
+    const songTypedChar = useSongProgressStore.use.songTypedChar();
+    const songTotalChar = useSongProgressStore.use.songTotalChar();
+
+    const onToggleQueueWindow = () => {
+        setQueueWindowOpen(!queueWindowOpen);
+    };
+
+    if (focus) return null;
+
+    return (
+        <div className="h-full">
+            <MobileMenu className=" sm:hidden " />
+            <div className="w-full flex-col justify-start   h-full hidden sm:flex ">
+                <Progress
+                    value={(songTypedChar / songTotalChar) * 100}
+                    className="w-full h-1"
+                />
+
+                <div className="px-3 h-full grid-cols-3 grid w-full bg-background  pt-1 ">
+                    <div className="w-fit flex gap-9">
+                        <SongInfo />
+                        <SongProgressStats />
+                    </div>
+                    <div className="flex items-center gap-2 h-full  justify-center flex-col">
+                        <MediaControl />
+                    </div>
+
+                    <div className="flex gap-8 items-center  justify-end ">
+                        <div className="w-[7rem] h-[2rem]">
+                            <WindowControls />
+                        </div>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    size={"icon"}
+                                    onClick={onToggleQueueWindow}
+                                    variant={"ghost"}
+                                >
+                                    {queueWindowOpen ? (
+                                        <CaretDownIcon />
+                                    ) : (
+                                        <CaretUpIcon />
+                                    )}
+                                </Button>
+                            </TooltipTrigger>
+
+                            <TooltipContent>
+                                <p>
+                                    {queueWindowOpen
+                                        ? "Close queue"
+                                        : "Open queue"}
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
                 </div>
             </div>
         </div>

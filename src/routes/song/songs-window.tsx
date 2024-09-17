@@ -1,8 +1,8 @@
 import React from "react";
-import SongsList from "./songs-list";
+import Songs from "./songs";
 import { Outlet, useParams } from "react-router";
 
-export default function SongsWindow() {
+export default function SongsPage() {
     return (
         <div className="w-full h-full ">
             <Outlet />

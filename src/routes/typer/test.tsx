@@ -55,34 +55,6 @@ interface TypingProps {
     className?: string;
 }
 
-const splitSongIntoLinesOld = (song: string) => {
-    const verseSplit = song.split(/\n\s*\n/);
-
-    const lines: string[] = [];
-    const verses: string[] = [];
-    const lineVerseMap: Record<number, number> = {};
-    let lineIndex = 0;
-
-    verseSplit.forEach((verse, verseIndex) => {
-        const tempLines = verse.split(/\r?\n/);
-
-        lines.push(...tempLines, "𝆕");
-
-        verses.push(verse);
-
-        tempLines.forEach(() => {
-            lineVerseMap[lineIndex] = verseIndex;
-            lineIndex++;
-        });
-
-        lineVerseMap[lineIndex] = verseIndex;
-        lineIndex++;
-    });
-
-    return { lines: lines, verses: verses, lineVerseMap: lineVerseMap };
-};
-
-// TODO : Maybe return newLineIndexes for the note skipping
 const splitSongIntoLines = (song: string) => {
     const linesVerseMap: {
         id: number;
@@ -130,6 +102,7 @@ const convertStuff = (
     let incorrect = 0;
 
     const angle = 10.5;
+    // TODO : need to decide this on size of the screen, e.g mobile needs to be less
     const lineLimit = 6;
 
     let lineIndex = 0;
@@ -138,8 +111,8 @@ const convertStuff = (
     newSplit.linesVerseMap.forEach((x, verseIndex) => {
         // render stops verses from being added, however it still does the computation and stuff
         let render = true;
-        const ress: ReactNode[] = [];
-        const res = x.lines.map((line) => {
+        // const ress: ReactNode[] = [];
+        const lines = x.lines.map((line) => {
             const transform = `rotateX(calc(${
                 start + lineIndex + midpoint + curr
             }*${angle}deg))`;
@@ -222,21 +195,21 @@ const convertStuff = (
 
             lineIndex++;
 
-            ress.push(
-                <div
-                    className="text-center w-full"
-                    key={lineIndex}
-                    style={{
-                        transform: transform,
-                        fontSize: fontSize,
-                        lineHeight: 1,
-                        fontWeight: fontWeight,
-                        color: fontColour,
-                    }}
-                >
-                    {formattedLine}
-                </div>
-            );
+            // ress.push(
+            //     <div
+            //         className="text-center w-full"
+            //         key={lineIndex}
+            //         style={{
+            //             transform: transform,
+            //             fontSize: fontSize,
+            //             lineHeight: 1,
+            //             fontWeight: fontWeight,
+            //             color: fontColour,
+            //         }}
+            //     >
+            //         {formattedLine}
+            //     </div>
+            // );
             return (
                 <div
                     className="text-center w-full"
@@ -254,16 +227,16 @@ const convertStuff = (
             );
         });
 
-        if (ress.length != 0) {
+        if (lines.length != 0) {
             drawLines.push(
                 <div
                     className={cn("rounded-md", {
                         "hover:outline hover:outline-border group/verse relative  px-2":
-                            ress.length > 2 && tryVerse,
+                            lines.length > 2 && tryVerse,
                     })}
                 >
-                    {...res}
-                    {ress.length > 2 && tryVerse && (
+                    {...lines}
+                    {lines.length > 2 && tryVerse && (
                         <TooltipProvider delayDuration={1200}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -282,7 +255,7 @@ const convertStuff = (
             );
 
             if (
-                ress.length != 0 &&
+                lines.length != 0 &&
                 verseIndex < newSplit.linesVerseMap.length - 1
             ) {
                 const transform = `rotateX(calc(${
@@ -326,175 +299,6 @@ const convertStuff = (
         newLineIndexes: [],
         stats: { correct: 0, incorrect: 0 },
         currentLine: currentLine,
-    };
-};
-const convertStuffOld = (
-    songContent: string,
-    userInput: string,
-    curr: number,
-    tryVerse: boolean,
-    onClickVerse?: (verse: string) => void
-) => {
-    const {
-        lines: songLines,
-        verses: songVerses,
-        lineVerseMap: lineVerseMap,
-    } = splitSongIntoLinesOld(songContent ?? "");
-
-    const midpoint = Math.floor(songLines.length / 2);
-    const start = -midpoint;
-
-    let correct = 0;
-    let incorrect = 0;
-
-    const angle = 10.5;
-    const lineLimit = 8;
-    let tempElements: ReactNode[] = [];
-    const newLineIndexes: number[] = [];
-    songLines.forEach((x, i) => {
-        if (x == "𝆕") {
-            newLineIndexes.push(i);
-        }
-    });
-
-    let tempLines = [];
-    let charIndex = 0;
-    let verseIndex = 0;
-    let currentLine = 0;
-
-    for (let i = 0; i < songLines.length; i++) {
-        if (
-            start + i + midpoint + curr < -lineLimit ||
-            start + i + midpoint + curr > lineLimit
-        ) {
-            if (tempLines.length > 0) {
-                tempElements.push(
-                    <div key={"verse" + i} className="bg-blue-400 rounded-lg">
-                        {...tempLines}
-                    </div>
-                );
-                tempLines = [];
-                verseIndex++;
-            }
-            continue;
-        }
-
-        const transform = `rotateX(calc(${
-            start + i + midpoint + curr
-        }*${angle}deg))`;
-        const fontSizeOffset = 10 - Math.abs(start + i + midpoint + curr);
-        const fontSize = `${fontSizeOffset * 3}px`;
-        const fontColourOffset =
-            1 - Math.abs(start + i + midpoint + curr) * (1 / lineLimit);
-        const fontColour = `rgb(255 255 255 / ${fontColourOffset})`;
-        const fontWeight = start + i + midpoint + curr == 0 ? "bold" : "normal";
-
-        if (songLines[i] == "𝆕") {
-            tempElements.push(
-                <div
-                    key={"verse" + i}
-                    className={cn("rounded-md", {
-                        "hover:outline hover:outline-border group/verse relative":
-                            tryVerse,
-                    })}
-                >
-                    {...tempLines}
-                    {tryVerse && (
-                        <TooltipProvider delayDuration={1200}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        className="absolute -bottom-4 right-0 group-hover/verse:flex group-hover/verse:bg-primary hidden gap-2 group/button"
-                                        onClick={() => {
-                                            onClickVerse?.(
-                                                songVerses[lineVerseMap[i]]
-                                            );
-                                        }}
-                                    >
-                                        <KeyboardIcon />
-                                        <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform opacity-60" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="group-hover/verse:block hidden">
-                                    <p>Attempt this part only. </p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )}
-                </div>
-            );
-            tempLines = [];
-            verseIndex++;
-
-            tempElements.push(
-                <div
-                    className="text-center w-full"
-                    key={i}
-                    style={{
-                        transform: transform,
-                        fontSize: fontSize,
-                        lineHeight: 1,
-                        fontWeight: fontWeight,
-                        color: fontColour,
-                    }}
-                >
-                    {songLines[i]}
-                </div>
-            );
-        } else {
-            tempLines.push(
-                <div
-                    className="text-center w-full"
-                    key={i}
-                    style={{
-                        transform: transform,
-                        fontSize: fontSize,
-                        lineHeight: 1,
-                        fontWeight: fontWeight,
-                        color: fontColour,
-                    }}
-                >
-                    {Array.from(songLines[i]).map((ch, k) => {
-                        let variant: chVariant = "normal";
-
-                        if (charIndex > userInput.length) {
-                            // variant = "not-covered";
-                        } else if (charIndex == userInput.length) {
-                            variant = "current";
-                        } else {
-                            if (ch == userInput.charAt(charIndex)) {
-                                correct++;
-                                variant = "correct";
-                            } else {
-                                incorrect++;
-                                variant = "incorrect";
-                                if (ch == " " || ch == "\n") {
-                                    variant = "incorrect-space";
-                                }
-                            }
-                        }
-
-                        charIndex++;
-                        return (
-                            <Ch key={"" + i + k} variant={variant}>
-                                {ch}
-                            </Ch>
-                        );
-                    })}
-                </div>
-            );
-        }
-    }
-
-    if (tempLines.length > 0) {
-        tempElements.push(...tempLines);
-    }
-
-    return {
-        elements: tempElements,
-        linesCount: songLines.length,
-        newLineIndexes: newLineIndexes,
-        stats: { correct: correct, incorrect: incorrect },
     };
 };
 
@@ -619,7 +423,7 @@ export default function Test({
     return (
         <div
             className={cn(
-                "flex justify-center items-center w-full h-screen flex-col text-xl space-y-2 relative",
+                "flex justify-center items-center w-full h-screen flex-col space-y-2 relative ",
                 className
             )}
             ref={scrollDivRef}

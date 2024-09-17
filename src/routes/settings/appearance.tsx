@@ -182,7 +182,7 @@ export default function Appearance() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 flex-wrap">
                             <TyperTextDisplayOption />
                         </div>
                     </CardContent>

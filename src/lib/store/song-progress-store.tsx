@@ -59,6 +59,7 @@ const useSongProgressStoreBase = create<State & Actions>(
 
 const useSongProgressStore = createSelectors(useSongProgressStoreBase);
 
+// TODO : why is this here???? what is it????
 declare global {
     interface Window {
         store: typeof useSongProgressStore;

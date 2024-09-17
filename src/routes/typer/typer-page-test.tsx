@@ -14,6 +14,7 @@ import EndScreen from "./end-screen";
 import Stat from "./stat";
 import Typing, { Handlers, ProgressManager, SongData } from "./typing";
 import NoSongSelected from "./no-song-selected";
+import { usePreferenceStore } from "@/lib/store/preferences-store";
 
 const Stats = ({
     onRestart,

@@ -1,5 +1,6 @@
 import SongCarousel from "@/components/song-carousel";
 import { Button } from "@/components/ui/button";
+import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
 import { cn, shuffleArray } from "@/lib/utils";
@@ -15,14 +16,9 @@ export default function NoSongSelected() {
         return shuffled.slice(0, Math.min(shuffled.length, 10));
     }, [songs]);
 
-    console.log(shortened.length);
-
     return (
         <div
-            className={cn(
-                "flex w-full items-center justify-center  flex-col "
-                // isQueueWindowOpen ? "" : "pl-[15rem]"
-            )}
+            className={cn("flex w-full items-center justify-center  flex-col ")}
         >
             <h2 className="font-bold text-3xl">No song selected.</h2>
             <div className="flex flex-col justify-center items-center  ">
@@ -32,7 +28,14 @@ export default function NoSongSelected() {
                             Here are some of your songs.
                         </h3>
 
-                        <div className="overflow-hidden w-[80vw]">
+                        <div
+                            className={cn(
+                                "overflow-hidden w-[100vw] ",
+                                isQueueWindowOpen
+                                    ? "sm:w-[calc(100vw-16.5rem)]"
+                                    : "sm:w-[calc(100vw-1.7rem)]"
+                            )}
+                        >
                             <SongCarousel songs={shortened} />
                         </div>
                     </div>

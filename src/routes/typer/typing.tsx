@@ -4,8 +4,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface SongData {
-    song: string;
-    songStripped: string;
+    full: string;
+    stripped: string;
 }
 
 export interface ProgressManager {
@@ -49,20 +49,20 @@ export default function Typing({
         useMemo(
             () =>
                 convertSongToElements(
-                    songData.song ?? "",
+                    songData.full ?? "",
                     progressManager.userInput,
                     handlers.onClickVerse,
                     tryVerseOption
                 ),
-            [songData.song, progressManager.userInput]
+            [songData.full, progressManager.userInput]
         );
 
     const onUserInput = (input: string) => {
-        if (songData.song == "") return;
+        if (songData.full == "") return;
 
         progressManager.setUserInput(input);
 
-        const finished = input.length == songData.songStripped.length;
+        const finished = input.length == songData.stripped.length;
         if (finished) {
             progressManager.setCompleted(true);
             handlers.onFinish?.();
@@ -91,17 +91,15 @@ export default function Typing({
         handlers.onChangeSong?.();
 
         progressManager.setTargetCharCount(
-            songData.songStripped != undefined
-                ? songData.songStripped.length
-                : 0
+            songData.stripped != undefined ? songData.stripped.length : 0
         );
-    }, [songData.song]);
+    }, [songData.full]);
 
     useHotkeys("*", () => {
         // focus
         inputRef.current?.focus();
 
-        if (songData.song != "" && !progressManager.completed) {
+        if (songData.full != "" && !progressManager.completed) {
             inputRef.current?.focus();
             handlers.onStart?.();
         }
@@ -115,17 +113,17 @@ export default function Typing({
     // console.log("rerender");
     return (
         <div className="relative h-full w-full overflow-y-hidden  rounded-md">
-            <ScrollArea className="h-full  relative">
+            <ScrollArea className="h-full  relative ">
                 <div className="w-full h-full ">
                     <div className="flex justify-start">
                         <div className="flex justify-center w-full py-24 relative">
                             <div
-                                className="text-2xl font-semibold"
+                                className="text-2xl font-semibold flex flex-col text-center"
                                 // className={
                                 //     queueWindowOpen ? "" : "pr-[15.5rem]"
                                 // }
                             >
-                                {songData.song != "" && element}
+                                {songData.full != "" && element}
                             </div>
 
                             {children}

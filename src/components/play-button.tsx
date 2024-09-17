@@ -4,10 +4,11 @@ import { PlayIcon } from "@radix-ui/react-icons";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
 import { useQueueStore } from "@/lib/store/queue-store";
 import MusicPlaying from "./music-playing";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function PlayButton({ songID }: { songID: string }) {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const songs = useQueueStore.use.songs();
     const enqueue = useQueueStore.use.enqueue();
@@ -15,19 +16,25 @@ export default function PlayButton({ songID }: { songID: string }) {
     const setCurrent = useQueueStore.use.setCurrent();
     console.log(current);
 
-    const onPlay = (songId: string) => {
+    const onPlay = (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        songId: string
+    ) => {
+        e.stopPropagation();
         if (!songs.includes(songId)) {
             enqueue(songId, true);
         } else {
             setCurrent(songId);
         }
 
-        navigate("/");
+        if (location.pathname != "/") {
+            navigate("/");
+        }
     };
 
     return (
         <Button
-            onClick={() => onPlay(songID)}
+            onClick={(e) => onPlay(e, songID)}
             size={"icon"}
             className="rounded-full hover:bg-background hover:text-foreground"
             variant={"ghost"}
