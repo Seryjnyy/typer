@@ -25,7 +25,7 @@ import { SongBanner, SongHeader } from "@/components/ui/song-header";
 import { Switch } from "@/components/ui/switch";
 import { useSongStore } from "@/lib/store/song-store";
 import { Song as SongType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, formatTimestamp } from "@/lib/utils";
 import {
     Pencil1Icon,
     PlayIcon,
@@ -104,7 +104,7 @@ const SongItemPopover = ({ song }: { song: SongType }) => {
                     className="space-x-1"
                     onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`./${song.id}/edit`);
+                        navigate(`./edit`);
                     }}
                 >
                     <Pencil1Icon />
@@ -195,7 +195,7 @@ const SongContent = ({ song, verseMode }: SongContentProps) => {
     };
 
     return (
-        <pre className="font-sans px-4">
+        <pre className="font-sans sm:px-4 max-w-[calc(100vw-1rem)] text-wrap">
             {verseMode && (
                 <div className="py-4 text-muted-foreground flex items-center justify-between  border-b mb-4">
                     <div className="flex items-center gap-2">
@@ -215,9 +215,8 @@ const SongContent = ({ song, verseMode }: SongContentProps) => {
                 </div>
             )}
             {verses.map((verse) => (
-                <>
+                <div key={verse.id}>
                     <div
-                        key={verse.id}
                         className={cn(
                             " w-fit p-1 rounded-md ",
                             {
@@ -236,7 +235,7 @@ const SongContent = ({ song, verseMode }: SongContentProps) => {
                         {verse.data}
                     </div>
                     <br />
-                </>
+                </div>
             ))}
         </pre>
     );
@@ -263,12 +262,12 @@ export default function Song() {
         );
 
     return (
-        <div
-            className={` h-[100%]  bg-gradient-to-b  ${
-                song.cover.split(" ")[1]
-            } rounded-md from-[5%] to-[30%]`}
-        >
-            <ScrollArea className="h-[100%] px-2 sm:px-12 pb-2 rounded-md">
+        <div className={` h-[100%]  `}>
+            <ScrollArea
+                className={`h-[100%] px-2 sm:px-12 pb-2  flex flex-col relative bg-gradient-to-b  ${
+                    song.cover.split(" ")[1]
+                } sm:rounded-md from-[5%] to-[30%]`}
+            >
                 <div className="flex flex-col items-start justify-start space-y-12 pt-12 w-full ">
                     <BackButton link="/songs" />
                     <div className="space-y-4 w-full">
@@ -289,7 +288,8 @@ export default function Song() {
                                 </div>
                             </SongHeader>
                         </div>
-                        <div className="flex items-center justify-between   w-full ">
+
+                        <div className="flex items-end justify-between   w-full ">
                             <div className="flex gap-4 border border-dashed p-2 rounded-lg w-fit ">
                                 <span className="text-xs text-muted-foreground">
                                     {song.record.accuracy}%
@@ -318,7 +318,7 @@ export default function Song() {
                                     <span className="text-xs">Queue</span>
                                 </Button>
                             </div> */}
-                            <div className="flex gap-2  w-[9rem] ">
+                            <div className="flex gap-2  w-[9rem] items-center  justify-between">
                                 <div className=" flex items-center gap-1 flex-col sm:flex-row">
                                     <Label
                                         htmlFor="verse-mode "
@@ -347,8 +347,26 @@ export default function Song() {
                         </div>
                     </div>
                 </div>
-                <div className="pt-12">
+
+                <div className="pt-12 text-sm sm:text-md md:text-lg">
                     <SongContent song={song} verseMode={verseMode} />
+                </div>
+
+                <div className="w-full px-2 flex items-center pt-24 flex-wrap gap-2 sm:gap-12">
+                    <div className="flex  text-muted-foreground gap-1">
+                        <span className="text-xs opacity-70">created at: </span>
+                        <span className="text-xs">
+                            {formatTimestamp(song.createdAt)}
+                        </span>
+                    </div>
+                    <div className="flex  text-muted-foreground gap-1">
+                        <span className="text-xs opacity-70">
+                            last modified at:
+                        </span>
+                        <span className="text-xs">
+                            {formatTimestamp(song.lastModifiedAt)}
+                        </span>
+                    </div>
                 </div>
             </ScrollArea>
         </div>

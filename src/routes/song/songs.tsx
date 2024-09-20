@@ -78,7 +78,13 @@ import { MenuIcon } from "lucide-react";
 
 type Order = "asc" | "desc";
 type ListStyle = "compact" | "list";
-type SortBy = "title" | "source" | "completions" | "length";
+type SortBy =
+    | "title"
+    | "source"
+    | "completions"
+    | "length"
+    | "created"
+    | "modified";
 
 const sortSongs = (songs: Song[], order: Order, sort: SortBy) => {
     switch (sort) {
@@ -107,13 +113,26 @@ const sortSongs = (songs: Song[], order: Order, sort: SortBy) => {
                 }
             });
         case "length":
-            console.log("man what");
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    console.log("what asc");
                     return a.content.length - b.content.length;
                 } else {
-                    console.log("what desc");
+                    return b.content.length - a.content.length;
+                }
+            });
+        case "created":
+            return songs.sort((a, b) => {
+                if (order === "asc") {
+                    return a.content.length - b.content.length;
+                } else {
+                    return b.content.length - a.content.length;
+                }
+            });
+        case "modified":
+            return songs.sort((a, b) => {
+                if (order === "asc") {
+                    return a.content.length - b.content.length;
+                } else {
                     return b.content.length - a.content.length;
                 }
             });
@@ -244,7 +263,10 @@ const SongItemPopover = ({ song }: { song: Song }) => {
 const SongLyricHoverCard = ({ song }: { song: Song }) => {
     return (
         <HoverCard openDelay={500} closeDelay={0}>
-            <HoverCardTrigger className="hidden md:block p-2">
+            <HoverCardTrigger
+                className="hidden md:block p-2"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <TextAlignCenterIcon />
             </HoverCardTrigger>
             <HoverCardContent
@@ -264,7 +286,10 @@ const SongLyricHoverCard = ({ song }: { song: Song }) => {
 
 const SongStats = ({ song }: { song: Song }) => {
     return (
-        <div className=" gap-4 border border-dashed  p-2 rounded-lg hidden sm:flex">
+        <div
+            className=" gap-4 border border-dashed  p-2 rounded-lg hidden sm:flex"
+            onClick={(e) => e.stopPropagation()}
+        >
             <span className="text-xs text-muted-foreground border-r pr-3">
                 {song.content.length} ch
             </span>
@@ -306,14 +331,19 @@ const SongItem = ({
         return (
             <div
                 className="border py-1 px-4 group hover:bg-secondary rounded-md flex justify-between items-center "
-                key={song.id}
                 onClick={() => navigate(`/songs/${song.id}`)}
             >
                 <div className="flex gap-4 items-center">
-                    <div className="text-muted group-hover:text-foreground text-xs sm:text-md">
+                    <div
+                        className="text-muted group-hover:text-foreground text-xs sm:text-md"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {index + 1}
                     </div>
-                    <div className=" gap-3 flex justify-between text-xs sm:text-sm items-center">
+                    <div
+                        className=" gap-3 flex justify-between text-xs sm:text-sm items-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <span className="font-semibold  text-ellipsis overflow-hidden whitespace-nowrap">
                             {song.title}
                         </span>
@@ -341,17 +371,24 @@ const SongItem = ({
             key={song.id}
             onClick={() => navigate(`/songs/${song.id}`)}
         >
-            <div className="flex gap-4 items-center">
-                <div className="text-muted group-hover:text-foreground">
+            <div className="flex gap-4 items-center ">
+                <div
+                    className="text-muted group-hover:text-foreground "
+                    onClick={(e) => e.stopPropagation()}
+                >
                     {index + 1}
                 </div>
                 <SongHeader>
-                    <SongBanner song={song} />
+                    <SongBanner
+                        song={song}
+                        onClick={(e) => e.stopPropagation()}
+                    />
                     <SongDetail
                         length={"extra-long"}
                         className="pl-3"
                         song={song}
                         isCurrent={song.id == currentSong}
+                        onClick={(e) => e.stopPropagation()}
                     />
                 </SongHeader>
             </div>
@@ -361,7 +398,6 @@ const SongItem = ({
                     <SongLyricHoverCard song={song} />
                     <SongStats song={song} />
                 </div>
-
                 <div className="gap-1 hidden lg:flex">
                     <Button
                         className="gap-1"
@@ -744,6 +780,7 @@ const AllSongs = () => {
                             )
                             .map((song, index) => (
                                 <SongItem
+                                    key={song.id}
                                     song={song}
                                     index={index}
                                     listStyle={listStyle}

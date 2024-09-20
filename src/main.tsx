@@ -11,9 +11,9 @@ import SettingsWindow from "./routes/settings/settings-window";
 import Song from "./routes/song/song-page";
 import Songs from "./routes/song/songs";
 import SongsPage from "./routes/song/songs-window";
-import TyperTestPage from "./routes/typer/typer-page-test";
+
 import VersePage from "./routes/typer/verse/verse-page";
-import TestPage from "./routes/typer/test-page";
+import TyperPage from "./routes/typer/typer-page";
 import EditSong from "./routes/song/edit-song";
 
 const router = createBrowserRouter([
@@ -27,7 +27,7 @@ const router = createBrowserRouter([
             {
                 path: "/",
                 // element: <TyperTestPage />,
-                element: <TestPage />,
+                element: <TyperPage />,
             },
             { path: "verse", element: <VersePage /> },
             {

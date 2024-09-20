@@ -25,7 +25,7 @@ export default function EditSong() {
 
     return (
         <div className="h-[100%] rounded-md overflow-hidden">
-            <ScrollArea className="h-[100%] px-12 pb-2 pt-12">
+            <ScrollArea className="h-[100%]  px-2 sm:px-6 md:px-12 sm:pb-2 pb-4 pt-12">
                 <div className="flex flex-col items-start justify-start">
                     <BackButton link="/songs" />
                     <h1 className="text-2xl font-bold py-4">Edit song</h1>

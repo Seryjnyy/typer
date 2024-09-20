@@ -22,32 +22,11 @@ import { Song } from "../../lib/types";
 import { cn } from "../../lib/utils";
 import { HarderOptions } from "@/lib/store/text-modifications-store";
 import KeyboardButton from "@/components/keyboard-button";
+import { Handlers, ProgressManager, SongData } from "./types";
 
-export interface ProgressManager {
-    userInput: string;
-    completed: boolean;
-    setUserInput: (val: string) => void;
-    setCompleted: (val: boolean) => void;
-    setTypedCharCount: (val: number) => void;
-    setTargetCharCount: (val: number) => void;
-    setCorrect: (correct: number) => void;
-    setIncorrect: (incorrect: number) => void;
-    restartState: () => void;
-}
-
-export interface Handlers {
-    onFinish?: () => void;
-    onStart?: () => void;
-    onChangeSong?: () => void;
-    onClickVerse?: (verse: string) => void;
-}
-
-interface TypingProps {
+interface CylinderTyperProps {
     progressManager: ProgressManager;
-    songData: {
-        song: Song;
-        songContent: { full: string; stripped: string };
-    } | null;
+    songData: SongData;
     handlers: Handlers;
     difficultyModifiers: HarderOptions;
     children?: ReactNode;
@@ -82,6 +61,41 @@ const splitSongIntoLines = (song: string) => {
     };
 };
 
+const calculateLineStyle = (
+    start: number,
+    lineIndex: number,
+    midpoint: number,
+    curr: number,
+    lineLimit: number,
+    angle: number
+) => {
+    const transform = `rotateX(calc(${
+        start + lineIndex + midpoint + curr
+    }*${angle}deg))`;
+    const fontSizeOffset = 10 - Math.abs(start + lineIndex + midpoint + curr);
+    const fontSize = `${fontSizeOffset * 3}px`;
+    const fontColourOffset =
+        1 - Math.abs(start + lineIndex + midpoint + curr) * (1 / lineLimit);
+    let fontColour = `rgb(255 255 255 / ${fontColourOffset / 3})`;
+    fontColour =
+        start + lineIndex + midpoint + curr == 0
+            ? "rgb(255 255 255)"
+            : fontColour;
+    const fontWeight =
+        start + lineIndex + midpoint + curr == 0 ? "bold" : "normal";
+
+    // const fontColour = `rgb(255 255 255 / ${fontColourOffset})`;
+
+    return {
+        transform: transform,
+        fontSize: fontSize,
+        fontColour: fontColour,
+        fontWeight: fontWeight,
+        fontSizeOffset: fontSizeOffset,
+        fontColourOffset: fontColourOffset,
+    };
+};
+
 const convertStuff = (
     songContent: string,
     userInput: string,
@@ -110,29 +124,22 @@ const convertStuff = (
     let currentLine = 0;
     newSplit.linesVerseMap.forEach((x, verseIndex) => {
         // render stops verses from being added, however it still does the computation and stuff
-        let render = true;
-        // const ress: ReactNode[] = [];
-        const lines = x.lines.map((line) => {
-            const transform = `rotateX(calc(${
-                start + lineIndex + midpoint + curr
-            }*${angle}deg))`;
-            const fontSizeOffset =
-                10 - Math.abs(start + lineIndex + midpoint + curr);
-            const fontSize = `${fontSizeOffset * 3}px`;
-            const fontColourOffset =
-                1 -
-                Math.abs(start + lineIndex + midpoint + curr) * (1 / lineLimit);
-            const fontColour = `rgb(255 255 255 / ${fontColourOffset})`;
-            const fontWeight =
-                start + lineIndex + midpoint + curr == 0 ? "bold" : "normal";
 
+        const lines = x.lines.map((line) => {
+            const style = calculateLineStyle(
+                start,
+                lineIndex,
+                midpoint,
+                curr,
+                lineLimit,
+                angle
+            );
             if (
                 start + lineIndex + midpoint + curr < -lineLimit ||
                 start + lineIndex + midpoint + curr > lineLimit
             ) {
                 lineIndex++;
-                Array.from(line).forEach((x) => chIndex++);
-                render = false;
+                Array.from(line).forEach(() => chIndex++);
                 return null;
             }
 
@@ -140,8 +147,6 @@ const convertStuff = (
                 let variant: chVariant = "normal";
 
                 if (chIndex > userInput.length) {
-                    // not covered yet
-
                     if (difficultyModifiers.cantSeeAhead) {
                         if (ch != " ") {
                             ch = "_";
@@ -180,10 +185,6 @@ const convertStuff = (
                     }
                 }
 
-                // if (variant == "normal" && difficultyModifiers.cantSeeAhead) {
-                //     variant = "normalInvisible";
-                // }
-
                 if (chIndex == userInput.length + 1) {
                     currentLine = -lineIndex;
                 }
@@ -195,31 +196,16 @@ const convertStuff = (
 
             lineIndex++;
 
-            // ress.push(
-            //     <div
-            //         className="text-center w-full"
-            //         key={lineIndex}
-            //         style={{
-            //             transform: transform,
-            //             fontSize: fontSize,
-            //             lineHeight: 1,
-            //             fontWeight: fontWeight,
-            //             color: fontColour,
-            //         }}
-            //     >
-            //         {formattedLine}
-            //     </div>
-            // );
             return (
                 <div
                     className="text-center w-full"
                     key={lineIndex}
                     style={{
-                        transform: transform,
-                        fontSize: fontSize,
+                        transform: style.transform,
+                        fontSize: style.fontSize,
                         lineHeight: 1,
-                        fontWeight: fontWeight,
-                        color: fontColour,
+                        fontWeight: style.fontWeight,
+                        color: style.fontColour,
                     }}
                 >
                     {formattedLine}
@@ -258,31 +244,24 @@ const convertStuff = (
                 lines.length != 0 &&
                 verseIndex < newSplit.linesVerseMap.length - 1
             ) {
-                const transform = `rotateX(calc(${
-                    start + lineIndex - 1 + midpoint + curr
-                }*${angle}deg))`;
-                const fontSizeOffset =
-                    10 - Math.abs(start + lineIndex - 1 + midpoint + curr);
-                const fontSize = `${fontSizeOffset * 3}px`;
-                const fontColourOffset =
-                    1 -
-                    Math.abs(start + lineIndex + midpoint + curr) *
-                        (1 / lineLimit);
-                const fontColour = `rgb(255 255 255 / ${fontColourOffset})`;
-                const fontWeight =
-                    start + lineIndex + midpoint + curr == 0
-                        ? "bold"
-                        : "normal";
+                const style = calculateLineStyle(
+                    start,
+                    lineIndex,
+                    midpoint,
+                    curr,
+                    lineLimit,
+                    angle
+                );
 
                 drawLines.push(
                     <div
                         className="text-center w-full opacity-50"
                         key={lineIndex + chIndex}
                         style={{
-                            color: fontColour,
-                            fontWeight: fontWeight,
-                            transform: transform,
-                            fontSize: fontSize,
+                            color: `rgb(255 255 255 / ${style.fontColourOffset})`,
+                            fontWeight: style.fontWeight,
+                            transform: style.transform,
+                            fontSize: style.fontSize,
                             lineHeight: 1,
                         }}
                     >
@@ -296,35 +275,34 @@ const convertStuff = (
     return {
         elements: drawLines,
         linesCount: newSplit.lineCount,
-        newLineIndexes: [],
+
         stats: { correct: 0, incorrect: 0 },
         currentLine: currentLine,
     };
 };
 
-export default function Test({
+export default function CylinderTyper({
     songData,
     progressManager,
     handlers,
     children,
     className,
     difficultyModifiers,
-}: TypingProps) {
+}: CylinderTyperProps) {
     const [focusedOnInput, setFocusedOnInput] = useState(false);
     const [curr, setCurr] = useState(0);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const { elements, linesCount, newLineIndexes, stats, currentLine } =
-        useMemo(() => {
-            return convertStuff(
-                songData?.songContent.full ?? "no song",
-                progressManager.userInput,
-                curr,
-                true,
-                difficultyModifiers,
-                handlers.onClickVerse
-            );
-        }, [songData, curr, progressManager.userInput, difficultyModifiers]);
+    const { elements, linesCount, stats, currentLine } = useMemo(() => {
+        return convertStuff(
+            songData?.full ?? "no song",
+            progressManager.userInput,
+            curr,
+            true,
+            difficultyModifiers,
+            handlers.onClickVerse
+        );
+    }, [songData, curr, progressManager.userInput, difficultyModifiers]);
 
     const scrollDivRef = useRef<HTMLDivElement>(null);
 
@@ -333,9 +311,10 @@ export default function Test({
 
         progressManager.setUserInput(input);
 
-        const finished = input.length == songData.songContent.stripped.length;
+        const finished = input.length == songData.stripped.length;
         if (finished) {
             progressManager.setCompleted(true);
+            // TODO : this is commented out, idk if stuff still works
             // handlers.onFinish?.();
         }
 
@@ -349,34 +328,18 @@ export default function Test({
         handlers.onChangeSong?.();
 
         progressManager.setTargetCharCount(
-            songData ? songData.songContent.stripped.length : 0
+            songData ? songData.stripped.length : 0
         );
 
         setCurr(0);
     }, [songData]);
 
-    useHotkeys("[", () => {
-        changeCurrVal(-1);
-    });
-
     const changeCurrVal = (amount: number) => {
         let newVal = curr + amount;
         if (newVal < -linesCount || newVal > 0) return;
 
-        // while (newLineIndexes.includes(-newVal)) {
-        //     if (newVal > curr) {
-        //         newVal++;
-        //     } else {
-        //         newVal--;
-        //     }
-        // }
-
         setCurr(newVal);
     };
-
-    useHotkeys("]", () => {
-        changeCurrVal(1);
-    });
 
     // TODO : Low value for smooth scrolling but then one scroll and it flies through everything idk
     const handleScroll = throttle((event: WheelEvent) => {

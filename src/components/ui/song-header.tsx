@@ -8,6 +8,7 @@ const songBannerVariants = cva("", {
     variants: {
         size: {
             default: "min-h-12 min-w-12",
+            small: "min-h-4 min-w-4 max-h-4 max-w-4",
             large: "min-h-[6rem] min-w-[6rem]",
             extraLarge: "min-h-[10rem] min-w-[10rem]",
         },
@@ -17,7 +18,9 @@ const songBannerVariants = cva("", {
     },
 });
 
-interface SongBannerProps extends VariantProps<typeof songBannerVariants> {
+interface SongBannerProps
+    extends React.ButtonHTMLAttributes<HTMLDivElement>,
+        VariantProps<typeof songBannerVariants> {
     song: Song;
     className?: string;
     playButton?: boolean;
@@ -28,16 +31,18 @@ const SongBanner = ({
     className,
     size,
     playButton = true,
+    ...props
 }: SongBannerProps) => {
     return (
         <div
             className={cn(
                 songBannerVariants({ size: size }),
-                className,
                 song.cover,
-                "rounded-md flex justify-center items-center relative"
+                "rounded-md flex justify-center items-center relative",
+                className
                 // "bg-gradient-to-bl from-yellow-200 to-violet-800"
             )}
+            {...props}
         >
             {playButton && (
                 <div className="z-40 peer">
@@ -68,7 +73,9 @@ const songDetailVariants = cva(
     }
 );
 
-interface SongDetailProps extends VariantProps<typeof songDetailVariants> {
+interface SongDetailProps
+    extends React.ButtonHTMLAttributes<HTMLDivElement>,
+        VariantProps<typeof songDetailVariants> {
     song: Song;
     isCurrent: boolean;
     className?: string;
@@ -79,6 +86,7 @@ const SongDetail = ({
     isCurrent,
     className,
     length,
+    ...props
 }: SongDetailProps) => {
     return (
         <div
@@ -86,6 +94,7 @@ const SongDetail = ({
                 "flex flex-col leading-tight justify-center ",
                 className
             )}
+            {...props}
         >
             <span
                 className={cn(

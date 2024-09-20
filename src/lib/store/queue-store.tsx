@@ -107,32 +107,48 @@ const useQueueStoreBase = create<State & Actions>()(
             enqueue: (songId, setNewCurrent, position) =>
                 set(() => {
                     const state = get();
+                    let current = state.current;
+
                     // Already in queue
                     if (state.songs.find((x) => x == songId) != null) {
-                        return { songs: state.songs };
+                        if (setNewCurrent) {
+                            current = songId;
+                        }
+
+                        return { songs: state.songs, current: current };
                     }
 
-                    // If no songs in queue set this new one as current
-                    let current = state.current;
+                    if (state.songs.length == 0 && setNewCurrent) {
+                        current = songId;
+                    }
+
                     if (setNewCurrent) {
-                        current =
-                            state.songs.length == 0 ? songId : state.current;
+                        current = songId;
                     }
 
-                    // Insert in position or else just append
-                    if (position && position >= 0 && position) {
+                    // Insert in position
+                    // Or just enqueue
+                    if (
+                        position &&
+                        position >= 0 &&
+                        position < state.songs.length
+                    ) {
                         // Check if position is valid
 
                         const currentIndex = state.songs.findIndex(
                             (x) => x == current
                         );
 
+                        // TODO : IMPLEMENT this stuff man
+                        console.error("NOT IMPLEMENTED YET.");
+
                         //
                         // if(position ==  currentIndex){
 
                         // }
 
-                        return { ...state };
+                        // return { ...state, current:current};
+                        return state;
                     } else {
                         return {
                             songs: [...state.songs, songId],

@@ -13,9 +13,11 @@ import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { useStopwatch } from "react-timer-hook";
 import Stat from "../stat";
-import Typing, { Handlers, ProgressManager, SongData } from "../typing";
+
 import { useSongStore } from "@/lib/store/song-store";
 import BackButton from "@/components/ui/back-button";
+import FlatTyper from "../flat-typer";
+import { Handlers, ProgressManager, SongData } from "../types";
 
 export default function VersePage() {
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
@@ -27,6 +29,8 @@ export default function VersePage() {
     const [completed, setCompleted] = useState(false);
     const [correct, setCorrect] = useState(0);
     const [incorrect, setIncorrect] = useState(0);
+    const [errorMap, setErrorMap] = useState(new Map<number, number>());
+
     const song = useMemo(() => {
         return songList.find((x) => x.id == id);
     }, [songList, id]);
@@ -64,9 +68,19 @@ export default function VersePage() {
         setIncorrect(0);
     };
 
+    const recordError = (index: number) => {
+        const newMap = new Map<number, number>(errorMap);
+
+        newMap.set(index, (newMap.get(index) ?? 0) + 1);
+        setErrorMap(newMap);
+    };
+
     const progressManager: ProgressManager = {
         userInput: userInput,
         completed: completed,
+        timeElapsed: totalSeconds,
+        errorMap: errorMap,
+        recordError: recordError,
         setCompleted: setCompleted,
         setCorrect: setCorrect,
         setIncorrect: setIncorrect,
@@ -77,6 +91,7 @@ export default function VersePage() {
     };
 
     const handlers: Handlers = {
+        onRestart: () => onRestart(),
         onStart: () => {
             startStopwatch();
         },
@@ -91,9 +106,40 @@ export default function VersePage() {
     };
 
     return (
-        <div className={cn("h-full flex", queueWindowOpen ? "" : "pr-[15rem]")}>
-            <div className="p-2">
+        <div
+            className={cn(
+                "h-[calc(100vh-5rem)] w-full flex overflow-hidden relative"
+            )}
+        >
+            <div className="absolute top-0 left-0 text-xs z-50 flex items-center gap-2 text-muted-foreground">
+                <Link to={"/"}>
+                    <Button
+                        size={"sm"}
+                        className="space-x-1 group rounded-none rounded-tl-md"
+                        variant={"ghost"}
+                    >
+                        <ArrowLeftIcon className="group-hover:-translate-x-1 transition-transform" />
+                        <span>Back</span>
+                    </Button>
+                </Link>
+                <div className="flex gap-1">
+                    {song && (
+                        <SongBanner
+                            song={song}
+                            size={"small"}
+                            playButton={false}
+                            className="rounded-[2px]"
+                        />
+                    )}
+                    <span>{song?.title}</span>
+                    <span>-</span>
+                    <span className="opacity-70">{song?.source}</span>
+                </div>
+            </div>
+            {/* <div className="p-2">
                 <div className="flex flex-col border rounded-md w-[15rem] h-full">
+
+
                     <div className="p-12">
                         <BackButton link={cameFrom ?? "/"} />
                     </div>
@@ -160,13 +206,13 @@ export default function VersePage() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
             <div className="w-full">
-                <Typing
+                <FlatTyper
                     songData={songData}
                     progressManager={progressManager}
                     handlers={handlers}
-                ></Typing>
+                ></FlatTyper>
             </div>
         </div>
     );

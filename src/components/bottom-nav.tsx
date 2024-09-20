@@ -3,7 +3,14 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import {
+    Drawer,
+    DrawerContent,
+    DrawerDescription,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Progress } from "@/components/ui/progress";
 import {
     Tooltip,
@@ -57,7 +64,11 @@ const MediaControl = () => {
 
     return (
         <div className="flex items-center gap-3">
-            <ShuffleButton variant={"ghost"} size={"icon"} />
+            <ShuffleButton
+                variant={"ghost"}
+                size={"icon"}
+                disabled={songs.length == 0}
+            />
             <QueueControl>
                 <Tooltip>
                     <TooltipTrigger asChild>
@@ -65,8 +76,9 @@ const MediaControl = () => {
                             onClick={onPlaySong}
                             size={"icon"}
                             className="rounded-full w-11 h-11"
+                            disabled={songs.length == 0}
                         >
-                            <PlayIcon className="w-6 h-6" />
+                            <PlayIcon className="size-6" />
                         </Button>
                     </TooltipTrigger>
 
@@ -132,11 +144,16 @@ const SongInfo = () => {
 const MobileMenu = ({ className }: { className?: string }) => {
     const currSong = useQueueStore.use.current();
     const song = useSongStore.use.songs().find((x) => x.id == currSong);
-
+    const setQueueWindowOpen = useUiStateStore.use.setQueueWindowOpen();
+    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const focus = useUiStateStore.use.focus();
     const songTypedChar = useSongProgressStore.use.songTypedChar();
     const songTotalChar = useSongProgressStore.use.songTotalChar();
     const [openQueue, setOpenQueue] = useState(false);
+
+    const onToggleQueueWindow = (val: boolean) => {
+        setQueueWindowOpen(val);
+    };
 
     if (focus) return null;
 
@@ -155,12 +172,16 @@ const MobileMenu = ({ className }: { className?: string }) => {
                     className={`h-14 w-full absolute -top-16 left-0 backdrop-blur-xl`}
                 >
                     <Drawer>
-                        <DrawerTrigger className="w-full h-full px-2 flex items-center justify-between border-y ">
-                            <div className="w-fit flex gap-2 md:gap-9">
-                                <SongInfo />
-                                <SongProgressStats />
-                            </div>
-                            {/* <div className="w-[10rem]">
+                        <DrawerTrigger
+                            className="w-full h-full px-2 flex items-center justify-between border-y "
+                            asChild
+                        >
+                            <div>
+                                <div className="w-fit flex gap-2 md:gap-9">
+                                    <SongInfo />
+                                    <SongProgressStats />
+                                </div>
+                                {/* <div className="w-[10rem]">
                                 <Progress
                                     value={
                                         (songTypedChar / songTotalChar) * 100
@@ -168,65 +189,74 @@ const MobileMenu = ({ className }: { className?: string }) => {
                                     className="w-full h-1"
                                 />
                             </div> */}
-                            <CaretUpIcon />
+                                <CaretUpIcon />
+                            </div>
                         </DrawerTrigger>
 
-                        <DrawerContent
-                            className={cn(
-                                "flex flex-col  ",
-                                openQueue ? "h-[90vh]" : "h-[50vh] ",
-                                from && `bg-gradient-to-b ${from} `
-                            )}
-                        >
-                            {/* <DrawerHeader>
-                                <DrawerTitle className="sr-only">
-                                    Extra details and queue card.
-                                </DrawerTitle>
-                            </DrawerHeader> */}
+                        <DrawerContent>
+                            <div
+                                className={cn(
+                                    "flex flex-col  transition-all overflow-hidden  ease-in-out duration-500",
+                                    // from && `bg-gradient-to-b ${from} `,
+                                    openQueue
+                                        ? "max-h-[90vh] h-[90vh]"
+                                        : "max-h-[50vh] h-[50vh]"
+                                )}
+                            >
+                                <DrawerHeader>
+                                    <DrawerTitle className="sr-only">
+                                        Media controls and queue drawer.
+                                    </DrawerTitle>
+                                    <DrawerDescription className="sr-only">
+                                        This is where you can control the media
+                                        with play, prev and next buttons. This
+                                        is also where the queue is.
+                                    </DrawerDescription>
+                                </DrawerHeader>
 
-                            <div className="space-y-2 mt-auto backdrop-brightness-50 pt-4 rounded-t-md">
-                                <div className="mx-2 sm:mx-12">
-                                    <div className="w-fit flex md:gap-9">
-                                        <SongInfo />
-                                        <SongProgressStats />
+                                <div className="space-y-2 mt-auto backdrop-brightness-50 pt-4 rounded-t-md">
+                                    <div className="mx-2 sm:mx-12">
+                                        <div className="w-fit flex md:gap-9">
+                                            <SongInfo />
+                                            <SongProgressStats />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex justify-center flex-col items-center gap-4 px-2 sm:mx-12">
-                                    <Progress
-                                        value={
-                                            (songTypedChar / songTotalChar) *
-                                            100
-                                        }
-                                        className="w-full h-1"
-                                    />
-                                    <MediaControl />
-                                </div>
-                                {/* <div className="flex justify-end p-1">
-                                    <Button
-                                        variant={"ghost"}
-                                        onClick={() =>
-                                            setOpenQueue((prev) => !prev)
-                                        }
+                                    <div className="flex justify-center flex-col items-center gap-4 px-2 sm:mx-12">
+                                        <Progress
+                                            value={
+                                                (songTypedChar /
+                                                    songTotalChar) *
+                                                100
+                                            }
+                                            className="w-full h-1"
+                                        />
+                                        <MediaControl />
+                                    </div>
+
+                                    <Collapsible
+                                        open={openQueue}
+                                        onOpenChange={(val) => {
+                                            setOpenQueue(val);
+                                            onToggleQueueWindow(!val);
+                                        }}
                                     >
-                                        {openQueue ? "Close" : "Open"} queue
-                                    </Button>
-                                </div> */}
-                                <Collapsible
-                                    open={openQueue}
-                                    onOpenChange={(val) => setOpenQueue(val)}
-                                >
-                                    <CollapsibleTrigger className="flex justify-between items-center w-full px-2 py-2 text-sm font-medium">
-                                        {openQueue ? (
-                                            <CaretUpIcon className="text-muted-foreground" />
+                                        <CollapsibleTrigger className="flex justify-between items-center w-full px-2 py-2 text-sm font-medium [&[data-state=open]>svg]:rotate-180  transition-all">
+                                            <span>Open queue</span>
+                                            <CaretUpIcon className="text-muted-foreground w-6 h-6 transition-transform duration-200" />
+                                            {/* {openQueue ? (
                                         ) : (
-                                            <CaretDownIcon className="text-muted-foreground" />
-                                        )}
-                                        <span>Open queue</span>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent className="h-[60vh] ">
-                                        <MobileQueue />
-                                    </CollapsibleContent>
-                                </Collapsible>
+                                            <CaretDownIcon className="text-muted-foreground w-6 h-6 transition-transform duration-200" />
+                                        )} */}
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent
+                                            // className=""
+
+                                            className="h-[53vh] overflow-hidden data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown duration-500 "
+                                        >
+                                            <MobileQueue />
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                </div>
                             </div>
                         </DrawerContent>
                     </Drawer>

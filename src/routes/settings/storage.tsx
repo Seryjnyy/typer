@@ -80,7 +80,10 @@ const QueueStorage = () => {
                 <CardContent>
                     <div className="space-y-2">
                         {options.map((option) => (
-                            <div className="border rounded-md p-2 flex justify-between">
+                            <div
+                                className="border rounded-md p-2 flex justify-between"
+                                key={option.id}
+                            >
                                 <div className="flex flex-col" key={option.id}>
                                     <span className="text-lg font-semibold">
                                         {option.title}

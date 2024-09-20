@@ -1,20 +1,33 @@
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongProgressStore } from "@/lib/store/song-progress-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
 import { Song } from "@/lib/types";
-import { calculateAccuracy, chpm, cn } from "@/lib/utils";
+import {
+    calculateAccuracy,
+    chpm,
+    cn,
+    textModification,
+    wpm,
+} from "@/lib/utils";
+
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { ReactNode, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-timer-hook";
 import EndScreen from "./end-screen";
-import Stat from "./stat";
-import Typing, { Handlers, ProgressManager, SongData } from "./typing";
-import NoSongSelected from "./no-song-selected";
+
+import CylinderTyper from "./cylinder-typer";
+
+import { Progress } from "@/components/ui/progress";
 import { usePreferenceStore } from "@/lib/store/preferences-store";
+import { useTextModificationsStore } from "@/lib/store/text-modifications-store";
+import TextModificationDialog from "./cylinder/text-modification-dialog";
+import FlatTyper from "./flat-typer";
+import NoSongSelected from "./no-song-selected";
+import Stat from "./stat";
+import { Handlers, ProgressManager } from "./types";
 
 const Stats = ({
     onRestart,
@@ -35,7 +48,7 @@ const Stats = ({
     return (
         <div
             className={cn(
-                "  border rounded-md flex flex-col  w-[15rem] pt-[8.3rem] h-full",
+                "  border-r flex flex-col  w-[15rem] pt-[8.3rem]",
                 className
             )}
         >
@@ -88,7 +101,7 @@ const Stats = ({
     );
 };
 
-export default function TyperTestPage() {
+export default function TyperPage() {
     const currentSongInQueue = useQueueStore.use.current();
     const songList = useSongStore.use.songs();
 
@@ -98,6 +111,8 @@ export default function TyperTestPage() {
     const setCorrect = useSongProgressStore.use.setCorrect();
     const correct = useSongProgressStore.use.correct();
     const setIncorrect = useSongProgressStore.use.setIncorrect();
+    const errorMap = useSongProgressStore.use.errorMap();
+    const recordError = useSongProgressStore.use.recordError();
 
     const userInput = useSongProgressStore.use.userInput();
     const setUserInput = useSongProgressStore.use.setUserInput();
@@ -117,6 +132,10 @@ export default function TyperTestPage() {
     const editSongCompletion = useSongStore.use.editSongCompletion();
     const editSongRecord = useSongStore.use.editSongRecord();
 
+    const txtMods = useTextModificationsStore.use.textModifications();
+    const difficultyModifiers = useTextModificationsStore.use.harderOptions();
+    const typerTextDisplay = usePreferenceStore.use.typerTextDisplay();
+
     const {
         totalSeconds,
         start: startStopwatch,
@@ -126,24 +145,30 @@ export default function TyperTestPage() {
         autoStart: false,
     });
 
-    const { song, songData }: { song: Song | null; songData: SongData } =
-        useMemo(() => {
-            const s = songList.find((x) => x.id == currentSongInQueue);
-            if (!s)
-                return { song: null, songData: { song: "", songStripped: "" } };
+    const songData: {
+        song: Song;
+        songContent: { full: string; stripped: string };
+    } | null = useMemo(() => {
+        const s = songList.find((x) => x.id == currentSongInQueue);
+        if (!s) return null;
 
-            return {
-                song: s,
-                songData: {
-                    song: s.content,
-                    songStripped: s.content.replace(/(\r\n|\n|\r)/gm, ""),
-                },
-            };
-        }, [songList, currentSongInQueue]);
+        let txt = textModification(s.content, txtMods);
+
+        return {
+            song: s,
+            songContent: {
+                full: txt,
+                stripped: txt.replace(/(\r\n|\n|\r)/gm, ""),
+            },
+        };
+    }, [songList, currentSongInQueue, txtMods]);
 
     const progressManager: ProgressManager = {
         userInput: userInput,
         completed: completed,
+        errorMap: errorMap,
+        timeElapsed,
+        recordError: recordError,
         setCompleted: setCompleted,
         setCorrect: setCorrect,
         setIncorrect: setIncorrect,
@@ -156,6 +181,7 @@ export default function TyperTestPage() {
     const navigate = useNavigate();
 
     const handlers: Handlers = {
+        onRestart: () => onRestart(),
         onStart: () => {
             startStopwatch();
         },
@@ -169,9 +195,9 @@ export default function TyperTestPage() {
                 next();
             }
 
-            if (!song) return;
+            if (!songData) return;
 
-            editSongCompletion(song.id, song.completion + 1);
+            editSongCompletion(songData.song.id, songData.song.completion + 1);
 
             const resultChpm =
                 timeElapsed == 0
@@ -180,20 +206,30 @@ export default function TyperTestPage() {
 
             const resultAcc = calculateAccuracy(correct, userInput.length);
             if (
-                resultChpm > song.record.chpm ||
-                (resultChpm == song.record.chpm &&
-                    resultAcc > song.record.accuracy)
+                resultChpm > songData.song.record.chpm ||
+                (resultChpm == songData.song.record.chpm &&
+                    resultAcc > songData.song.record.accuracy)
             ) {
-                // TODO : Set song record
-                editSongRecord(song.id, {
-                    chpm: resultChpm,
-                    accuracy: resultAcc,
-                });
+                // Only save if text wasn't made easier.
+                if (
+                    txtMods.letterCase == "normal" &&
+                    txtMods.numbers == "normal" &&
+                    txtMods.punctuation == "normal"
+                ) {
+                    editSongRecord(songData.song.id, {
+                        chpm: resultChpm,
+                        accuracy: resultAcc,
+                    });
+                }
             }
         },
         onClickVerse: (verse: string) => {
             navigate("/verse", {
-                state: { content: verse, id: song?.id ?? "" },
+                state: {
+                    content: verse,
+                    id: songData?.song.id ?? "",
+                    cameFrom: `/`,
+                },
             });
         },
     };
@@ -205,28 +241,46 @@ export default function TyperTestPage() {
 
     useEffect(() => {
         setTimeElapsed(totalSeconds);
+
+        console.log(
+            "WPM",
+            totalSeconds > 0 ? wpm(userInput.length, totalSeconds) : 0
+        );
     }, [totalSeconds]);
 
+    // console.log(completed ? "song-completed" : "not-completed");
     return (
-        <div className={cn("h-full flex", queueWindowOpen ? "" : "pr-[15rem]")}>
-            {song != null && (
-                <div className="p-2">
-                    <Stats
-                        onRestart={onRestart}
-                        // className={song == null ? "invisible" : "visible"}
-                    >
-                        {/* {
-                <Button variant={"secondary"} onClick={onRestart}>
-                    reset song progress
-                </Button>
-            } */}
-                    </Stats>
-                </div>
+        <div
+            className={cn(
+                "h-[calc(100vh-4rem)] w-full flex overflow-hidden "
+                // queueWindowOpen ? "" : "pr-[15rem]"
             )}
-            {song != null && (
-                <div className="w-full p-2">
-                    <Typing
-                        songData={songData}
+        >
+            {songData == null && <NoSongSelected />}
+            {songData != null && typerTextDisplay == "cylinder" && (
+                <CylinderTyper
+                    songData={songData.songContent}
+                    progressManager={progressManager}
+                    handlers={handlers}
+                    tryVerseOption={true}
+                    difficultyModifiers={difficultyModifiers}
+                >
+                    {/* <Stats onRestart={onRestart} className="absolute left-0" /> */}
+                    <div className="absolute sm:left-8 left-4 bottom-[9rem] sm:bottom-[6rem] z-50">
+                        <TextModificationDialog />
+                    </div>
+                    {!autoplay && completed && (
+                        <EndScreen
+                            onRestart={onRestart}
+                            userInputLength={userInput.length}
+                        />
+                    )}
+                </CylinderTyper>
+            )}
+            {songData != null && typerTextDisplay == "flat" && (
+                <div className="w-full pb-4">
+                    <FlatTyper
+                        songData={songData.songContent}
                         progressManager={progressManager}
                         handlers={handlers}
                         tryVerseOption={true}
@@ -237,11 +291,9 @@ export default function TyperTestPage() {
                                 userInputLength={userInput.length}
                             />
                         )}
-                    </Typing>
+                    </FlatTyper>
                 </div>
             )}
-
-            {song == null && <NoSongSelected />}
         </div>
     );
 }

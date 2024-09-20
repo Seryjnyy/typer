@@ -49,6 +49,7 @@ export const convertSongToElements = (
                 );
             }
 
+            const arrayFromLine = Array.from(line);
             const formatedLine = (
                 <div
                     key={"" + i + j}
@@ -59,7 +60,7 @@ export const convertSongToElements = (
                         lineCounter++;
                     }}
                 >
-                    {Array.from(line).map((ch, k) => {
+                    {arrayFromLine.map((ch, k) => {
                         let variant: chVariant = "not-covered";
 
                         if (k == 0) {
@@ -127,6 +128,22 @@ export const convertSongToElements = (
         );
     });
 
+    // console.log(currentCharIndex.length > 0 ? currentCharIndex[0] : "no");
+
+    // TODO : not 1000% sure but works
+    let errorIndex = null;
+    if (userInput.length - 1 >= 0) {
+        // console.log(
+        //     song.charAt(userInput.length - 1),
+        //     userInput.charAt(userInput.length - 1)
+        // );
+        if (
+            song.charAt(userInput.length - 1) !=
+            userInput.charAt(userInput.length - 1)
+        ) {
+            errorIndex = userInput.length - 1;
+        }
+    }
     return {
         element: elements.map((x, i) => {
             if (i < elements.length - 1) {
@@ -145,5 +162,6 @@ export const convertSongToElements = (
         startOfLineRefs: startOfLineRefs,
         correct: correct,
         incorrect: incorrect,
+        errorIndex: errorIndex,
     };
 };

@@ -12,6 +12,7 @@ type State = {
     correct: number;
     incorrect: number;
     userInput: string;
+    errorMap: Map<number, number>;
 };
 interface Actions {
     setSongTotalChar: (charCount: number) => void;
@@ -23,6 +24,7 @@ interface Actions {
     setIncorrect: (value: number) => void;
     setUserInput: (value: string) => void;
     resetState: () => void;
+    recordError: (index: number) => void;
 }
 
 const defaults: State = {
@@ -34,6 +36,7 @@ const defaults: State = {
     correct: 0,
     incorrect: 0,
     userInput: "",
+    errorMap: new Map<number, number>(),
 };
 
 const useSongProgressStoreBase = create<State & Actions>(
@@ -54,18 +57,25 @@ const useSongProgressStoreBase = create<State & Actions>(
                 return { userInput: value };
             }),
         resetState: () => set(() => defaults),
+        recordError: (index) =>
+            set((state) => {
+                const newMap = new Map<number, number>(state.errorMap);
+
+                newMap.set(index, (newMap.get(index) ?? 0) + 1);
+                return { errorMap: newMap };
+            }),
     }))
 );
 
 const useSongProgressStore = createSelectors(useSongProgressStoreBase);
 
 // TODO : why is this here???? what is it????
-declare global {
-    interface Window {
-        store: typeof useSongProgressStore;
-    }
-}
+// declare global {
+//     interface Window {
+//         store: typeof useSongProgressStore;
+//     }
+// }
 
-window.store = useSongProgressStore;
+// window.store = useSongProgressStore;
 
 export { useSongProgressStore };

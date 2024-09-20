@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { songSchema, songSchemaType } from "@/lib/schemas/song";
 import { useSongStore } from "@/lib/store/song-store";
+import { Song } from "@/lib/types";
 import {
     cn,
     generateGradient,
@@ -54,14 +55,16 @@ export default function CreateSongForm({
     function onSubmit(values: songSchemaType) {
         console.log(values);
 
-        const song = {
+        const song: Song = {
             id: uuidv4(),
             title: values.title,
-            content: values.content,
+            content: values.content.trim(),
             source: values.source,
             completion: 0,
             record: { accuracy: 0, chpm: 0 },
             cover: values.cover,
+            createdAt: Date.now(),
+            lastModifiedAt: Date.now(),
         };
 
         try {
@@ -94,7 +97,7 @@ export default function CreateSongForm({
     }
 
     return (
-        <ScrollArea className="h-[100%] px-2 sm:px-6 md:px-12 pb-2  rounded-md overflow-hidden border-t rounded-t-none ">
+        <ScrollArea className="h-[100%] px-2 sm:px-6 md:px-12 sm:pb-2 pb-4  rounded-md overflow-hidden border-t rounded-t-none ">
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -136,7 +139,7 @@ export default function CreateSongForm({
                                 </FormItem>
                             )}
                         />
-                        <div className="flex gap-8 flex-wrap">
+                        <div className="flex gap-8 flex-wrap mx-1">
                             <FormField
                                 control={form.control}
                                 name={"title"}
@@ -193,11 +196,15 @@ export default function CreateSongForm({
                                         (Lyrics)
                                     </span>
                                 </FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        className="min-h-[12rem]"
-                                        {...field}
-                                    />
+                                <FormControl
+                                // className="mx-1 "
+                                >
+                                    <div className="mx-1">
+                                        <Textarea
+                                            className="min-h-[12rem] "
+                                            {...field}
+                                        />
+                                    </div>
                                 </FormControl>
                                 <FormDescription className="sr-only">
                                     This is the content of the song. It is what

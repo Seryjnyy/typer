@@ -31,6 +31,16 @@ export function chpm(ch: number, seconds: number) {
     return round(ch / (seconds / 60));
 }
 
+export function wpm(ch: number, seconds: number) {
+    return round(ch / 5 / (seconds / 60));
+}
+
+export function formatTimestamp(time: number) {
+    const date = new Date(time);
+
+    return `${date.toLocaleTimeString()} - ${date.toLocaleDateString()}`;
+}
+
 export function formatBytes(bytes: number, decimals = 2) {
     if (!+bytes) return "0 Bytes";
 

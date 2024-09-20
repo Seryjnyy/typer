@@ -11,6 +11,8 @@ import {
 export default function QueueControl({ children }: { children?: ReactNode }) {
     const playNext = useQueueStore.use.next();
     const playPrev = useQueueStore.use.prev();
+    const getNextSong = useQueueStore.use.getNextSong();
+    const getPrevSong = useQueueStore.use.getPrevSong();
 
     return (
         <div className="space-x-1 flex items-center">
@@ -21,6 +23,7 @@ export default function QueueControl({ children }: { children?: ReactNode }) {
                         size={"icon"}
                         variant={"secondary"}
                         className="rounded-full"
+                        disabled={getPrevSong() == null}
                     >
                         <TrackPreviousIcon />
                     </Button>
@@ -38,6 +41,7 @@ export default function QueueControl({ children }: { children?: ReactNode }) {
                         size={"icon"}
                         variant={"secondary"}
                         className="rounded-full"
+                        disabled={getNextSong() == null}
                     >
                         <TrackNextIcon />
                     </Button>

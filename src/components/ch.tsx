@@ -19,7 +19,7 @@ export const chVariants = cva("", {
         variant: {
             "start-of-line": "bg-purple-400",
             current:
-                "rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] animate-pulse duration-1500 text-muted-foreground",
+                "rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.09rem] before:animate-pulse before:duration-1500 ",
             currentInvisible:
                 "invisible before:visible rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem] animate-pulse duration-1500 text-muted-foreground",
             "not-covered": "text-muted-foreground",

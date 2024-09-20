@@ -14,7 +14,6 @@ export default function PlayButton({ songID }: { songID: string }) {
     const enqueue = useQueueStore.use.enqueue();
     const current = useQueueStore.use.current();
     const setCurrent = useQueueStore.use.setCurrent();
-    console.log(current);
 
     const onPlay = (
         e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -22,6 +21,8 @@ export default function PlayButton({ songID }: { songID: string }) {
     ) => {
         e.stopPropagation();
         if (!songs.includes(songId)) {
+            // TODO : Should enqueue the song at the top of the queue if no current
+            // Otherwise enqueue after current
             enqueue(songId, true);
         } else {
             setCurrent(songId);

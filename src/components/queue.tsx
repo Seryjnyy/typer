@@ -32,6 +32,7 @@ export const MobileQueue = () => {
     const removeSong = useQueueStore.use.removeSong();
     const current = useQueueStore.use.current();
     const enqueue = useQueueStore.use.enqueue();
+    const setCurrent = useQueueStore.use.setCurrent();
     const setQueueSongs = useQueueStore.use.setSongs();
 
     const songList = useSongStore.use.songs();
@@ -57,9 +58,13 @@ export const MobileQueue = () => {
         const randomSongs = shuffleArray(songList).slice(0, 5);
 
         randomSongs.forEach((song) => {
-            enqueue(song.id, true);
+            enqueue(song.id);
         });
+        if (randomSongs.length > 0) {
+            setCurrent(randomSongs[randomSongs.length - 1]);
+        }
     };
+
     return (
         <div className="h-full    w-full ">
             <ScrollArea className=" h-[calc(100%)]  pl-1 pr-3 pb-1 border-t">
@@ -160,6 +165,7 @@ export default function Queue() {
     const current = useQueueStore.use.current();
     const setSongs = useQueueStore.use.setSongs();
     const enqueue = useQueueStore.use.enqueue();
+    const setCurrent = useQueueStore.use.setCurrent();
     const setQueueSongs = useQueueStore.use.setSongs();
 
     const songList = useSongStore.use.songs();
@@ -194,12 +200,26 @@ export default function Queue() {
         const randomSongs = shuffleArray(songList).slice(0, 5);
 
         randomSongs.forEach((song) => {
-            enqueue(song.id, true);
+            enqueue(song.id);
         });
+        if (randomSongs.length > 0) {
+            setCurrent(randomSongs[0].id);
+        }
     };
 
+    // TODO : have option for styled queue
+    const isStyledQueue = true;
+
     return (
-        <div className="h-full border rounded-md py-4  w-[15rem] ">
+        <div
+            className={cn(
+                "h-full border rounded-md py-4  w-[15rem]",
+                isStyledQueue &&
+                    `bg-gradient-to-b ${
+                        songs.find((x) => x.id == current)?.cover.split(" ")[1]
+                    } to-85%`
+            )}
+        >
             <div className="flex justify-between px-2 pb-2">
                 <h3 className="font-semibold text-xl pl-1">Up next</h3>
                 <AutoplayButton />
@@ -226,11 +246,13 @@ export default function Queue() {
                                             {...provided.dragHandleProps}
                                             {...provided.draggableProps}
                                             className={cn(
-                                                "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
-                                                {
-                                                    "bg-secondary ":
-                                                        current == song.id,
-                                                }
+                                                "border p-4 rounded-md space-y-2 group mt-2 bg-transparent flex ",
+                                                isStyledQueue
+                                                    ? current == song.id
+                                                        ? "backdrop-brightness-50"
+                                                        : "backdrop-brightness-75"
+                                                    : current == song.id ??
+                                                          "bg-secondary"
                                             )}
                                         >
                                             <div

@@ -6,17 +6,20 @@ import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
 
-const windowControlVariants = cva("border flex justify-evenly flex-1 h-full", {
-    variants: {
-        variant: {
-            default: "rounded-md",
-            square: "rounded-none",
+const windowControlVariants = cva(
+    "border flex justify-evenly flex-1 h-full  overflow-hidden",
+    {
+        variants: {
+            variant: {
+                default: "rounded-md",
+                square: "rounded-none",
+            },
         },
-    },
-    defaultVariants: {
-        variant: "default",
-    },
-});
+        defaultVariants: {
+            variant: "default",
+        },
+    }
+);
 
 interface WindowControlsProps
     extends VariantProps<typeof windowControlVariants> {}
@@ -36,12 +39,6 @@ export default function WindowControls({ variant }: WindowControlsProps) {
         <div className={windowControlVariants({ variant })}>
             {options.map((option, index) => {
                 let className = "";
-                if (index == 0) {
-                    className = "rounded-l-md ";
-                }
-                if (index == options.length - 1) {
-                    className = "rounded-r-md ";
-                }
 
                 return (
                     <Link

@@ -16,13 +16,17 @@ interface SongCarouselProps {
 
 export default function SongCarousel({ songs }: SongCarouselProps) {
     const enqueue = useQueueStore.use.enqueue();
+    const setCurrent = useQueueStore.use.setCurrent();
 
     const onEnqueueAll = () => {
         songs.forEach((song) => enqueue(song.id));
+        if (songs.length > 0) {
+            setCurrent(songs[0].id);
+        }
     };
 
     const onEnqueue = (song: Song) => {
-        enqueue(song.id);
+        enqueue(song.id, false);
     };
 
     return (

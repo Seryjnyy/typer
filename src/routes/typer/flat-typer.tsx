@@ -2,32 +2,14 @@ import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { convertSongToElements } from "./utils";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { KeyboardIcon, ReloadIcon } from "@radix-ui/react-icons";
+import { cn, wpm } from "@/lib/utils";
+import { Handlers, ProgressManager, SongData } from "./types";
+import SmallStats from "./small-stats";
+import TextModificationDialog from "./cylinder/text-modification-dialog";
 
-export interface SongData {
-    full: string;
-    stripped: string;
-}
-
-export interface ProgressManager {
-    userInput: string;
-    completed: boolean;
-    setUserInput: (val: string) => void;
-    setCompleted: (val: boolean) => void;
-    setTypedCharCount: (val: number) => void;
-    setTargetCharCount: (val: number) => void;
-    setCorrect: (correct: number) => void;
-    setIncorrect: (incorrect: number) => void;
-    restartState: () => void;
-}
-
-export interface Handlers {
-    onFinish?: () => void;
-    onStart?: () => void;
-    onChangeSong?: () => void;
-    onClickVerse?: (verse: string) => void;
-}
-
-interface TypingProps {
+interface FlatTyperProps {
     progressManager: ProgressManager;
     songData: SongData;
     handlers: Handlers;
@@ -35,34 +17,42 @@ interface TypingProps {
     tryVerseOption?: boolean;
 }
 
-export default function Typing({
+export default function FlatTyper({
     progressManager,
     songData,
     handlers,
     children,
     tryVerseOption,
-}: TypingProps) {
+}: FlatTyperProps) {
     const [focusedOnInput, setFocusedOnInput] = useState(false);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
+    const generatorResult = useMemo(
+        () =>
+            convertSongToElements(
+                songData?.full ?? "",
+                progressManager.userInput,
+                handlers.onClickVerse,
+                tryVerseOption
+            ),
+        [songData?.full, progressManager.userInput]
+    );
+
     const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
-        useMemo(
-            () =>
-                convertSongToElements(
-                    songData.full ?? "",
-                    progressManager.userInput,
-                    handlers.onClickVerse,
-                    tryVerseOption
-                ),
-            [songData.full, progressManager.userInput]
-        );
+        useMemo(() => generatorResult, [generatorResult]);
+
+    useEffect(() => {
+        if (generatorResult.errorIndex != null) {
+            progressManager.recordError(generatorResult.errorIndex);
+        }
+    }, [generatorResult]);
 
     const onUserInput = (input: string) => {
-        if (songData.full == "") return;
+        if (songData?.full == "") return;
 
         progressManager.setUserInput(input);
 
-        const finished = input.length == songData.stripped.length;
+        const finished = input.length == songData?.stripped.length;
         if (finished) {
             progressManager.setCompleted(true);
             handlers.onFinish?.();
@@ -91,17 +81,26 @@ export default function Typing({
         handlers.onChangeSong?.();
 
         progressManager.setTargetCharCount(
-            songData.stripped != undefined ? songData.stripped.length : 0
+            songData?.stripped != undefined ? songData.stripped.length : 0
         );
-    }, [songData.full]);
+    }, [songData?.full]);
 
-    useHotkeys("*", () => {
-        // focus
-        inputRef.current?.focus();
+    useHotkeys("*", (event) => {
+        const { key } = event;
+        const isLetter = /^[a-zA-Z]$/.test(key);
+        const isNumber = /^[0-9]$/.test(key);
+        const isPunctuation = /^[.,:;?!'"()\-_=+[\]{}<>/@#$%^&*~`]$/.test(key);
 
-        if (songData.full != "" && !progressManager.completed) {
+        // Only accept letters, numbers and punctuation
+        // TODO : what happens with non standard characters, like from different alphabets?
+        if (isLetter || isNumber || isPunctuation) {
+            // focus
             inputRef.current?.focus();
-            handlers.onStart?.();
+
+            if (songData?.full != "" && !progressManager.completed) {
+                inputRef.current?.focus();
+                handlers.onStart?.();
+            }
         }
     });
 
@@ -110,20 +109,19 @@ export default function Typing({
         progressManager.setIncorrect(incorrect);
     }, [correct, incorrect]);
 
-    // console.log("rerender");
     return (
-        <div className="relative h-full w-full overflow-y-hidden  rounded-md">
-            <ScrollArea className="h-full  relative ">
+        <div className="relative h-full w-full overflow-y-hidden  rounded-md ">
+            <ScrollArea className="h-full  relative z-40">
                 <div className="w-full h-full ">
                     <div className="flex justify-start">
                         <div className="flex justify-center w-full py-24 relative">
                             <div
-                                className="text-2xl font-semibold flex flex-col text-center"
+                                className="text-2xl font-semibold flex flex-col text-center px-1 sm:px-2"
                                 // className={
                                 //     queueWindowOpen ? "" : "pr-[15.5rem]"
                                 // }
                             >
-                                {songData.full != "" && element}
+                                {songData?.full != "" && element}
                             </div>
 
                             {children}
@@ -142,6 +140,26 @@ export default function Typing({
                     </div>
                 </div>
             </ScrollArea>
+            <div className="absolute sm:bottom-1 bottom-14 right-2 z-50 flex items-center gap-4">
+                <Button
+                    className=" text-xs"
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => {
+                        handlers.onRestart?.();
+                    }}
+                >
+                    <ReloadIcon />
+                </Button>
+                <TextModificationDialog />
+            </div>
+            <div className="absolute sm:bottom-2 bottom-14 left-2 text-xs text-muted-foreground flex items-center gap-1 z-0">
+                <SmallStats
+                    timeElapsed={progressManager.timeElapsed}
+                    focusedOnInput={focusedOnInput}
+                    userInputLength={progressManager.userInput.length}
+                />
+            </div>
         </div>
     );
 }

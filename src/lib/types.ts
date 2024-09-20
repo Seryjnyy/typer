@@ -11,4 +11,6 @@ export type Song = {
         accuracy: number;
         chpm: number;
     };
+    createdAt: number;
+    lastModifiedAt: number;
 };
