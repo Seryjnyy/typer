@@ -123,7 +123,7 @@ export default function EndScreen({
     return (
         <div
             className={cn(
-                "absolute w-[98%] h-[70vh] sm:h-[calc(100vh-10rem)] backdrop-blur-lg border   flex justify-center right-[1%] top-[10%] z-40 bg-gradient-to-t from-transparent  rounded-md from-50%",
+                "absolute w-[98%] h-[70vh] sm:h-[calc(100vh-10rem)] backdrop-blur-lg border   flex justify-center right-[1%] top-2 z-50 bg-gradient-to-t from-transparent  rounded-md from-50%",
                 songData?.cover.split(" ")[2] ?? "to-transparent",
                 { "max-h-9 w-9 border-none": !open }
             )}

@@ -18,12 +18,30 @@ import { useSongStore } from "@/lib/store/song-store";
 import BackButton from "@/components/ui/back-button";
 import FlatTyper from "../flat-typer";
 import { Handlers, ProgressManager, SongData } from "../types";
+import CylinderTyper from "../cylinder-typer";
+import { usePreferenceStore } from "@/lib/store/preferences-store";
+import { useTextModificationsStore } from "@/lib/store/text-modifications-store";
+
+const SomethingWentWrong = () => {
+    return (
+        <div className="flex justify-center items-center h-full flex-col gap-12">
+            <div className="text-center">
+                <h1 className="text-xl font-semibold">
+                    Sorry something went wrong.
+                </h1>
+                <p>Please go back and try again.</p>
+            </div>
+            <BackButton link="/" />
+        </div>
+    );
+};
 
 export default function VersePage() {
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const songList = useSongStore.use.songs();
-    const { state } = useLocation();
-    const { content, id, cameFrom } = state;
+    const verseTyperTextDisplay =
+        usePreferenceStore.use.verseTyperTextDisplay();
+    const difficultyModifiers = useTextModificationsStore.use.harderOptions();
 
     const [userInput, setUserInput] = useState("");
     const [completed, setCompleted] = useState(false);
@@ -31,24 +49,30 @@ export default function VersePage() {
     const [incorrect, setIncorrect] = useState(0);
     const [errorMap, setErrorMap] = useState(new Map<number, number>());
 
+    const { state } = useLocation();
+
+    if (!state) {
+        return <SomethingWentWrong />;
+    }
+    const { content, id, cameFrom } = state;
+
     const song = useMemo(() => {
         return songList.find((x) => x.id == id);
     }, [songList, id]);
 
-    if (typeof content != "string") {
-        throw Error("Verse in incorrect format.");
-    }
-
-    if (!content || !id) {
-        throw Error("Missing data.");
+    if (!song || !content || !id || typeof content != "string") {
+        return <SomethingWentWrong />;
     }
 
     const songData: SongData = useMemo(() => {
-        if (!content) return { full: "", stripped: "" };
+        if (!content) return null;
 
         return {
-            full: content,
-            stripped: content.replace(/(\r\n|\n|\r)/gm, ""),
+            song: song,
+            content: {
+                full: content,
+                stripped: content.replace(/(\r\n|\n|\r)/gm, ""),
+            },
         };
     }, [content]);
 
@@ -108,112 +132,63 @@ export default function VersePage() {
     return (
         <div
             className={cn(
-                "h-[calc(100vh-5rem)] w-full flex overflow-hidden relative"
+                "h-[calc(100vh-5rem)] w-full   overflow-hidden relative "
             )}
         >
             <div className="absolute top-0 left-0 text-xs z-50 flex items-center gap-2 text-muted-foreground">
-                <Link to={"/"}>
+                <Link to={cameFrom != null ? cameFrom : "/"}>
                     <Button
                         size={"sm"}
-                        className="space-x-1 group rounded-none rounded-tl-md"
+                        className="group rounded-none sm:rounded-tl-md "
                         variant={"ghost"}
                     >
-                        <ArrowLeftIcon className="group-hover:-translate-x-1 transition-transform" />
-                        <span>Back</span>
+                        <span className="flex gap-1 backdrop-blur-sm px-1 rounded-sm">
+                            <ArrowLeftIcon className="group-hover:-translate-x-1 transition-transform" />
+                            <span>Back</span>
+                        </span>
                     </Button>
                 </Link>
-                <div className="flex gap-1">
+                <div className="flex gap-1 backdrop-blur-sm rounded-sm pr-1">
                     {song && (
                         <SongBanner
                             song={song}
                             size={"small"}
-                            playButton={false}
                             className="rounded-[2px]"
                         />
                     )}
-                    <span>{song?.title}</span>
+                    <span className="overflow-hidden text-nowrap text-ellipsis max-w-[5rem] sm:max-w-[15rem]">
+                        {song?.title}
+                    </span>
                     <span>-</span>
-                    <span className="opacity-70">{song?.source}</span>
+                    <span className="overflow-hidden text-nowrap text-ellipsis max-w-[5rem] sm:max-w-[15rem] opacity-70">
+                        {song?.source}
+                    </span>
                 </div>
             </div>
-            {/* <div className="p-2">
-                <div className="flex flex-col border rounded-md w-[15rem] h-full">
 
+            {verseTyperTextDisplay == "cylinder" && (
+                <CylinderTyper
+                    songData={songData}
+                    progressManager={progressManager}
+                    handlers={handlers}
+                    tryVerseOption={true}
+                    difficultyModifiers={difficultyModifiers}
+                >
+                    {/* <Stats onRestart={onRestart} className="absolute left-0" /> */}
+                    {/* <div className="absolute sm:left-8 left-4 bottom-[9rem] sm:bottom-[6rem] z-50">
+                        <TextModificationDialog />
+                    </div> */}
+                </CylinderTyper>
+            )}
 
-                    <div className="p-12">
-                        <BackButton link={cameFrom ?? "/"} />
-                    </div>
-                    <div className="mx-2 space-y-4">
-                        <div className="border p-2 rounded-md">
-                            <span className="font-semibold">Verse from:</span>
-                            {song ? (
-                                <SongHeader>
-                                    <SongBanner
-                                        song={song}
-                                        playButton={false}
-                                    ></SongBanner>
-                                    <SongDetail isCurrent={true} song={song} />
-                                </SongHeader>
-                            ) : (
-                                <div className="bg-secondary rounded-md text-sm p-2">
-                                    Missing data.
-                                </div>
-                            )}
-                        </div>
-                        <div className="border rounded-md  p-2">
-                            <Stat title="time" stat={totalSeconds} append="s" />
-                            <Stat
-                                title="chpm"
-                                stat={
-                                    totalSeconds == 0
-                                        ? userInput.length
-                                        : chpm(userInput.length, totalSeconds)
-                                }
-                            />
-                            <Stat
-                                title="accuracy"
-                                stat={calculateAccuracy(
-                                    correct,
-                                    userInput.length
-                                )}
-                                append="%"
-                            />
-                            <Stat
-                                title="ch"
-                                stat={`${userInput.length}/${songData.stripped.length}`}
-                            />
-                        </div>
-                        <Button
-                            className="w-full"
-                            variant={"outline"}
-                            onClick={onRestart}
-                        >
-                            <ReloadIcon />
-                        </Button>
-                        <div className="space-y-1">
-                            <Progress
-                                value={
-                                    (userInput.length /
-                                        songData.stripped.length) *
-                                    100
-                                }
-                            />
-                            {userInput.length == songData.stripped.length && (
-                                <div className="text-primary flex justify-center text-xs uppercase opacity-80">
-                                    <span>complete</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div> */}
-            <div className="w-full">
+            {verseTyperTextDisplay == "flat" && (
                 <FlatTyper
+                    versePage={true}
                     songData={songData}
                     progressManager={progressManager}
                     handlers={handlers}
                 ></FlatTyper>
-            </div>
+            )}
         </div>
     );
 }

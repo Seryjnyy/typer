@@ -78,7 +78,7 @@ const SettingsMobileMenu = ({
 export default function SettingsWindow() {
     const location = useLocation();
     const split = location.pathname.split("/");
-    const current = split.length > 2 ? split[split.length - 1] : "storage";
+    const current = split.length > 2 ? split[split.length - 1] : "appearance";
 
     if (
         current != "storage" &&
@@ -91,8 +91,8 @@ export default function SettingsWindow() {
     }
 
     const links = [
-        { link: "storage", label: "Storage" },
         { link: "appearance", label: "Appearance" },
+        { link: "storage", label: "Storage" },
         // { link: "progress", label: "Progress" },
     ];
 

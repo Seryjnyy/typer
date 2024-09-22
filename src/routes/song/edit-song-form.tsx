@@ -51,7 +51,7 @@ export default function EditSongForm({
         console.log(values);
 
         let completion = song.completion;
-        let record = { accuracy: song.record.accuracy, chpm: song.record.chpm };
+        let record = { accuracy: song.record.accuracy, chpm: song.record.wpm };
 
         if (values.content != song.content) {
             completion = 0;

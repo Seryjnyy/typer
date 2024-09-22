@@ -129,7 +129,7 @@ const SongInfo = () => {
         <div className="flex flex-col max-w-[12rem]">
             {songData && (
                 <SongHeader>
-                    <SongBanner song={songData} />
+                    <SongBanner song={songData} playButton />
                     <SongDetail
                         length={"long"}
                         song={songData}

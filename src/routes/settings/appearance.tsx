@@ -16,10 +16,13 @@ import { themeList } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
-const TyperTextDisplayOption = () => {
-    const typerTextDisplay = usePreferenceStore.use.typerTextDisplay();
-    const setTyperTextDisplay = usePreferenceStore.use.setTyperTextDisplay();
-
+const TyperTextDisplayOption = ({
+    value,
+    onChange,
+}: {
+    value: TyperTextDisplay;
+    onChange: (val: TyperTextDisplay) => void;
+}) => {
     const options: {
         title: string;
         value: TyperTextDisplay;
@@ -71,9 +74,9 @@ const TyperTextDisplayOption = () => {
                             {option.title}
                         </span>
                         <Checkbox
-                            checked={option.value == typerTextDisplay}
+                            checked={option.value == value}
                             onCheckedChange={(val) => {
-                                setTyperTextDisplay(option.value);
+                                onChange(option.value);
                             }}
                         />
                     </div>
@@ -85,6 +88,37 @@ const TyperTextDisplayOption = () => {
 
 export default function Appearance() {
     const { setTheme, theme } = useTheme();
+
+    const typerTextDisplay = usePreferenceStore.use.typerTextDisplay();
+    const setTyperTextDisplay = usePreferenceStore.use.setTyperTextDisplay();
+
+    const verseTyperTextDisplay =
+        usePreferenceStore.use.verseTyperTextDisplay();
+    const setVerseTyperTextDisplay =
+        usePreferenceStore.use.setVerseTyperTextDisplay();
+
+    const isCompletionAnimOn = usePreferenceStore.use.isCompletionAnim();
+    const setCompletionAnim = usePreferenceStore.use.setCompletionAnim();
+
+    const isQueueColour = usePreferenceStore.use.isQueueColour();
+    const setQueueColour = usePreferenceStore.use.setQueueColour();
+
+    const options = [
+        {
+            id: "complete_animation_toggle",
+            title: "Animation on completion",
+            value: isCompletionAnimOn,
+            desc: "The screen flashes upon completion of a song.",
+            onCheckedChange: setCompletionAnim,
+        },
+        {
+            id: "queue_colour_toggle",
+            title: "Queue colour",
+            value: isQueueColour,
+            desc: "The queue gets a background gradient based on the song cover.",
+            onCheckedChange: setQueueColour,
+        },
+    ];
 
     return (
         <div className="space-y-12">
@@ -174,17 +208,79 @@ export default function Appearance() {
             </div>
             <div>
                 <h2 className="text-2xl font-semibold pb-2">Text display</h2>
+                <div className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Typer text</CardTitle>
+                            <CardDescription>
+                                Change the way text in typer is displayed.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex gap-3 flex-wrap">
+                                <TyperTextDisplayOption
+                                    value={typerTextDisplay}
+                                    onChange={setTyperTextDisplay}
+                                />
+                            </div>
+                        </CardContent>
+
+                        <CardFooter></CardFooter>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Verse typer text</CardTitle>
+                            <CardDescription>
+                                Change the way text in verse typer is displayed.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex gap-3 flex-wrap">
+                                <TyperTextDisplayOption
+                                    value={verseTyperTextDisplay}
+                                    onChange={setVerseTyperTextDisplay}
+                                />
+                            </div>
+                        </CardContent>
+
+                        <CardFooter></CardFooter>
+                    </Card>
+                </div>
+            </div>
+            <div>
+                <h2 className="text-2xl font-semibold pb-2">Other</h2>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Typer text</CardTitle>
+                        <CardTitle>Other</CardTitle>
                         <CardDescription>
-                            Change the way text in typer is displayed.
+                            Change the various other options.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="flex gap-3 flex-wrap">
-                            <TyperTextDisplayOption />
-                        </div>
+                    <CardContent className="space-y-4">
+                        {options.map((option) => (
+                            <div
+                                className="border rounded-md p-2 flex justify-between"
+                                key={option.id}
+                            >
+                                <div className="flex flex-col" key={option.id}>
+                                    <span className="text-lg font-semibold">
+                                        {option.title}
+                                    </span>
+                                    <p className="text-muted-foreground text-sm md:pr-12 pl-2">
+                                        {option.desc}
+                                    </p>
+                                </div>
+                                <div className="flex justify-center items-center px-4 border-l ">
+                                    <Checkbox
+                                        checked={option.value}
+                                        onCheckedChange={(val) => {
+                                            if (val == "indeterminate") return;
+                                            option.onCheckedChange(val);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
                     </CardContent>
 
                     <CardFooter></CardFooter>

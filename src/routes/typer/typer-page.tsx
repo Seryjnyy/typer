@@ -147,7 +147,7 @@ export default function TyperPage() {
 
     const songData: {
         song: Song;
-        songContent: { full: string; stripped: string };
+        content: { full: string; stripped: string };
     } | null = useMemo(() => {
         const s = songList.find((x) => x.id == currentSongInQueue);
         if (!s) return null;
@@ -156,7 +156,7 @@ export default function TyperPage() {
 
         return {
             song: s,
-            songContent: {
+            content: {
                 full: txt,
                 stripped: txt.replace(/(\r\n|\n|\r)/gm, ""),
             },
@@ -192,22 +192,18 @@ export default function TyperPage() {
         onFinish: () => {
             pauseStopwatch();
             if (autoplay) {
-                next();
+                setTimeout(() => next(), 2000);
             }
-
             if (!songData) return;
-
-            editSongCompletion(songData.song.id, songData.song.completion + 1);
-
-            const resultChpm =
+            // editSongCompletion(songData.song.id, songData.song.completion + 1);
+            const resultWpm =
                 timeElapsed == 0
                     ? userInput.length
-                    : chpm(userInput.length, timeElapsed);
-
+                    : wpm(userInput.length, timeElapsed);
             const resultAcc = calculateAccuracy(correct, userInput.length);
             if (
-                resultChpm > songData.song.record.chpm ||
-                (resultChpm == songData.song.record.chpm &&
+                resultWpm > songData.song.record.wpm ||
+                (resultWpm == songData.song.record.wpm &&
                     resultAcc > songData.song.record.accuracy)
             ) {
                 // Only save if text wasn't made easier.
@@ -217,7 +213,7 @@ export default function TyperPage() {
                     txtMods.punctuation == "normal"
                 ) {
                     editSongRecord(songData.song.id, {
-                        chpm: resultChpm,
+                        wpm: resultWpm,
                         accuracy: resultAcc,
                     });
                 }
@@ -248,27 +244,19 @@ export default function TyperPage() {
         );
     }, [totalSeconds]);
 
-    // console.log(completed ? "song-completed" : "not-completed");
     return (
         <div
-            className={cn(
-                "h-[calc(100vh-4rem)] w-full flex overflow-hidden "
-                // queueWindowOpen ? "" : "pr-[15rem]"
-            )}
+            className={cn("h-[calc(100vh-4rem)] w-full flex overflow-hidden ")}
         >
             {songData == null && <NoSongSelected />}
             {songData != null && typerTextDisplay == "cylinder" && (
                 <CylinderTyper
-                    songData={songData.songContent}
+                    songData={songData}
                     progressManager={progressManager}
                     handlers={handlers}
                     tryVerseOption={true}
                     difficultyModifiers={difficultyModifiers}
                 >
-                    {/* <Stats onRestart={onRestart} className="absolute left-0" /> */}
-                    <div className="absolute sm:left-8 left-4 bottom-[9rem] sm:bottom-[6rem] z-50">
-                        <TextModificationDialog />
-                    </div>
                     {!autoplay && completed && (
                         <EndScreen
                             onRestart={onRestart}
@@ -280,7 +268,7 @@ export default function TyperPage() {
             {songData != null && typerTextDisplay == "flat" && (
                 <div className="w-full pb-4">
                     <FlatTyper
-                        songData={songData.songContent}
+                        songData={songData}
                         progressManager={progressManager}
                         handlers={handlers}
                         tryVerseOption={true}

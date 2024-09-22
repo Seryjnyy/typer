@@ -1,3 +1,5 @@
+import { Song } from "@/lib/types";
+
 export interface ProgressManager {
     userInput: string;
     completed: boolean;
@@ -22,6 +24,9 @@ export interface Handlers {
 }
 
 export type SongData = {
-    full: string;
-    stripped: string;
+    song: Song;
+    content: {
+        full: string;
+        stripped: string;
+    };
 } | null;

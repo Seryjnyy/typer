@@ -3,11 +3,23 @@ import { convertSongToElements } from "./utils";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { KeyboardIcon, ReloadIcon } from "@radix-ui/react-icons";
+import {
+    ArrowRightIcon,
+    ChevronRightIcon,
+    KeyboardIcon,
+    ReloadIcon,
+} from "@radix-ui/react-icons";
 import { cn, wpm } from "@/lib/utils";
 import { Handlers, ProgressManager, SongData } from "./types";
 import SmallStats from "./small-stats";
 import TextModificationDialog from "./cylinder/text-modification-dialog";
+import { ArrowRight, ChevronRight, Loader, Loader2 } from "lucide-react";
+import { useQueueStore } from "@/lib/store/queue-store";
+import { usePreferenceStore } from "@/lib/store/preferences-store";
+import CompletionAnim from "./footer/completion-anim";
+import Stats from "./footer/stats";
+import AutoplayMsg from "./footer/autoplay-msg";
+import Buttons from "./footer/buttons";
 
 interface FlatTyperProps {
     progressManager: ProgressManager;
@@ -15,6 +27,7 @@ interface FlatTyperProps {
     handlers: Handlers;
     children?: ReactNode;
     tryVerseOption?: boolean;
+    versePage?: boolean;
 }
 
 export default function FlatTyper({
@@ -23,6 +36,7 @@ export default function FlatTyper({
     handlers,
     children,
     tryVerseOption,
+    versePage,
 }: FlatTyperProps) {
     const [focusedOnInput, setFocusedOnInput] = useState(false);
     const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -30,12 +44,12 @@ export default function FlatTyper({
     const generatorResult = useMemo(
         () =>
             convertSongToElements(
-                songData?.full ?? "",
+                songData?.content.full ?? "",
                 progressManager.userInput,
                 handlers.onClickVerse,
                 tryVerseOption
             ),
-        [songData?.full, progressManager.userInput]
+        [songData?.content.full, progressManager.userInput]
     );
 
     const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
@@ -48,11 +62,11 @@ export default function FlatTyper({
     }, [generatorResult]);
 
     const onUserInput = (input: string) => {
-        if (songData?.full == "") return;
+        if (songData?.content.full == "") return;
 
         progressManager.setUserInput(input);
 
-        const finished = input.length == songData?.stripped.length;
+        const finished = input.length == songData?.content.stripped.length;
         if (finished) {
             progressManager.setCompleted(true);
             handlers.onFinish?.();
@@ -81,9 +95,11 @@ export default function FlatTyper({
         handlers.onChangeSong?.();
 
         progressManager.setTargetCharCount(
-            songData?.stripped != undefined ? songData.stripped.length : 0
+            songData?.content.stripped != undefined
+                ? songData.content.stripped.length
+                : 0
         );
-    }, [songData?.full]);
+    }, [songData?.content.full]);
 
     useHotkeys("*", (event) => {
         const { key } = event;
@@ -97,7 +113,7 @@ export default function FlatTyper({
             // focus
             inputRef.current?.focus();
 
-            if (songData?.full != "" && !progressManager.completed) {
+            if (songData?.content.full != "" && !progressManager.completed) {
                 inputRef.current?.focus();
                 handlers.onStart?.();
             }
@@ -110,7 +126,7 @@ export default function FlatTyper({
     }, [correct, incorrect]);
 
     return (
-        <div className="relative h-full w-full overflow-y-hidden  rounded-md ">
+        <div className="relative h-full w-full   rounded-md overflow-hidden">
             <ScrollArea className="h-full  relative z-40">
                 <div className="w-full h-full ">
                     <div className="flex justify-start">
@@ -121,7 +137,7 @@ export default function FlatTyper({
                                 //     queueWindowOpen ? "" : "pr-[15.5rem]"
                                 // }
                             >
-                                {songData?.full != "" && element}
+                                {songData?.content.full != "" && element}
                             </div>
 
                             {children}
@@ -140,26 +156,21 @@ export default function FlatTyper({
                     </div>
                 </div>
             </ScrollArea>
-            <div className="absolute sm:bottom-1 bottom-14 right-2 z-50 flex items-center gap-4">
-                <Button
-                    className=" text-xs"
-                    variant={"ghost"}
-                    size={"icon"}
-                    onClick={() => {
-                        handlers.onRestart?.();
-                    }}
-                >
-                    <ReloadIcon />
-                </Button>
-                <TextModificationDialog />
-            </div>
-            <div className="absolute sm:bottom-2 bottom-14 left-2 text-xs text-muted-foreground flex items-center gap-1 z-0">
-                <SmallStats
-                    timeElapsed={progressManager.timeElapsed}
-                    focusedOnInput={focusedOnInput}
-                    userInputLength={progressManager.userInput.length}
-                />
-            </div>
+
+            {/* TODO : Duplicate code with cylinder typer */}
+            <Buttons handlers={handlers} />
+
+            <Stats
+                focusedOnInput={focusedOnInput}
+                progressManager={progressManager}
+            />
+
+            <CompletionAnim
+                songData={songData}
+                progressManager={progressManager}
+            />
+
+            {!versePage && <AutoplayMsg progressManager={progressManager} />}
         </div>
     );
 }

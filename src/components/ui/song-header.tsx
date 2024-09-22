@@ -7,10 +7,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 const songBannerVariants = cva("", {
     variants: {
         size: {
-            default: "min-h-12 min-w-12",
+            default: "min-h-12 min-w-12 max-h-12 max-w-12",
             small: "min-h-4 min-w-4 max-h-4 max-w-4",
-            large: "min-h-[6rem] min-w-[6rem]",
-            extraLarge: "min-h-[10rem] min-w-[10rem]",
+            large: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem]",
+            extraLarge:
+                "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem]",
         },
     },
     defaultVariants: {
@@ -30,7 +31,7 @@ const SongBanner = ({
     song,
     className,
     size,
-    playButton = true,
+    playButton = false,
     ...props
 }: SongBannerProps) => {
     return (
@@ -77,13 +78,13 @@ interface SongDetailProps
     extends React.ButtonHTMLAttributes<HTMLDivElement>,
         VariantProps<typeof songDetailVariants> {
     song: Song;
-    isCurrent: boolean;
+    isCurrent?: boolean;
     className?: string;
 }
 
 const SongDetail = ({
     song,
-    isCurrent,
+    isCurrent = false,
     className,
     length,
     ...props

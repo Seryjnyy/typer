@@ -61,7 +61,7 @@ export default function CreateSongForm({
             content: values.content.trim(),
             source: values.source,
             completion: 0,
-            record: { accuracy: 0, chpm: 0 },
+            record: { accuracy: 0, wpm: 0 },
             cover: values.cover,
             createdAt: Date.now(),
             lastModifiedAt: Date.now(),

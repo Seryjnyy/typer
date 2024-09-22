@@ -273,11 +273,7 @@ export default function Song() {
                     <div className="space-y-4 w-full">
                         <div>
                             <SongHeader>
-                                <SongBanner
-                                    song={song}
-                                    playButton={false}
-                                    size={"extraLarge"}
-                                />
+                                <SongBanner song={song} size={"extraLarge"} />
                                 <div className="flex flex-col justify-center items-start px-8">
                                     <h1 className="text-2xl font-bold">
                                         {song.title}
@@ -295,7 +291,7 @@ export default function Song() {
                                     {song.record.accuracy}%
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                    {song.record.chpm} chpm
+                                    {song.record.wpm} chpm
                                 </span>
                                 <span className="text-xs text-muted-foreground">
                                     {song.completion} completions

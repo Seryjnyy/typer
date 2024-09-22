@@ -5,7 +5,13 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowRightIcon, KeyboardIcon } from "@radix-ui/react-icons";
+import {
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    KeyboardIcon,
+} from "@radix-ui/react-icons";
 import { throttle } from "lodash";
 import {
     ReactNode,
@@ -23,6 +29,11 @@ import { cn } from "../../lib/utils";
 import { HarderOptions } from "@/lib/store/text-modifications-store";
 import KeyboardButton from "@/components/keyboard-button";
 import { Handlers, ProgressManager, SongData } from "./types";
+import Buttons from "./footer/buttons";
+import Stats from "./footer/stats";
+import CompletionAnim from "./footer/completion-anim";
+import AutoplayMsg from "./footer/autoplay-msg";
+import useScreenSize from "@/lib/hooks/use-screen-size";
 
 interface CylinderTyperProps {
     progressManager: ProgressManager;
@@ -32,6 +43,7 @@ interface CylinderTyperProps {
     children?: ReactNode;
     tryVerseOption?: boolean;
     className?: string;
+    versePage?: boolean;
 }
 
 const splitSongIntoLines = (song: string) => {
@@ -67,13 +79,16 @@ const calculateLineStyle = (
     midpoint: number,
     curr: number,
     lineLimit: number,
-    angle: number
+    angle: number,
+    isSmallScreen: boolean
 ) => {
     const transform = `rotateX(calc(${
         start + lineIndex + midpoint + curr
     }*${angle}deg))`;
     const fontSizeOffset = 10 - Math.abs(start + lineIndex + midpoint + curr);
-    const fontSize = `${fontSizeOffset * 3}px`;
+
+    const fontSizeModifier = isSmallScreen ? 2 : 3;
+    const fontSize = `${fontSizeOffset * fontSizeModifier}px`;
     const fontColourOffset =
         1 - Math.abs(start + lineIndex + midpoint + curr) * (1 / lineLimit);
     let fontColour = `rgb(255 255 255 / ${fontColourOffset / 3})`;
@@ -102,6 +117,7 @@ const convertStuff = (
     curr: number,
     tryVerse: boolean,
     difficultyModifiers: HarderOptions,
+    isSmallScreen: boolean,
     onClickVerse?: (verse: string) => void
 ) => {
     // lineVerseMap maps EVERY line to a verse
@@ -117,7 +133,9 @@ const convertStuff = (
 
     const angle = 10.5;
     // TODO : need to decide this on size of the screen, e.g mobile needs to be less
-    const lineLimit = 6;
+
+    // TODO : works well with 8, however when too far the outline and try verse shows on bascially nothing
+    let lineLimit = 8;
 
     let lineIndex = 0;
     let chIndex = 0;
@@ -132,7 +150,8 @@ const convertStuff = (
                 midpoint,
                 curr,
                 lineLimit,
-                angle
+                angle,
+                isSmallScreen
             );
             if (
                 start + lineIndex + midpoint + curr < -lineLimit ||
@@ -218,11 +237,11 @@ const convertStuff = (
                 <div
                     className={cn("rounded-md", {
                         "hover:outline hover:outline-border group/verse relative  px-2":
-                            lines.length > 2 && tryVerse,
+                            lines.length > 0 && tryVerse,
                     })}
                 >
                     {...lines}
-                    {lines.length > 2 && tryVerse && (
+                    {lines.length > 0 && tryVerse && (
                         <TooltipProvider delayDuration={1200}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -250,7 +269,8 @@ const convertStuff = (
                     midpoint,
                     curr,
                     lineLimit,
-                    angle
+                    angle,
+                    isSmallScreen
                 );
 
                 drawLines.push(
@@ -288,34 +308,44 @@ export default function CylinderTyper({
     children,
     className,
     difficultyModifiers,
+    tryVerseOption,
+    versePage,
 }: CylinderTyperProps) {
     const [focusedOnInput, setFocusedOnInput] = useState(false);
     const [curr, setCurr] = useState(0);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const { elements, linesCount, stats, currentLine } = useMemo(() => {
+    const { isMd } = useScreenSize();
+
+    console.log(isMd ? "isMd" : "is not Md");
+    const generatorResult = useMemo(() => {
         return convertStuff(
-            songData?.full ?? "no song",
+            songData?.content.full ?? "no song",
             progressManager.userInput,
             curr,
-            true,
+            tryVerseOption ?? false,
             difficultyModifiers,
+            isMd ? false : true,
             handlers.onClickVerse
         );
-    }, [songData, curr, progressManager.userInput, difficultyModifiers]);
+    }, [songData, curr, progressManager.userInput, difficultyModifiers, isMd]);
+
+    const { elements, linesCount, stats, currentLine } = useMemo(
+        () => generatorResult,
+        [generatorResult]
+    );
 
     const scrollDivRef = useRef<HTMLDivElement>(null);
 
     const onUserInput = (input: string) => {
-        if (!songData) return;
+        if (songData?.content.full == "") return;
 
         progressManager.setUserInput(input);
 
-        const finished = input.length == songData.stripped.length;
+        const finished = input.length == songData?.content.stripped.length;
         if (finished) {
             progressManager.setCompleted(true);
-            // TODO : this is commented out, idk if stuff still works
-            // handlers.onFinish?.();
+            handlers.onFinish?.();
         }
 
         progressManager.setTypedCharCount(input.length);
@@ -328,11 +358,13 @@ export default function CylinderTyper({
         handlers.onChangeSong?.();
 
         progressManager.setTargetCharCount(
-            songData ? songData.stripped.length : 0
+            songData?.content.stripped != undefined
+                ? songData.content.stripped.length
+                : 0
         );
 
         setCurr(0);
-    }, [songData]);
+    }, [songData?.content.full]);
 
     const changeCurrVal = (amount: number) => {
         let newVal = curr + amount;
@@ -369,14 +401,40 @@ export default function CylinderTyper({
         }
     }, [handleScroll]);
 
-    useHotkeys("*", () => {
-        // focus
-        inputRef.current?.focus();
+    useHotkeys("*", (event) => {
+        const { key } = event;
+        const isLetter = /^[a-zA-Z]$/.test(key);
+        const isNumber = /^[0-9]$/.test(key);
+        const isPunctuation = /^[.,:;?!'"()\-_=+[\]{}<>/@#$%^&*~`]$/.test(key);
 
-        if (!songData && !progressManager.completed) {
-            handlers.onStart?.();
+        // Only accept letters, numbers and punctuation
+        // TODO : what happens with non standard characters, like from different alphabets?
+        if (isLetter || isNumber || isPunctuation) {
+            // focus
+            inputRef.current?.focus();
+
+            if (songData?.content.full != "" && !progressManager.completed) {
+                inputRef.current?.focus();
+                handlers.onStart?.();
+            }
         }
     });
+
+    useHotkeys(
+        "ArrowLeft",
+        () => {
+            changeCurrVal(1);
+        },
+        { enableOnFormTags: true }
+    );
+
+    useHotkeys(
+        "ArrowRight",
+        () => {
+            changeCurrVal(-1);
+        },
+        { enableOnFormTags: true }
+    );
 
     useEffect(() => {
         progressManager.setCorrect(stats.correct);
@@ -385,24 +443,26 @@ export default function CylinderTyper({
 
     return (
         <div
-            className={cn(
-                "flex justify-center items-center w-full h-screen flex-col space-y-2 relative ",
-                className
-            )}
+            className={cn(" w-full h-[calc(100vh-5rem)] relative ", className)}
             ref={scrollDivRef}
         >
-            <Progress
-                value={((-curr + 1) / linesCount) * 100}
-                className="absolute rotate-90 w-[5rem] left-0 opacity-60"
-            />
-            {children}
+            <div className="absolute   top-2    right-[50%] translate-x-[50%] opacity-60 flex items-center gap-2 text-primary">
+                <ChevronLeftIcon />
+                <Progress
+                    value={((-curr + 1) / linesCount) * 100}
+                    className="w-[5rem]"
+                />
+                <ChevronRightIcon />
+            </div>
+            <div className="space-y-3 sm:space-y-2 z-30  flex-col flex justify-center items-center pt-[4rem]">
+                {elements}
+            </div>
+            {/* {children} */}
             {/* <div
                 className={`space-y-2 ${songData?.song.cover} p-12 rounded-md w-[90%] h-[60%] absolute opacity-35`}
-                
             >
                 Maybe add this idk
             </div> */}
-            {elements}
             <textarea
                 value={progressManager.userInput}
                 onChange={(e) => onUserInput(e.target.value)}
@@ -413,6 +473,20 @@ export default function CylinderTyper({
                 onFocus={() => setFocusedOnInput(true)}
                 onBlur={() => setFocusedOnInput(false)}
             />
+
+            <Buttons handlers={handlers} />
+
+            <Stats
+                focusedOnInput={focusedOnInput}
+                progressManager={progressManager}
+            />
+
+            <CompletionAnim
+                songData={songData}
+                progressManager={progressManager}
+            />
+
+            {!versePage && <AutoplayMsg progressManager={progressManager} />}
         </div>
     );
 }

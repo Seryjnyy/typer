@@ -1,17 +1,19 @@
 import { cn, wpm } from "@/lib/utils";
-import { KeyboardIcon } from "@radix-ui/react-icons";
+import { CheckIcon, KeyboardIcon } from "@radix-ui/react-icons";
 import React from "react";
 
 interface SmallStatsProps {
     timeElapsed: number;
     userInputLength: number;
     focusedOnInput: boolean;
+    completed: boolean;
 }
 
 export default function SmallStats({
     timeElapsed,
     userInputLength,
     focusedOnInput,
+    completed,
 }: SmallStatsProps) {
     return (
         <>
@@ -27,6 +29,11 @@ export default function SmallStats({
             >
                 <KeyboardIcon />
             </span>
+            {completed && (
+                <span className="pl-1 border-l">
+                    <CheckIcon />
+                </span>
+            )}
         </>
     );
 }

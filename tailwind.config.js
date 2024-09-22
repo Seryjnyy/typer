@@ -94,6 +94,30 @@ module.exports = {
                         height: "0",
                     },
                 },
+                explode: {
+                    "75%": {
+                        transform: "scale(2)",
+                        opacity: 0,
+                    },
+                    "90%": {
+                        transform: "scale(2)",
+                        opacity: 0,
+                    },
+                    "100%": {
+                        transform: "scale(0)",
+                        opacity: 0,
+                    },
+                },
+                playingNextSong: {
+                    from: {
+                        opacity: 0,
+                    },
+                    "100%": {
+                        opacity: 1,
+                        // top: "0",
+                    },
+                },
+
                 slideDown: {
                     from: { height: "0" },
                     to: { height: "var(--radix-collapsible-content-height)" },
@@ -108,6 +132,8 @@ module.exports = {
                 "accordion-up": "accordion-up 0.2s ease-out",
                 slideDown: "slideDown 300ms ease-out",
                 slideUp: "slideUp 300ms ease-out",
+                playingNextSong: "playingNextSong 2000ms ease-out forwards",
+                // explode:"_1s_cubic-bezier(0,_0,_0.2,_1)"
             },
         },
     },

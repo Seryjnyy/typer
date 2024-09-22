@@ -9,7 +9,7 @@ export type Song = {
     completion: number;
     record: {
         accuracy: number;
-        chpm: number;
+        wpm: number;
     };
     createdAt: number;
     lastModifiedAt: number;

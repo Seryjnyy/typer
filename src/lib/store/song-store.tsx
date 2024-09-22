@@ -13,7 +13,7 @@ interface Store {
     editSongCompletion: (id: string, completion: number) => void;
     editSongRecord: (
         id: string,
-        record: { chpm: number; accuracy: number }
+        record: { wpm: number; accuracy: number }
     ) => void;
     editSong: (song: Song) => void;
 }
@@ -56,9 +56,10 @@ const useSongStoreBase = create<Store>()(
                 }),
             editSongRecord: (id, record) =>
                 set(() => {
-                    const song = get().songs.find((x) => x.id == id);
+                    const state = get();
+                    const song = state.songs.find((x) => x.id == id);
 
-                    if (!song) return {};
+                    if (!song) return state;
 
                     const songs = get().songs.filter((x) => x.id != id);
 

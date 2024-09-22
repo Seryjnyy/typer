@@ -75,6 +75,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Song } from "@/lib/types";
 import { MenuIcon } from "lucide-react";
+import StatsPage from "./stats-page";
+import { useUiStateStore } from "@/lib/store/ui-state-store";
+import useScreenSize from "@/lib/hooks/use-screen-size";
 
 type Order = "asc" | "desc";
 type ListStyle = "compact" | "list";
@@ -123,17 +126,17 @@ const sortSongs = (songs: Song[], order: Order, sort: SortBy) => {
         case "created":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.content.length - b.content.length;
+                    return a.createdAt - b.createdAt;
                 } else {
-                    return b.content.length - a.content.length;
+                    return b.createdAt - a.createdAt;
                 }
             });
         case "modified":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.content.length - b.content.length;
+                    return a.lastModifiedAt - b.lastModifiedAt;
                 } else {
-                    return b.content.length - a.content.length;
+                    return b.lastModifiedAt - a.lastModifiedAt;
                 }
             });
 
@@ -297,7 +300,7 @@ const SongStats = ({ song }: { song: Song }) => {
                 {song.record.accuracy}%
             </span>
             <span className="text-xs text-muted-foreground">
-                {song.record.chpm} chpm
+                {song.record.wpm} wpm
             </span>
             <span className="text-xs text-muted-foreground">
                 {song.completion} completions
@@ -382,6 +385,7 @@ const SongItem = ({
                     <SongBanner
                         song={song}
                         onClick={(e) => e.stopPropagation()}
+                        playButton
                     />
                     <SongDetail
                         length={"extra-long"}
@@ -459,7 +463,7 @@ const AllSongs = () => {
     // TODO : Include song content in the search
     // TODO : Highlight the section that was searched for and found, this includes some element to show it was found in lyrics
     const [sortOrder, setSortOrder] = useState<Order>("asc");
-    const [sortBy, setSortBy] = useState<SortBy>("title");
+    const [sortBy, setSortBy] = useState<SortBy>("created");
     const [listStyle, setListStyle] = useState<ListStyle>("list");
     const [searchTerm, setSearchTerm] = useState("");
     const songsList = useSongStore.use.songs();
@@ -471,7 +475,14 @@ const AllSongs = () => {
 
     const listStyleOptions = ["list", "compact"];
     const sortOrderOptions = ["asc", "desc"];
-    const sortByOptions = ["title", "source", "length", "completions"];
+    const sortByOptions = [
+        "title",
+        "source",
+        "length",
+        "completions",
+        "created",
+        "modified",
+    ];
 
     const onChangeSortOrder = (val: string) => {
         if (val != "asc" && val != "desc") return;
@@ -484,6 +495,8 @@ const AllSongs = () => {
             val != "title" &&
             val != "source" &&
             val != "length" &&
+            val != "modified" &&
+            val != "created" &&
             val != "completions"
         )
             return;
@@ -497,11 +510,11 @@ const AllSongs = () => {
         setListStyle(val);
     };
 
-    const isSortNotStandard = sortBy != "title" || sortOrder != "asc";
+    const isSortNotStandard = sortBy != "created" || sortOrder != "asc";
 
     return (
         <>
-            <div className="absolute right-3 -top-12  items-center gap-6 hidden sm:flex ">
+            <div className="absolute right-3  -top-12  items-center gap-6 hidden lg:flex ">
                 <div>
                     <Popover>
                         <PopoverTrigger>
@@ -621,7 +634,7 @@ const AllSongs = () => {
                 </div>
             </div>
 
-            <div className="absolute right-3 -top-9 flex gap-8 sm:hidden ">
+            <div className="absolute right-3 -top-9 flex gap-8 lg:hidden ">
                 <Popover>
                     <PopoverTrigger>
                         <ListBulletIcon
@@ -807,6 +820,7 @@ export default function Songs() {
                     <PlusIcon />
                     Add song
                 </TabsTrigger>
+                <TabsTrigger value="stats">Stats</TabsTrigger>
             </TabsList>
             <TabsContent
                 value="all-songs"
@@ -819,6 +833,12 @@ export default function Songs() {
             {/* <TabsContent value="playlists">playlists</TabsContent> */}
             <TabsContent value="add-song" className=" h-[100%] ">
                 <CreateSongForm />
+            </TabsContent>
+            <TabsContent
+                value="stats"
+                className=" h-[100%] px-2 sm:px-6 md:px-12 border-t"
+            >
+                <StatsPage />
             </TabsContent>
         </Tabs>
     );

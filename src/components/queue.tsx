@@ -23,6 +23,7 @@ import {
 import { useToast } from "./ui/use-toast";
 import { Icons } from "./icons";
 import { Link } from "react-router-dom";
+import { usePreferenceStore } from "@/lib/store/preferences-store";
 
 export const MobileQueue = () => {
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
@@ -88,7 +89,7 @@ export const MobileQueue = () => {
                             <span className="">{index + 1}</span>
                         </div>
                         <SongHeader className="pl-3">
-                            <SongBanner song={song} />
+                            <SongBanner song={song} playButton />
                             <SongDetail
                                 song={song}
                                 isCurrent={song.id == current}
@@ -167,6 +168,7 @@ export default function Queue() {
     const enqueue = useQueueStore.use.enqueue();
     const setCurrent = useQueueStore.use.setCurrent();
     const setQueueSongs = useQueueStore.use.setSongs();
+    const isQueueColour = usePreferenceStore.use.isQueueColour();
 
     const songList = useSongStore.use.songs();
     const songs = useMemo(() => {
@@ -208,13 +210,12 @@ export default function Queue() {
     };
 
     // TODO : have option for styled queue
-    const isStyledQueue = true;
 
     return (
         <div
             className={cn(
                 "h-full border rounded-md py-4  w-[15rem]",
-                isStyledQueue &&
+                isQueueColour &&
                     `bg-gradient-to-b ${
                         songs.find((x) => x.id == current)?.cover.split(" ")[1]
                     } to-85%`
@@ -247,7 +248,7 @@ export default function Queue() {
                                             {...provided.draggableProps}
                                             className={cn(
                                                 "border p-4 rounded-md space-y-2 group mt-2 bg-transparent flex ",
-                                                isStyledQueue
+                                                isQueueColour
                                                     ? current == song.id
                                                         ? "backdrop-brightness-50"
                                                         : "backdrop-brightness-75"
@@ -268,7 +269,10 @@ export default function Queue() {
                                                 </span>
                                             </div>
                                             <SongHeader className="pl-3">
-                                                <SongBanner song={song} />
+                                                <SongBanner
+                                                    song={song}
+                                                    playButton
+                                                />
                                                 <SongDetail
                                                     song={song}
                                                     isCurrent={
