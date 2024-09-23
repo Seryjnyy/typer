@@ -108,6 +108,15 @@ module.exports = {
                         opacity: 0,
                     },
                 },
+                startUp: {
+                    from: {
+                        color: "hsl(var(--primary))",
+                        opacity: 0,
+                    },
+                    to: {
+                        opacity: 1,
+                    },
+                },
                 playingNextSong: {
                     from: {
                         opacity: 0,
@@ -133,7 +142,8 @@ module.exports = {
                 slideDown: "slideDown 300ms ease-out",
                 slideUp: "slideUp 300ms ease-out",
                 playingNextSong: "playingNextSong 2000ms ease-out forwards",
-                // explode:"_1s_cubic-bezier(0,_0,_0.2,_1)"
+                startUp: "startUp 500ms ease-out forwards",
+                explosion: "explode 2s cubic-bezier(0,0,0.2,1) forwards",
             },
         },
     },

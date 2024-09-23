@@ -7,6 +7,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { GeneratorFunction } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ArrowRightIcon, KeyboardIcon } from "@radix-ui/react-icons";
 
@@ -18,11 +19,11 @@ export const convertSongToElements = (
 ) => {
     if (song == undefined) {
         return {
-            element: <></>,
+            elements: [<></>],
             startOfLineIndexes: [],
             startOfLineRefs: [],
-            correct: 0,
-            incorrect: 0,
+            errorIndex: null,
+            stats: { correct: 0, incorrect: 0 },
         };
     }
 
@@ -145,7 +146,7 @@ export const convertSongToElements = (
         }
     }
     return {
-        element: elements.map((x, i) => {
+        elements: elements.map((x, i) => {
             if (i < elements.length - 1) {
                 return (
                     <>
@@ -160,8 +161,7 @@ export const convertSongToElements = (
         }),
         startOfLineIndexes: startOfLineIndexes,
         startOfLineRefs: startOfLineRefs,
-        correct: correct,
-        incorrect: incorrect,
+        stats: { correct: correct, incorrect: incorrect },
         errorIndex: errorIndex,
     };
 };

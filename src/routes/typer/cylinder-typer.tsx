@@ -1,39 +1,24 @@
-import { Button } from "@/components/ui/button";
+import KeyboardButton from "@/components/keyboard-button";
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-    ArrowLeftIcon,
-    ArrowRightIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    KeyboardIcon,
-} from "@radix-ui/react-icons";
+import useScreenSize from "@/lib/hooks/use-screen-size";
+import { HarderOptions } from "@/lib/store/text-modifications-store";
+import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { throttle } from "lodash";
-import {
-    ReactNode,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import Ch, { chVariant } from "../../components/ch";
 import { Progress } from "../../components/ui/progress";
-import { Song } from "../../lib/types";
 import { cn } from "../../lib/utils";
-import { HarderOptions } from "@/lib/store/text-modifications-store";
-import KeyboardButton from "@/components/keyboard-button";
-import { Handlers, ProgressManager, SongData } from "./types";
-import Buttons from "./footer/buttons";
-import Stats from "./footer/stats";
-import CompletionAnim from "./footer/completion-anim";
 import AutoplayMsg from "./footer/autoplay-msg";
-import useScreenSize from "@/lib/hooks/use-screen-size";
+import Buttons from "./footer/buttons";
+import CompletionAnim from "./footer/completion-anim";
+import Stats from "./footer/stats";
+import { Handlers, ProgressManager, SongData } from "./types";
 
 interface CylinderTyperProps {
     progressManager: ProgressManager;
@@ -292,11 +277,21 @@ const convertStuff = (
         }
     });
 
+    let errorIndex = null;
+    if (userInput.length - 1 >= 0) {
+        if (
+            songContent.charAt(userInput.length - 1) !=
+            userInput.charAt(userInput.length - 1)
+        ) {
+            errorIndex = userInput.length - 1;
+        }
+    }
+
     return {
         elements: drawLines,
         linesCount: newSplit.lineCount,
-
-        stats: { correct: 0, incorrect: 0 },
+        errorIndex: errorIndex,
+        stats: { correct: correct, incorrect: incorrect },
         currentLine: currentLine,
     };
 };
@@ -317,7 +312,6 @@ export default function CylinderTyper({
 
     const { isMd } = useScreenSize();
 
-    console.log(isMd ? "isMd" : "is not Md");
     const generatorResult = useMemo(() => {
         return convertStuff(
             songData?.content.full ?? "no song",
@@ -334,6 +328,12 @@ export default function CylinderTyper({
         () => generatorResult,
         [generatorResult]
     );
+
+    useEffect(() => {
+        if (generatorResult.errorIndex != null) {
+            progressManager.recordError(generatorResult.errorIndex);
+        }
+    }, [generatorResult.errorIndex]);
 
     const scrollDivRef = useRef<HTMLDivElement>(null);
 
@@ -457,12 +457,8 @@ export default function CylinderTyper({
             <div className="space-y-3 sm:space-y-2 z-30  flex-col flex justify-center items-center pt-[4rem]">
                 {elements}
             </div>
-            {/* {children} */}
-            {/* <div
-                className={`space-y-2 ${songData?.song.cover} p-12 rounded-md w-[90%] h-[60%] absolute opacity-35`}
-            >
-                Maybe add this idk
-            </div> */}
+            {children}
+
             <textarea
                 value={progressManager.userInput}
                 onChange={(e) => onUserInput(e.target.value)}

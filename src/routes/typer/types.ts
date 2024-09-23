@@ -1,6 +1,7 @@
 import { Song } from "@/lib/types";
 
 export interface ProgressManager {
+    started: boolean;
     userInput: string;
     completed: boolean;
     errorMap: Map<number, number>;

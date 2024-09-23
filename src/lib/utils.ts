@@ -150,6 +150,7 @@ export const seeSizeOfStringInLocalStorage = (some: string) => {
 
 // I think leave as strings for now so its extendable, like punctuation = ".,/"
 
+// TODO : why isn't textmodificationoptions values optional????
 export const textModification = (
     s: string,
     options: TextModificationOptions

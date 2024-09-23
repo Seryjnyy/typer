@@ -1,25 +1,14 @@
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { convertSongToElements } from "./utils";
-import { useHotkeys } from "react-hotkeys-hook";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import {
-    ArrowRightIcon,
-    ChevronRightIcon,
-    KeyboardIcon,
-    ReloadIcon,
-} from "@radix-ui/react-icons";
-import { cn, wpm } from "@/lib/utils";
-import { Handlers, ProgressManager, SongData } from "./types";
-import SmallStats from "./small-stats";
-import TextModificationDialog from "./cylinder/text-modification-dialog";
-import { ArrowRight, ChevronRight, Loader, Loader2 } from "lucide-react";
-import { useQueueStore } from "@/lib/store/queue-store";
-import { usePreferenceStore } from "@/lib/store/preferences-store";
-import CompletionAnim from "./footer/completion-anim";
-import Stats from "./footer/stats";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import AutoplayMsg from "./footer/autoplay-msg";
 import Buttons from "./footer/buttons";
+import CompletionAnim from "./footer/completion-anim";
+import Stats from "./footer/stats";
+import { Handlers, ProgressManager, SongData } from "./types";
+import { convertSongToElements } from "./utils";
+import { cn } from "@/lib/utils";
+import ErrorAnim from "./footer/error-anim";
 
 interface FlatTyperProps {
     progressManager: ProgressManager;
@@ -40,7 +29,6 @@ export default function FlatTyper({
 }: FlatTyperProps) {
     const [focusedOnInput, setFocusedOnInput] = useState(false);
     const inputRef = useRef<HTMLTextAreaElement>(null);
-
     const generatorResult = useMemo(
         () =>
             convertSongToElements(
@@ -52,14 +40,17 @@ export default function FlatTyper({
         [songData?.content.full, progressManager.userInput]
     );
 
-    const { element, startOfLineIndexes, startOfLineRefs, correct, incorrect } =
-        useMemo(() => generatorResult, [generatorResult]);
+    const { elements, startOfLineIndexes, startOfLineRefs, stats } = useMemo(
+        () => generatorResult,
+        [generatorResult]
+    );
 
     useEffect(() => {
+        console.log(generatorResult.errorIndex);
         if (generatorResult.errorIndex != null) {
             progressManager.recordError(generatorResult.errorIndex);
         }
-    }, [generatorResult]);
+    }, [generatorResult.errorIndex]);
 
     const onUserInput = (input: string) => {
         if (songData?.content.full == "") return;
@@ -121,9 +112,9 @@ export default function FlatTyper({
     });
 
     useEffect(() => {
-        progressManager.setCorrect(correct);
-        progressManager.setIncorrect(incorrect);
-    }, [correct, incorrect]);
+        progressManager.setCorrect(stats.correct);
+        progressManager.setIncorrect(stats.incorrect);
+    }, [stats]);
 
     return (
         <div className="relative h-full w-full   rounded-md overflow-hidden">
@@ -137,7 +128,7 @@ export default function FlatTyper({
                                 //     queueWindowOpen ? "" : "pr-[15.5rem]"
                                 // }
                             >
-                                {songData?.content.full != "" && element}
+                                {songData?.content.full != "" && elements}
                             </div>
 
                             {children}
@@ -159,7 +150,9 @@ export default function FlatTyper({
 
             {/* TODO : Duplicate code with cylinder typer */}
             <Buttons handlers={handlers} />
-
+            {/* {generatorResult.errorIndex != null && ( */}
+            <ErrorAnim errorIndex={generatorResult.errorIndex} />
+            {/* )} */}
             <Stats
                 focusedOnInput={focusedOnInput}
                 progressManager={progressManager}

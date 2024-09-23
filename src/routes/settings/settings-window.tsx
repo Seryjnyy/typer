@@ -83,16 +83,17 @@ export default function SettingsWindow() {
     if (
         current != "storage" &&
         current != "appearance" &&
-        // current != "progress" &&
+        current != "preferences" &&
         current != "" &&
         split.length != 2
     ) {
-        throw Error("Not found.");
+        throw Error("Settings page: Can't find subsection.");
     }
 
     const links = [
         { link: "appearance", label: "Appearance" },
         { link: "storage", label: "Storage" },
+        { link: "preferences", label: "Preferences" },
         // { link: "progress", label: "Progress" },
     ];
 

@@ -16,6 +16,7 @@ import VersePage from "./routes/typer/verse/verse-page";
 import TyperPage from "./routes/typer/typer-page";
 import EditSong from "./routes/song/edit-song";
 import TestPage from "./test-page";
+import Preferences from "./routes/settings/preferences";
 
 const router = createBrowserRouter([
     {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
                     {
                         path: "storage",
                         element: <Storage />,
+                    },
+                    {
+                        path: "preferences",
+                        element: <Preferences />,
                     },
                 ],
             },

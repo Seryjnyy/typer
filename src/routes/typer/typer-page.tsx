@@ -123,6 +123,8 @@ export default function TyperPage() {
 
     const timeElapsed = useSongProgressStore.use.timeElapsed();
     const setTimeElapsed = useSongProgressStore.use.setTimeElapsed();
+    const started = useSongProgressStore.use.started();
+    const setStarted = useSongProgressStore.use.setStarted();
 
     const autoplay = useQueueStore.use.autoplay();
     const next = useQueueStore.use.next();
@@ -164,6 +166,7 @@ export default function TyperPage() {
     }, [songList, currentSongInQueue, txtMods]);
 
     const progressManager: ProgressManager = {
+        started: started,
         userInput: userInput,
         completed: completed,
         errorMap: errorMap,
@@ -184,6 +187,7 @@ export default function TyperPage() {
         onRestart: () => onRestart(),
         onStart: () => {
             startStopwatch();
+            setStarted(true);
         },
         onChangeSong: () => {
             resetProgressState();
@@ -195,11 +199,18 @@ export default function TyperPage() {
                 setTimeout(() => next(), 2000);
             }
             if (!songData) return;
-            // editSongCompletion(songData.song.id, songData.song.completion + 1);
-            const resultWpm =
-                timeElapsed == 0
-                    ? userInput.length
-                    : wpm(userInput.length, timeElapsed);
+            editSongCompletion(songData.song.id, songData.song.completion + 1);
+
+            // Change time elapsed to 1 if it's 0 because we don't have milliseconds
+            if (timeElapsed == 0) {
+                setTimeElapsed(1);
+            }
+
+            const resultWpm = wpm(
+                userInput.length,
+                timeElapsed == 0 ? 1 : timeElapsed
+            );
+
             const resultAcc = calculateAccuracy(correct, userInput.length);
             if (
                 resultWpm > songData.song.record.wpm ||

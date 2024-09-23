@@ -17,13 +17,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-    CaretDownIcon,
-    CaretUpIcon,
-    CheckIcon,
-    DividerVerticalIcon,
-    PlayIcon,
-} from "@radix-ui/react-icons";
+import { CaretDownIcon, CaretUpIcon, PlayIcon } from "@radix-ui/react-icons";
 import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQueueStore } from "../lib/store/queue-store";
@@ -92,31 +86,6 @@ const MediaControl = () => {
     );
 };
 
-const SongProgressStats = () => {
-    const completed = useSongProgressStore.use.completed();
-    const current = useQueueStore.use.current();
-
-    return (
-        <div className="flex items-center gap-1">
-            {/* <span className="text-xs text-muted-foreground">
-                {songProgress.songTypedChar}/{songProgress.songTotalChar}
-            </span>
-            <span className="text-xs text-muted-foreground">
-                {songProgress.timeElapsed}s
-            </span> */}
-            <div className="border rounded-full">
-                {!completed && current != null && (
-                    <DividerVerticalIcon className="w-3 h-3 animate-spin" />
-                )}
-                {completed && <CheckIcon />}
-                {/* {!songProgress.completed && queue.current == null && (
-                            <DividerHorizontalIcon />
-                        )} */}
-            </div>
-        </div>
-    );
-};
-
 const SongInfo = () => {
     const current = useQueueStore.use.current();
     const songList = useSongStore.use.songs();
@@ -145,7 +114,7 @@ const MobileMenu = ({ className }: { className?: string }) => {
     const currSong = useQueueStore.use.current();
     const song = useSongStore.use.songs().find((x) => x.id == currSong);
     const setQueueWindowOpen = useUiStateStore.use.setQueueWindowOpen();
-    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
+
     const focus = useUiStateStore.use.focus();
     const songTypedChar = useSongProgressStore.use.songTypedChar();
     const songTotalChar = useSongProgressStore.use.songTotalChar();
@@ -179,7 +148,6 @@ const MobileMenu = ({ className }: { className?: string }) => {
                             <div>
                                 <div className="w-fit flex gap-2 md:gap-9">
                                     <SongInfo />
-                                    <SongProgressStats />
                                 </div>
                                 {/* <div className="w-[10rem]">
                                 <Progress
@@ -218,7 +186,6 @@ const MobileMenu = ({ className }: { className?: string }) => {
                                     <div className="mx-2 sm:mx-12">
                                         <div className="w-fit flex md:gap-9">
                                             <SongInfo />
-                                            <SongProgressStats />
                                         </div>
                                     </div>
                                     <div className="flex justify-center flex-col items-center gap-4 px-2 sm:mx-12">
@@ -296,7 +263,6 @@ export default function BottomNav() {
                 <div className="px-3 h-full grid-cols-3 grid w-full bg-background  pt-1 ">
                     <div className="w-fit flex gap-9">
                         <SongInfo />
-                        <SongProgressStats />
                     </div>
                     <div className="flex items-center gap-2 h-full  justify-center flex-col">
                         <MediaControl />

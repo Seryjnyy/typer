@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -22,7 +22,8 @@ import { songSchema, songSchemaType } from "@/lib/schemas/song";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Song } from "@/lib/types";
 import { Icons } from "@/components/icons";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import SongContentFormField from "./song-content-form-field";
 
 export default function EditSongForm({
     onSuccess,
@@ -36,6 +37,7 @@ export default function EditSongForm({
     const formRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const [coverForRerender, setCoverForRerender] = useState(song.cover);
+    const [contentRerender, setContentRerender] = useState(false);
 
     const form = useForm<songSchemaType>({
         resolver: zodResolver(songSchema),
@@ -51,11 +53,11 @@ export default function EditSongForm({
         console.log(values);
 
         let completion = song.completion;
-        let record = { accuracy: song.record.accuracy, chpm: song.record.wpm };
+        let record = { accuracy: song.record.accuracy, wpm: song.record.wpm };
 
         if (values.content != song.content) {
             completion = 0;
-            record = { accuracy: 0, chpm: 0 };
+            record = { accuracy: 0, wpm: 0 };
         }
 
         // TODO : I don't like this icl
@@ -76,11 +78,21 @@ export default function EditSongForm({
             title: "Successfully edited your song.",
             description: `${values.title} - ${values.source}`,
             variant: "success",
+            action: (
+                <Link to={`/songs/${song.id}`}>
+                    <Button variant={"outline"}>View song</Button>
+                </Link>
+            ),
         });
 
         formRef.current?.focus();
         if (onSuccess) onSuccess();
     }
+
+    const handleContentChange = () => {
+        console.log("change");
+        setContentRerender((prev) => !prev);
+    };
 
     return (
         <Form {...form}>
@@ -145,7 +157,7 @@ export default function EditSongForm({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Title{" "}
+                                        Title
                                         {field.value != song.title ? (
                                             <span className="text-primary">
                                                 *
@@ -153,6 +165,10 @@ export default function EditSongForm({
                                         ) : (
                                             ""
                                         )}
+                                        <span className="text-xs text-muted-foreground">
+                                            {" "}
+                                            (Song name)
+                                        </span>
                                     </FormLabel>
                                     <FormControl>
                                         <Input {...field} ref={formRef} />
@@ -170,7 +186,7 @@ export default function EditSongForm({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Source{" "}
+                                        Source
                                         {field.value != song.source ? (
                                             <span className="text-primary">
                                                 *
@@ -178,6 +194,10 @@ export default function EditSongForm({
                                         ) : (
                                             ""
                                         )}
+                                        <span className="text-xs text-muted-foreground">
+                                            {" "}
+                                            (Artist)
+                                        </span>
                                     </FormLabel>
                                     <FormControl>
                                         <Input {...field} />
@@ -193,32 +213,11 @@ export default function EditSongForm({
                     </div>
                 </div>
 
-                <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>
-                                Content{" "}
-                                {field.value != song.content ? (
-                                    <span className="text-primary">*</span>
-                                ) : (
-                                    ""
-                                )}
-                            </FormLabel>
-                            <FormControl>
-                                <Textarea
-                                    {...field}
-                                    className="min-h-[12rem] "
-                                />
-                            </FormControl>
-                            <FormDescription className="sr-only">
-                                This is the content of the song. It is what you
-                                will be typing.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                <SongContentFormField
+                    form={form}
+                    initialVal={song.content}
+                    onContentChange={handleContentChange}
+                    changeIndicator
                 />
 
                 <div className="flex justify-between pt-8">

@@ -22,7 +22,7 @@ export default function CompletionAnim({
                 "absolute bottom-0 left-0 brightness-50 rounded-lg",
                 songData?.song.cover,
                 {
-                    "w-full h-full  animate-[explode_2s_cubic-bezier(0,_0,_0.2,_1)_forwards]":
+                    "w-full h-full  animate-explosion":
                         progressManager.completed,
                 }
             )}

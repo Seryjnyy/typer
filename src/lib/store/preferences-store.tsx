@@ -3,11 +3,14 @@ import { create } from "zustand";
 import { Windows } from "../types";
 import { createSelectors } from "./create-selectors";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { ListStyle, Order, SortBy } from "@/routes/song/songs";
 
 export type TyperTextDisplay = "cylinder" | "flat";
 export type QueueStorage = "localStorage" | "sessionStorage";
 
 // const PreferenceStoreName = "typer-preferences-storage";
+
+type SongList = { listStyle: ListStyle; sortBy: SortBy; order: Order };
 
 type State = {
     typerTextDisplay: TyperTextDisplay;
@@ -15,6 +18,7 @@ type State = {
     queueStorage: QueueStorage;
     isCompletionAnim: boolean;
     isQueueColour: boolean;
+    songList: SongList;
 };
 
 type Actions = {
@@ -23,6 +27,8 @@ type Actions = {
     setQueueStorage: (val: QueueStorage) => void;
     setCompletionAnim: (val: boolean) => void;
     setQueueColour: (val: boolean) => void;
+    setSongListPref: (val: SongList) => void;
+    resetPreferences: () => void;
 };
 
 const defaults: State = {
@@ -31,6 +37,7 @@ const defaults: State = {
     queueStorage: "localStorage",
     isCompletionAnim: true,
     isQueueColour: true,
+    songList: { listStyle: "list", sortBy: "created", order: "asc" },
 };
 
 const usePreferenceStoreBase = create<State & Actions>()(
@@ -53,9 +60,17 @@ const usePreferenceStoreBase = create<State & Actions>()(
                 set(() => {
                     return { isCompletionAnim: val };
                 }),
+            setSongListPref: (val: SongList) =>
+                set(() => {
+                    return { songList: val };
+                }),
             setQueueColour: (val: boolean) =>
                 set(() => {
                     return { isQueueColour: val };
+                }),
+            resetPreferences: () =>
+                set(() => {
+                    return defaults;
                 }),
         }),
         {

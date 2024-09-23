@@ -5,37 +5,20 @@ import { useUiStateStore } from "@/lib/store/ui-state-store";
 import { useQueueStore } from "@/lib/store/queue-store";
 import MusicPlaying from "./music-playing";
 import { useLocation, useNavigate } from "react-router-dom";
+import usePlaySong from "@/lib/hooks/use-play-song";
 
 export default function PlayButton({ songID }: { songID: string }) {
-    const navigate = useNavigate();
-    const location = useLocation();
-
-    const songs = useQueueStore.use.songs();
-    const enqueue = useQueueStore.use.enqueue();
+    const playSong = usePlaySong();
     const current = useQueueStore.use.current();
-    const setCurrent = useQueueStore.use.setCurrent();
 
-    const onPlay = (
-        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        songId: string
-    ) => {
+    const onPlay = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.stopPropagation();
-        if (!songs.includes(songId)) {
-            // TODO : Should enqueue the song at the top of the queue if no current
-            // Otherwise enqueue after current
-            enqueue(songId, true);
-        } else {
-            setCurrent(songId);
-        }
-
-        if (location.pathname != "/") {
-            navigate("/");
-        }
+        playSong(songID);
     };
 
     return (
         <Button
-            onClick={(e) => onPlay(e, songID)}
+            onClick={(e) => onPlay(e)}
             size={"icon"}
             className="rounded-full hover:bg-background hover:text-foreground"
             variant={"ghost"}

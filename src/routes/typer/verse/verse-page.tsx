@@ -48,6 +48,7 @@ export default function VersePage() {
     const [correct, setCorrect] = useState(0);
     const [incorrect, setIncorrect] = useState(0);
     const [errorMap, setErrorMap] = useState(new Map<number, number>());
+    const [started, setStarted] = useState(false);
 
     const { state } = useLocation();
 
@@ -100,6 +101,7 @@ export default function VersePage() {
     };
 
     const progressManager: ProgressManager = {
+        started: started,
         userInput: userInput,
         completed: completed,
         timeElapsed: totalSeconds,
@@ -118,6 +120,7 @@ export default function VersePage() {
         onRestart: () => onRestart(),
         onStart: () => {
             startStopwatch();
+            setStarted(true);
         },
         onFinish: () => {
             pauseStopwatch();

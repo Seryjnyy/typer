@@ -1,6 +1,10 @@
-import { ComboboxDemo } from "@/components/combobox-demo";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
     Form,
     FormControl,
@@ -11,6 +15,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
@@ -21,12 +26,15 @@ import {
     cn,
     generateGradient,
     seeSizeOfStringInLocalStorage,
+    textModification,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { CaretDownIcon, Cross1Icon, ResetIcon } from "@radix-ui/react-icons";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
+import SongContentFormField from "./song-content-form-field";
 
 export default function CreateSongForm({
     onSuccess,
@@ -36,6 +44,7 @@ export default function CreateSongForm({
     const songStore = useSongStore();
     const { toast } = useToast();
     const formRef = useRef<HTMLInputElement>(null);
+    const [resetChildState, setResetChildState] = useState(false);
     const artists = useMemo(() => {
         const artistSet = new Set<string>();
         songStore.songs.forEach((x) => artistSet.add(x.source));
@@ -86,10 +95,17 @@ export default function CreateSongForm({
         }
 
         form.reset({ cover: generateGradient() });
+        setResetChildState((prev) => !prev);
+
         toast({
             title: "Successfully added your song.",
             description: `${values.title} - ${values.source}`,
             variant: "success",
+            action: (
+                <Link to={`/songs/${song.id}`}>
+                    <Button variant={"outline"}>View song</Button>
+                </Link>
+            ),
         });
 
         formRef.current?.focus();
@@ -149,7 +165,7 @@ export default function CreateSongForm({
                                             <span>Title</span>
                                             <span className="text-xs text-muted-foreground">
                                                 (Song name)
-                                            </span>{" "}
+                                            </span>
                                         </FormLabel>
                                         <FormControl>
                                             <Input {...field} ref={formRef} />
@@ -185,34 +201,9 @@ export default function CreateSongForm({
                             />
                         </div>
                     </div>
-                    <FormField
-                        control={form.control}
-                        name="content"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="space-x-1">
-                                    <span>Content</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        (Lyrics)
-                                    </span>
-                                </FormLabel>
-                                <FormControl
-                                // className="mx-1 "
-                                >
-                                    <div className="mx-1">
-                                        <Textarea
-                                            className="min-h-[12rem] "
-                                            {...field}
-                                        />
-                                    </div>
-                                </FormControl>
-                                <FormDescription className="sr-only">
-                                    This is the content of the song. It is what
-                                    you will be typing.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                    <SongContentFormField
+                        form={form}
+                        resetState={resetChildState}
                     />
 
                     <Button type="submit">Submit</Button>

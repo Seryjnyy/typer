@@ -43,6 +43,7 @@ import {
 } from "@radix-ui/react-icons";
 
 import { useQueueStore } from "../../lib/store/queue-store";
+import SongPopover from "./song-popover";
 
 interface SongContentProps {
     song: SongType;
@@ -51,108 +52,17 @@ interface SongContentProps {
 
 type Verse = { id: number; data: string };
 
-// TODO : Duplicate code with song list, but this popover has one less option 'view more' should do something about this
-const SongItemPopover = ({ song }: { song: SongType }) => {
-    const queueNext = useQueueStore.use.queueNext();
-    const removeSong = useSongStore.use.removeSong();
-    const enqueue = useQueueStore.use.enqueue();
-
-    const onAddToQueue = (songId: string) => {
-        enqueue(songId);
-    };
-    const navigate = useNavigate();
+const SomethingWentWrong = () => {
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger className="p-2">
-                <DotsHorizontalIcon />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        console.error("Play button not implemented yet.");
-                    }}
-                >
-                    <PlayIcon />
-                    <span> Play</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onAddToQueue(song.id);
-                    }}
-                >
-                    <PlusIcon />
-                    <span> Queue</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        queueNext(song.id);
-                    }}
-                >
-                    <PlusIcon />
-                    <span> Next</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`./edit`);
-                    }}
-                >
-                    <Pencil1Icon />
-                    <span>Edit</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="space-x-1 text-destructive">
-                    <AlertDialog>
-                        <AlertDialogTrigger
-                            asChild
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                        >
-                            <div className="gap-1 relative flex  cursor-default select-none items-center rounded-sm   text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground ">
-                                <TrashIcon />
-                                Delete
-                            </div>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will
-                                    permanently delete the song.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeSong(song.id);
-                                        navigate("/songs");
-                                    }}
-                                >
-                                    Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex justify-center items-center h-full flex-col gap-12">
+            <div className="text-center">
+                <h1 className="text-xl font-semibold">
+                    Sorry something went wrong.
+                </h1>
+                <p>The song might not exist anymore.</p>
+            </div>
+            <BackButton link="/songs" />
+        </div>
     );
 };
 
@@ -254,12 +164,7 @@ export default function Song() {
     const song = songs.find((x) => x.id == songID);
 
     // TODO : Could be better
-    if (!song)
-        return (
-            <div className="w-full h-full flex justify-center items-center">
-                Sorry could not find this song. It might not exist anymore.
-            </div>
-        );
+    if (!song) return <SomethingWentWrong />;
 
     return (
         <div className={` h-[100%]  `}>
@@ -338,7 +243,10 @@ export default function Song() {
                                     </Link>
                                 </div> */}
 
-                                <SongItemPopover song={song} />
+                                <SongPopover
+                                    song={song}
+                                    exclude={{ viewMore: true }}
+                                />
                             </div>
                         </div>
                     </div>

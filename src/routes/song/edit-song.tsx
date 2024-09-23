@@ -4,6 +4,21 @@ import { useSongStore } from "@/lib/store/song-store";
 import { useNavigate, useParams } from "react-router-dom";
 import EditSongForm from "./edit-song-form";
 
+// TODO : Duplicate code with song page, also very similar code to verse page
+const SomethingWentWrong = () => {
+    return (
+        <div className="flex justify-center items-center h-full flex-col gap-12">
+            <div className="text-center">
+                <h1 className="text-xl font-semibold">
+                    Sorry something went wrong.
+                </h1>
+                <p>Please go back and try again.</p>
+            </div>
+            <BackButton link="/songs" />
+        </div>
+    );
+};
+
 export default function EditSong() {
     const songs = useSongStore.use.songs();
     const { songID } = useParams();
@@ -16,12 +31,7 @@ export default function EditSong() {
     const song = songs.find((x) => x.id == songID);
 
     // TODO : Could be better
-    if (!song)
-        return (
-            <div className="w-full h-full flex justify-center items-center">
-                Sorry could not find this song. It might not exist anymore.
-            </div>
-        );
+    if (!song) return <SomethingWentWrong />;
 
     return (
         <div className="h-[100%] rounded-md overflow-hidden">
