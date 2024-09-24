@@ -9,16 +9,25 @@ import useScreenSize from "@/lib/hooks/use-screen-size";
 import { HarderOptions } from "@/lib/store/text-modifications-store";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
 import { throttle } from "lodash";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+    ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import Ch, { chVariant } from "../../components/ch";
 import { Progress } from "../../components/ui/progress";
-import { cn } from "../../lib/utils";
+import { cn, splitSongIntoVerses } from "../../lib/utils";
 import AutoplayMsg from "./footer/autoplay-msg";
 import Buttons from "./footer/buttons";
 import CompletionAnim from "./footer/completion-anim";
 import Stats from "./footer/stats";
 import { Handlers, ProgressManager, SongData } from "./types";
+import ErrorAnim from "./footer/error-anim";
+import CorrectAnim from "./footer/correct-anim";
 
 interface CylinderTyperProps {
     progressManager: ProgressManager;
@@ -37,7 +46,7 @@ const splitSongIntoLines = (song: string) => {
         lines: string[];
         verse: string;
     }[] = [];
-    const verseSplit = song.split(/\n\s*\n/);
+    const verseSplit = splitSongIntoVerses(song);
     let lineCount = 0;
     verseSplit.forEach((verse, verseIndex) => {
         const tempLines = verse.split(/\r?\n/);
@@ -103,6 +112,7 @@ const convertStuff = (
     tryVerse: boolean,
     difficultyModifiers: HarderOptions,
     isSmallScreen: boolean,
+    direction: string,
     onClickVerse?: (verse: string) => void
 ) => {
     // lineVerseMap maps EVERY line to a verse
@@ -290,7 +300,7 @@ const convertStuff = (
     return {
         elements: drawLines,
         linesCount: newSplit.lineCount,
-        errorIndex: errorIndex,
+        errorIndex: direction == "backward" ? null : errorIndex,
         stats: { correct: correct, incorrect: incorrect },
         currentLine: currentLine,
     };
@@ -309,6 +319,9 @@ export default function CylinderTyper({
     const [focusedOnInput, setFocusedOnInput] = useState(false);
     const [curr, setCurr] = useState(0);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const [currentAction, setCurrentAction] = useState<"forward" | "backward">(
+        "forward"
+    );
 
     const { isMd } = useScreenSize();
 
@@ -320,6 +333,7 @@ export default function CylinderTyper({
             tryVerseOption ?? false,
             difficultyModifiers,
             isMd ? false : true,
+            currentAction,
             handlers.onClickVerse
         );
     }, [songData, curr, progressManager.userInput, difficultyModifiers, isMd]);
@@ -441,9 +455,32 @@ export default function CylinderTyper({
         progressManager.setIncorrect(stats.incorrect);
     }, [stats]);
 
+    const handleKeyDown = useCallback(
+        (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            let newAction = "";
+
+            if (event.key === "Backspace") {
+                newAction = "backward";
+            } else if (event.key.length === 1) {
+                // Single character keys
+                newAction = "forward";
+            }
+
+            if (newAction != "forward" && newAction != "backward") return;
+
+            if (newAction) {
+                setCurrentAction(newAction);
+            }
+        },
+        []
+    );
+
     return (
         <div
-            className={cn(" w-full h-[calc(100vh-5rem)] relative ", className)}
+            className={cn(
+                " w-full h-[calc(100vh-5rem)] relative  overflow-hidden rounded-md",
+                className
+            )}
             ref={scrollDivRef}
         >
             <div className="absolute   top-2    right-[50%] translate-x-[50%] opacity-60 flex items-center gap-2 text-primary">
@@ -468,8 +505,21 @@ export default function CylinderTyper({
                 disabled={progressManager.completed}
                 onFocus={() => setFocusedOnInput(true)}
                 onBlur={() => setFocusedOnInput(false)}
+                onKeyDown={(e) => handleKeyDown(e)}
             />
 
+            {generatorResult.errorIndex != null && (
+                <ErrorAnim errorIndex={generatorResult.errorIndex} />
+            )}
+            {generatorResult.errorIndex == null && (
+                <CorrectAnim
+                    index={
+                        progressManager.userInput.length > 0
+                            ? progressManager.userInput.length
+                            : null
+                    }
+                />
+            )}
             <Buttons handlers={handlers} />
 
             <Stats

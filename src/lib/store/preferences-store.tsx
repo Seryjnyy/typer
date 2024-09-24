@@ -17,6 +17,8 @@ type State = {
     verseTyperTextDisplay: TyperTextDisplay;
     queueStorage: QueueStorage;
     isCompletionAnim: boolean;
+    isErrorAnim: boolean;
+    isCorrectAnim: boolean;
     isQueueColour: boolean;
     songList: SongList;
 };
@@ -26,6 +28,8 @@ type Actions = {
     setVerseTyperTextDisplay: (val: TyperTextDisplay) => void;
     setQueueStorage: (val: QueueStorage) => void;
     setCompletionAnim: (val: boolean) => void;
+    setErrorAnim: (val: boolean) => void;
+    setCorrectAnim: (val: boolean) => void;
     setQueueColour: (val: boolean) => void;
     setSongListPref: (val: SongList) => void;
     resetPreferences: () => void;
@@ -37,6 +41,8 @@ const defaults: State = {
     queueStorage: "localStorage",
     isCompletionAnim: true,
     isQueueColour: true,
+    isErrorAnim: true,
+    isCorrectAnim: true,
     songList: { listStyle: "list", sortBy: "created", order: "asc" },
 };
 
@@ -59,6 +65,14 @@ const usePreferenceStoreBase = create<State & Actions>()(
             setCompletionAnim: (val: boolean) =>
                 set(() => {
                     return { isCompletionAnim: val };
+                }),
+            setErrorAnim: (val: boolean) =>
+                set(() => {
+                    return { isErrorAnim: val };
+                }),
+            setCorrectAnim: (val: boolean) =>
+                set(() => {
+                    return { isCorrectAnim: val };
                 }),
             setSongListPref: (val: SongList) =>
                 set(() => {

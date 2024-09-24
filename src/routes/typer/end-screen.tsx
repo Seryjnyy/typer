@@ -58,14 +58,62 @@ const QueueControlButton = ({
     );
 };
 
-const Stat = ({ title, value }: { title: string; value: string | number }) => {
+const EndScreenFooter = ({
+    onRestart,
+    versePage,
+}: {
+    onRestart: () => void;
+    versePage: boolean;
+}) => {
+    const getSongData = useSongStore.use.getSongData();
+    const getNextSong = useQueueStore.use.getNextSong();
+    const getPrevSong = useQueueStore.use.getPrevSong();
+    const next = useQueueStore.use.next();
+    const prev = useQueueStore.use.prev();
+
+    const prevSongID = getPrevSong();
+    const prevSong = prevSongID ? getSongData(prevSongID) : undefined;
+
+    const nextSongID = getNextSong();
+    const nextSong = nextSongID ? getSongData(nextSongID) : undefined;
+
     return (
-        <div className="flex flex-col">
-            <span className="text-muted-foreground text-xl">{title}</span>
-            <span className="text-primary text-3xl font-semibold">{value}</span>
+        <div className="sm:w-[22.5rem] md:w-[30rem] sm:flex sm:justify-between sm:flex-row border p-2 flex flex-col items-center gap-4 sm:gap-0 ">
+            <div className="w-[12rem]  flex justify-start">
+                {!versePage && (
+                    <QueueControlButton
+                        song={prevSong}
+                        controlType="prev"
+                        onClick={prev}
+                    />
+                )}
+            </div>
+
+            <Button variant={"ghost"} size={"icon"} onClick={onRestart}>
+                <ReloadIcon />
+            </Button>
+
+            <div className="w-[12rem]  flex justify-end">
+                {!versePage && (
+                    <QueueControlButton
+                        song={nextSong}
+                        controlType="next"
+                        onClick={next}
+                    />
+                )}
+            </div>
         </div>
     );
 };
+
+// const Stat = ({ title, value }: { title: string; value: string | number }) => {
+//     return (
+//         <div className="flex flex-col">
+//             <span className="text-muted-foreground text-xl">{title}</span>
+//             <span className="text-primary text-3xl font-semibold">{value}</span>
+//         </div>
+//     );
+// };
 
 const Stat2 = ({ title, value }: { title: string; value: string | number }) => {
     return (
@@ -79,38 +127,42 @@ const Stat2 = ({ title, value }: { title: string; value: string | number }) => {
 export default function EndScreen({
     onRestart,
     userInputLength,
+    initialValue,
+    song,
+    stats: { timeElapsed, typedChars, correct, incorrect, errorMap },
+    versePage,
 }: {
     onRestart: () => void;
     userInputLength: number;
+    initialValue?: boolean;
+    song: Song;
+    stats: {
+        timeElapsed: number;
+        typedChars: number;
+        correct: number;
+        incorrect: number;
+        errorMap: Map<number, number>;
+    };
+    versePage?: boolean;
 }) {
-    const [open, setOpen] = useState(true);
-    const currentSongID = useQueueStore.use.current();
-    const getSongData = useSongStore.use.getSongData();
+    const [open, setOpen] = useState(initialValue ?? true);
 
-    const getNextSong = useQueueStore.use.getNextSong();
-    const getPrevSong = useQueueStore.use.getPrevSong();
-    const next = useQueueStore.use.next();
-    const prev = useQueueStore.use.prev();
+    // const currentSongID = useQueueStore.use.current();
+    // const getSongData = useSongStore.use.getSongData();
 
     // const playNextSong = useQueueStore.use.();
 
-    const timeElapsed = useSongProgressStore.use.timeElapsed();
+    // const timeElapsed = useSongProgressStore.use.timeElapsed();
 
-    const typedChars = useSongProgressStore.use.songTypedChar();
-    const errorMap = useSongProgressStore.use.errorMap();
+    // const typedChars = useSongProgressStore.use.songTypedChar();
+    // const errorMap = useSongProgressStore.use.errorMap();
 
-    const correct = useSongProgressStore.use.correct();
-    const incorrect = useSongProgressStore.use.incorrect();
+    // const correct = useSongProgressStore.use.correct();
+    // const incorrect = useSongProgressStore.use.incorrect();
 
-    if (!currentSongID) return <></>;
+    // if (!currentSongID) return <></>;
 
-    const songData = getSongData(currentSongID);
-
-    const prevSongID = getPrevSong();
-    const prevSong = prevSongID ? getSongData(prevSongID) : undefined;
-
-    const nextSongID = getNextSong();
-    const nextSong = nextSongID ? getSongData(nextSongID) : undefined;
+    // const songData = getSongData(currentSongID);
 
     const errorTotal = useMemo(() => {
         const arrFromError = Array.from(errorMap.values());
@@ -123,8 +175,8 @@ export default function EndScreen({
     return (
         <div
             className={cn(
-                "absolute w-[98%] h-[70vh] sm:h-[calc(100vh-10rem)] backdrop-blur-lg border   flex justify-center right-[1%] top-2 z-50 bg-gradient-to-t from-transparent  rounded-md from-50%",
-                songData?.cover.split(" ")[2] ?? "to-transparent",
+                "absolute w-[98%] h-[70vh] sm:h-[calc(100vh-10rem)] backdrop-blur-lg border   flex justify-center right-[1%] top-2 z-[300] bg-gradient-to-t from-transparent  rounded-md from-50%",
+                song?.cover.split(" ")[2] ?? "to-transparent",
                 { "max-h-9 w-9 border-none": !open }
             )}
         >
@@ -142,13 +194,18 @@ export default function EndScreen({
                 </Button>
                 {open && (
                     <div className="flex flex-col  justify-between items-center h-full p-8 ">
-                        <div className="text-center backdrop-brightness-50 rounded-sm p-2">
+                        <div className="text-center backdrop-brightness-50 rounded-sm p-2 ">
                             <h2 className="text-6xl font-semibold">
-                                {songData?.title}
+                                {song?.title}
                             </h2>
                             <span className="text-foreground/50 text-md">
-                                {songData?.source}
+                                {song?.source}
                             </span>
+                            {versePage && (
+                                <span className="block text-foreground/40">
+                                    -verse mode-
+                                </span>
+                            )}
                         </div>
                         <div className=" w-full rounded-lg p-12 flex flex-col items-center gap-12">
                             <div className=" flex gap-6 flex-col items-center">
@@ -205,108 +262,10 @@ export default function EndScreen({
                                 </div>
                             </div>
 
-                            <div className="sm:w-[22.5rem] md:w-[30rem] sm:flex sm:justify-between sm:flex-row border p-2 flex flex-col items-center gap-4 sm:gap-0 ">
-                                <div className="w-[12rem]  flex justify-start">
-                                    <QueueControlButton
-                                        song={prevSong}
-                                        controlType="prev"
-                                        onClick={prev}
-                                    />
-                                </div>
-
-                                <Button
-                                    variant={"ghost"}
-                                    size={"icon"}
-                                    onClick={onRestart}
-                                >
-                                    <ReloadIcon />
-                                </Button>
-
-                                <div className="w-[12rem]  flex justify-end">
-                                    <QueueControlButton
-                                        song={nextSong}
-                                        controlType="next"
-                                        onClick={next}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-
-    return (
-        <div
-            className={cn(
-                "absolute w-[98%] h-[60vh] backdrop-blur-[6px] border rounded-xl  flex justify-center right-[1%] top-[10%] z-40",
-                { "h-9 w-9 border-none": !open }
-            )}
-        >
-            <div className="w-full h-full relative">
-                <Button
-                    className={cn(
-                        "absolute right-0 top-0 rounded-l-none rounded-tr-xl",
-                        open ? "rounded-br-none" : "rounded-xl border"
-                    )}
-                    variant={"ghost"}
-                    size={"icon"}
-                    onClick={() => setOpen((prev) => !prev)}
-                >
-                    {open ? <Cross1Icon /> : <HamburgerMenuIcon />}
-                </Button>
-                {open && (
-                    <div className="flex flex-col  justify-between items-center h-full p-8 ">
-                        <div className="text-center">
-                            <h2 className="text-6xl font-semibold">
-                                {songData?.title}
-                            </h2>
-                            <span className="text-muted-foreground text-md">
-                                {songData?.source}
-                            </span>
-                        </div>
-                        <div className="bg-secondary w-full rounded-lg p-12 flex flex-col items-center gap-12">
-                            <div className=" flex gap-12">
-                                <Stat
-                                    title="chpm"
-                                    value={
-                                        timeElapsed == 0
-                                            ? userInputLength
-                                            : chpm(userInputLength, timeElapsed)
-                                    }
-                                />
-                                <Stat
-                                    title="acc"
-                                    value={`${calculateAccuracy(
-                                        correct,
-                                        userInputLength
-                                    )}%`}
-                                />
-
-                                <Stat title="ch" value={typedChars} />
-
-                                <Stat title="s" value={timeElapsed} />
-                            </div>
-                            <div className="w-full flex justify-between ">
-                                <QueueControlButton
-                                    song={prevSong}
-                                    controlType="prev"
-                                />
-
-                                <Button
-                                    variant={"ghost"}
-                                    size={"icon"}
-                                    onClick={onRestart}
-                                >
-                                    <ReloadIcon />
-                                </Button>
-
-                                <QueueControlButton
-                                    song={nextSong}
-                                    controlType="next"
-                                />
-                            </div>
+                            <EndScreenFooter
+                                onRestart={onRestart}
+                                versePage={versePage ?? false}
+                            />
                         </div>
                     </div>
                 )}

@@ -1,3 +1,9 @@
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { textModification } from "@/lib/utils";
 
@@ -122,22 +128,32 @@ export default function TextModificationDialog() {
         harderOptions.cantSeeUnderlines;
     return (
         <Dialog>
-            <DialogTrigger className="group p-2">
-                <div className="relative ">
-                    <GearIcon className="group-hover:text-primary" />
-                    {isTxtModificationChanged && (
-                        <span className="text-emerald-400 absolute bottom-0 left-2 font-bold">
-                            *
-                        </span>
-                    )}
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger className="group p-2">
+                            <div className="relative ">
+                                <GearIcon className="group-hover:text-primary" />
+                                {isTxtModificationChanged && (
+                                    <span className="text-emerald-400 absolute bottom-0 left-2 font-bold">
+                                        *
+                                    </span>
+                                )}
 
-                    {isHarderOptionsChanged && (
-                        <span className="text-red-600 absolute bottom-0 right-2 font-bold">
-                            *
-                        </span>
-                    )}
-                </div>
-            </DialogTrigger>
+                                {isHarderOptionsChanged && (
+                                    <span className="text-red-600 absolute bottom-0 right-2 font-bold">
+                                        *
+                                    </span>
+                                )}
+                            </div>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Difficulty modification</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+
             <DialogContent className="h-[72vh] flex flex-col">
                 <DialogHeader className="relative">
                     <Button
@@ -160,9 +176,19 @@ export default function TextModificationDialog() {
                     <TabsList className="w-full mb-3">
                         <TabsTrigger value="easier" className="w-full">
                             Easier
+                            {isTxtModificationChanged && (
+                                <span className="text-emerald-400  font-bold">
+                                    *
+                                </span>
+                            )}
                         </TabsTrigger>
                         <TabsTrigger value="harder" className="w-full">
                             Harder
+                            {isHarderOptionsChanged && (
+                                <span className="text-red-600 font-bold">
+                                    *
+                                </span>
+                            )}
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="easier" className="">

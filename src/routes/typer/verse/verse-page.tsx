@@ -21,6 +21,8 @@ import { Handlers, ProgressManager, SongData } from "../types";
 import CylinderTyper from "../cylinder-typer";
 import { usePreferenceStore } from "@/lib/store/preferences-store";
 import { useTextModificationsStore } from "@/lib/store/text-modifications-store";
+import EndScreen from "../end-screen";
+import { Song } from "@/lib/types";
 
 const SomethingWentWrong = () => {
     return (
@@ -32,6 +34,45 @@ const SomethingWentWrong = () => {
                 <p>Please go back and try again.</p>
             </div>
             <BackButton link="/" />
+        </div>
+    );
+};
+
+interface TopProps {
+    cameFrom: string;
+    song?: Song;
+}
+const Top = ({ song, cameFrom }: TopProps) => {
+    return (
+        <div className="absolute top-0 left-0 text-xs z-40 flex items-center gap-2 text-muted-foreground">
+            <Link to={cameFrom != null ? cameFrom : "/"}>
+                <Button
+                    size={"sm"}
+                    className="group rounded-none sm:rounded-tl-md "
+                    variant={"ghost"}
+                >
+                    <span className="flex gap-1 backdrop-blur-sm px-1 rounded-sm">
+                        <ArrowLeftIcon className="group-hover:-translate-x-1 transition-transform" />
+                        <span>Back</span>
+                    </span>
+                </Button>
+            </Link>
+            <div className="flex gap-1 backdrop-blur-sm rounded-sm pr-1">
+                {song && (
+                    <SongBanner
+                        song={song}
+                        size={"small"}
+                        className="rounded-[2px]"
+                    />
+                )}
+                <span className="overflow-hidden text-nowrap text-ellipsis max-w-[5rem] sm:max-w-[15rem]">
+                    {song?.title}
+                </span>
+                <span>-</span>
+                <span className="overflow-hidden text-nowrap text-ellipsis max-w-[5rem] sm:max-w-[15rem] opacity-70">
+                    {song?.source}
+                </span>
+            </div>
         </div>
     );
 };
@@ -101,6 +142,9 @@ export default function VersePage() {
     };
 
     const progressManager: ProgressManager = {
+        correct: correct,
+        incorrect: incorrect,
+        typedChars: userInput.length,
         started: started,
         userInput: userInput,
         completed: completed,
@@ -138,37 +182,6 @@ export default function VersePage() {
                 "h-[calc(100vh-5rem)] w-full   overflow-hidden relative "
             )}
         >
-            <div className="absolute top-0 left-0 text-xs z-50 flex items-center gap-2 text-muted-foreground">
-                <Link to={cameFrom != null ? cameFrom : "/"}>
-                    <Button
-                        size={"sm"}
-                        className="group rounded-none sm:rounded-tl-md "
-                        variant={"ghost"}
-                    >
-                        <span className="flex gap-1 backdrop-blur-sm px-1 rounded-sm">
-                            <ArrowLeftIcon className="group-hover:-translate-x-1 transition-transform" />
-                            <span>Back</span>
-                        </span>
-                    </Button>
-                </Link>
-                <div className="flex gap-1 backdrop-blur-sm rounded-sm pr-1">
-                    {song && (
-                        <SongBanner
-                            song={song}
-                            size={"small"}
-                            className="rounded-[2px]"
-                        />
-                    )}
-                    <span className="overflow-hidden text-nowrap text-ellipsis max-w-[5rem] sm:max-w-[15rem]">
-                        {song?.title}
-                    </span>
-                    <span>-</span>
-                    <span className="overflow-hidden text-nowrap text-ellipsis max-w-[5rem] sm:max-w-[15rem] opacity-70">
-                        {song?.source}
-                    </span>
-                </div>
-            </div>
-
             {verseTyperTextDisplay == "cylinder" && (
                 <CylinderTyper
                     songData={songData}
@@ -177,10 +190,23 @@ export default function VersePage() {
                     tryVerseOption={true}
                     difficultyModifiers={difficultyModifiers}
                 >
-                    {/* <Stats onRestart={onRestart} className="absolute left-0" /> */}
-                    {/* <div className="absolute sm:left-8 left-4 bottom-[9rem] sm:bottom-[6rem] z-50">
-                        <TextModificationDialog />
-                    </div> */}
+                    {completed && (
+                        <EndScreen
+                            initialValue={false}
+                            onRestart={onRestart}
+                            userInputLength={userInput.length}
+                            song={song}
+                            stats={{
+                                errorMap: progressManager.errorMap,
+                                timeElapsed: progressManager.timeElapsed,
+                                typedChars: progressManager.typedChars,
+                                correct: progressManager.correct,
+                                incorrect: progressManager.incorrect,
+                            }}
+                            versePage
+                        />
+                    )}
+                    <Top song={song} cameFrom={cameFrom} />
                 </CylinderTyper>
             )}
 
@@ -190,7 +216,26 @@ export default function VersePage() {
                     songData={songData}
                     progressManager={progressManager}
                     handlers={handlers}
-                ></FlatTyper>
+                    difficultyModifiers={difficultyModifiers}
+                >
+                    {completed && (
+                        <EndScreen
+                            initialValue={false}
+                            onRestart={onRestart}
+                            userInputLength={userInput.length}
+                            song={song}
+                            stats={{
+                                errorMap: progressManager.errorMap,
+                                timeElapsed: progressManager.timeElapsed,
+                                typedChars: progressManager.typedChars,
+                                correct: progressManager.correct,
+                                incorrect: progressManager.incorrect,
+                            }}
+                            versePage
+                        />
+                    )}
+                    <Top song={song} cameFrom={cameFrom} />
+                </FlatTyper>
             )}
         </div>
     );

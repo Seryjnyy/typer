@@ -1,105 +1,22 @@
-import { Button } from "@/components/ui/button";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongProgressStore } from "@/lib/store/song-progress-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
 import { Song } from "@/lib/types";
-import {
-    calculateAccuracy,
-    chpm,
-    cn,
-    textModification,
-    wpm,
-} from "@/lib/utils";
+import { calculateAccuracy, cn, textModification, wpm } from "@/lib/utils";
 
-import { ReloadIcon } from "@radix-ui/react-icons";
-import { ReactNode, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStopwatch } from "react-timer-hook";
 import EndScreen from "./end-screen";
 
 import CylinderTyper from "./cylinder-typer";
 
-import { Progress } from "@/components/ui/progress";
 import { usePreferenceStore } from "@/lib/store/preferences-store";
 import { useTextModificationsStore } from "@/lib/store/text-modifications-store";
-import TextModificationDialog from "./cylinder/text-modification-dialog";
 import FlatTyper from "./flat-typer";
 import NoSongSelected from "./no-song-selected";
-import Stat from "./stat";
 import { Handlers, ProgressManager } from "./types";
-
-const Stats = ({
-    onRestart,
-    children,
-    className,
-}: {
-    onRestart: () => void;
-    className?: string;
-    children?: ReactNode;
-}) => {
-    const correct = useSongProgressStore.use.correct();
-    const incorrect = useSongProgressStore.use.incorrect();
-    const userInput = useSongProgressStore.use.userInput();
-    const completed = useSongProgressStore.use.completed();
-    const timeElapsed = useSongProgressStore.use.timeElapsed();
-    const totalChar = useSongProgressStore.use.songTotalChar();
-
-    return (
-        <div
-            className={cn(
-                "  border-r flex flex-col  w-[15rem] pt-[8.3rem]",
-                className
-            )}
-        >
-            <div className="mx-2 space-y-4">
-                <div className="border rounded-md  p-2">
-                    <Stat title="time" stat={timeElapsed} append="s" />
-                    <Stat
-                        title="chpm"
-                        stat={
-                            timeElapsed == 0
-                                ? userInput.length
-                                : chpm(userInput.length, timeElapsed)
-                        }
-                    />
-                    <Stat
-                        title="accuracy"
-                        stat={calculateAccuracy(correct, userInput.length)}
-                        append="%"
-                    />
-                    <Stat
-                        title="ch"
-                        stat={`${userInput.length}/${totalChar}`}
-                    />
-                </div>
-                <Button
-                    className="w-full"
-                    variant={"outline"}
-                    onClick={onRestart}
-                >
-                    <ReloadIcon />
-                </Button>
-                <div className="space-y-1">
-                    <Progress value={(userInput.length / totalChar) * 100} />
-                    {completed && (
-                        <div className="text-primary flex justify-center text-xs uppercase opacity-80">
-                            <span>complete</span>
-                        </div>
-                    )}
-                </div>
-
-                <div className="border rounded-md  p-2">
-                    <Stat title="correct" stat={correct} />
-                    <Stat title="incorrect" stat={incorrect} />
-                    {/* <Stat title="focused" stat={focusedOnInput} /> */}
-                </div>
-            </div>
-
-            <div className="flex flex-col gap-2 pt-4">{children}</div>
-        </div>
-    );
-};
 
 export default function TyperPage() {
     const currentSongInQueue = useQueueStore.use.current();
@@ -110,6 +27,9 @@ export default function TyperPage() {
 
     const setCorrect = useSongProgressStore.use.setCorrect();
     const correct = useSongProgressStore.use.correct();
+    const songTypedChars = useSongProgressStore.use.songTypedChar();
+
+    const incorrect = useSongProgressStore.use.incorrect();
     const setIncorrect = useSongProgressStore.use.setIncorrect();
     const errorMap = useSongProgressStore.use.errorMap();
     const recordError = useSongProgressStore.use.recordError();
@@ -166,6 +86,9 @@ export default function TyperPage() {
     }, [songList, currentSongInQueue, txtMods]);
 
     const progressManager: ProgressManager = {
+        typedChars: songTypedChars,
+        correct: correct,
+        incorrect: incorrect,
         started: started,
         userInput: userInput,
         completed: completed,
@@ -270,6 +193,14 @@ export default function TyperPage() {
                 >
                     {!autoplay && completed && (
                         <EndScreen
+                            song={songData.song}
+                            stats={{
+                                errorMap: progressManager.errorMap,
+                                timeElapsed: progressManager.timeElapsed,
+                                typedChars: progressManager.typedChars,
+                                correct: progressManager.correct,
+                                incorrect: progressManager.incorrect,
+                            }}
                             onRestart={onRestart}
                             userInputLength={userInput.length}
                         />
@@ -283,9 +214,18 @@ export default function TyperPage() {
                         progressManager={progressManager}
                         handlers={handlers}
                         tryVerseOption={true}
+                        difficultyModifiers={difficultyModifiers}
                     >
                         {!autoplay && completed && (
                             <EndScreen
+                                song={songData.song}
+                                stats={{
+                                    errorMap: progressManager.errorMap,
+                                    timeElapsed: progressManager.timeElapsed,
+                                    typedChars: progressManager.typedChars,
+                                    correct: progressManager.correct,
+                                    incorrect: progressManager.incorrect,
+                                }}
                                 onRestart={onRestart}
                                 userInputLength={userInput.length}
                             />

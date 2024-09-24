@@ -1,21 +1,21 @@
 import Ch, { chVariant } from "@/components/ch";
 import KeyboardButton from "@/components/keyboard-button";
-import { Button } from "@/components/ui/button";
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { GeneratorFunction } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { ArrowRightIcon, KeyboardIcon } from "@radix-ui/react-icons";
+import { HarderOptions } from "@/lib/store/text-modifications-store";
+import { cn, splitSongIntoVerses } from "@/lib/utils";
 
 export const convertSongToElements = (
     song: string,
     userInput: string,
-    onClickVerse?: (verse: string) => void,
-    tryVerseOption: boolean = false
+    direction: "backward" | "forward",
+    difficultyModifiers: HarderOptions,
+    tryVerseOption: boolean = false,
+    onClickVerse?: (verse: string) => void
 ) => {
     if (song == undefined) {
         return {
@@ -28,7 +28,7 @@ export const convertSongToElements = (
     }
 
     // const split = song?.content.split(/\r?\n/);
-    const verseSplit = song.split(/\n\s*\n/);
+    const verseSplit = splitSongIntoVerses(song);
 
     let lineCounter = 0;
     let charIndex = 0;
@@ -70,9 +70,34 @@ export const convertSongToElements = (
                         }
 
                         if (charIndex > userInput.length) {
-                            variant = "not-covered";
+                            // variant = "not-covered";
+
+                            if (difficultyModifiers.cantSeeAhead) {
+                                if (ch != " ") {
+                                    ch = "_";
+                                }
+
+                                if (!difficultyModifiers.cantSeeUnderlines) {
+                                    variant = "normal";
+                                } else {
+                                    variant = "normalInvisible";
+                                }
+                            }
                         } else if (charIndex == userInput.length) {
                             variant = "current";
+                            if (difficultyModifiers.cantSeeCurrent) {
+                                if (ch != " ") {
+                                    ch = "_";
+                                }
+
+                                if (!difficultyModifiers.cantSeeUnderlines) {
+                                    variant = "current";
+                                } else {
+                                    variant = "currentInvisible";
+                                }
+                            } else {
+                                variant = "current";
+                            }
                         } else {
                             if (ch == userInput.charAt(charIndex)) {
                                 correct++;
@@ -162,6 +187,6 @@ export const convertSongToElements = (
         startOfLineIndexes: startOfLineIndexes,
         startOfLineRefs: startOfLineRefs,
         stats: { correct: correct, incorrect: incorrect },
-        errorIndex: errorIndex,
+        errorIndex: direction == "backward" ? null : errorIndex,
     };
 };

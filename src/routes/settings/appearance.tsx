@@ -103,6 +103,12 @@ export default function Appearance() {
     const isQueueColour = usePreferenceStore.use.isQueueColour();
     const setQueueColour = usePreferenceStore.use.setQueueColour();
 
+    const isErrorAnim = usePreferenceStore.use.isErrorAnim();
+    const setErrorAnim = usePreferenceStore.use.setErrorAnim();
+
+    const setCorrectAnim = usePreferenceStore.use.setCorrectAnim();
+    const isCorrectAnim = usePreferenceStore.use.isCorrectAnim();
+
     const options = [
         {
             id: "complete_animation_toggle",
@@ -110,6 +116,20 @@ export default function Appearance() {
             value: isCompletionAnimOn,
             desc: "The screen flashes upon completion of a song.",
             onCheckedChange: setCompletionAnim,
+        },
+        {
+            id: "error_animation_toggle",
+            title: "Error animation",
+            value: isErrorAnim,
+            desc: "There is a small flash of red to show you made an error.",
+            onCheckedChange: setErrorAnim,
+        },
+        {
+            id: "correct_animation_toggle",
+            title: "Correct animation",
+            value: isCorrectAnim,
+            desc: "There is a small flash of green to show you typed the correct character.",
+            onCheckedChange: setCorrectAnim,
         },
         {
             id: "queue_colour_toggle",

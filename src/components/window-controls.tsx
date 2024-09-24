@@ -5,6 +5,12 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const windowControlVariants = cva(
     "border flex justify-evenly flex-1 h-full  overflow-hidden",
@@ -37,32 +43,39 @@ export default function WindowControls({ variant }: WindowControlsProps) {
 
     return (
         <div className={windowControlVariants({ variant })}>
-            {options.map((option, index) => {
-                let className = "";
-
-                return (
-                    <Link
-                        to={option.link[0]}
-                        key={option.link[0]}
-                        className="w-full h-full"
-                    >
-                        <Button
-                            size={"icon"}
-                            variant={
-                                option.link.includes(currentLocation)
-                                    ? "default"
-                                    : "ghost"
-                            }
-                            className={cn(
-                                "rounded-none w-full h-full",
-                                className
-                            )}
-                        >
-                            {option.icon}
-                        </Button>
-                    </Link>
-                );
-            })}
+            <TooltipProvider>
+                {options.map((option) => {
+                    return (
+                        <Tooltip key={option.link[0]}>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    to={option.link[0]}
+                                    className="w-full h-full"
+                                >
+                                    <Button
+                                        size={"icon"}
+                                        variant={
+                                            option.link.includes(
+                                                currentLocation
+                                            )
+                                                ? "default"
+                                                : "ghost"
+                                        }
+                                        className={cn(
+                                            "rounded-none w-full h-full"
+                                        )}
+                                    >
+                                        {option.icon}
+                                    </Button>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{option.label}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    );
+                })}
+            </TooltipProvider>
         </div>
     );
 }

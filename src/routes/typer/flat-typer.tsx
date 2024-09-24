@@ -1,5 +1,12 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import {
+    ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import AutoplayMsg from "./footer/autoplay-msg";
 import Buttons from "./footer/buttons";
@@ -9,11 +16,14 @@ import { Handlers, ProgressManager, SongData } from "./types";
 import { convertSongToElements } from "./utils";
 import { cn } from "@/lib/utils";
 import ErrorAnim from "./footer/error-anim";
+import CorrectAnim from "./footer/correct-anim";
+import { HarderOptions } from "@/lib/store/text-modifications-store";
 
 interface FlatTyperProps {
     progressManager: ProgressManager;
     songData: SongData;
     handlers: Handlers;
+    difficultyModifiers: HarderOptions;
     children?: ReactNode;
     tryVerseOption?: boolean;
     versePage?: boolean;
@@ -26,27 +36,58 @@ export default function FlatTyper({
     children,
     tryVerseOption,
     versePage,
+    difficultyModifiers,
 }: FlatTyperProps) {
     const [focusedOnInput, setFocusedOnInput] = useState(false);
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-    const generatorResult = useMemo(
-        () =>
-            convertSongToElements(
-                songData?.content.full ?? "",
-                progressManager.userInput,
-                handlers.onClickVerse,
-                tryVerseOption
-            ),
-        [songData?.content.full, progressManager.userInput]
+    const [currentAction, setCurrentAction] = useState<"forward" | "backward">(
+        "forward"
     );
+
+    const inputRef = useRef<HTMLTextAreaElement>(null);
+    const generatorResult = useMemo(() => {
+        console.log(currentAction);
+        const res = convertSongToElements(
+            songData?.content.full ?? "",
+            progressManager.userInput,
+            currentAction,
+            difficultyModifiers,
+            tryVerseOption,
+            handlers.onClickVerse
+        );
+
+        return res;
+    }, [
+        songData?.content.full,
+        progressManager.userInput,
+        difficultyModifiers,
+    ]);
 
     const { elements, startOfLineIndexes, startOfLineRefs, stats } = useMemo(
         () => generatorResult,
         [generatorResult]
     );
 
+    const handleKeyDown = useCallback(
+        (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            let newAction = "";
+
+            if (event.key === "Backspace") {
+                newAction = "backward";
+            } else if (event.key.length === 1) {
+                // Single character keys
+                newAction = "forward";
+            }
+
+            if (newAction != "forward" && newAction != "backward") return;
+
+            if (newAction) {
+                setCurrentAction(newAction);
+            }
+        },
+        []
+    );
+
     useEffect(() => {
-        console.log(generatorResult.errorIndex);
         if (generatorResult.errorIndex != null) {
             progressManager.recordError(generatorResult.errorIndex);
         }
@@ -111,6 +152,16 @@ export default function FlatTyper({
         }
     });
 
+    // TODO : abandoned for now cause it doesn't work correctly, seconds and stuff is not recorded after pressing esc
+    // but somehow reset button works just fine when using the same handler.onRestart function
+    // useHotkeys(
+    //     "esc",
+    //     () => {
+    //         handlers.onRestart?.();
+    //     },
+    //     { enableOnFormTags: true },
+    // );
+
     useEffect(() => {
         progressManager.setCorrect(stats.correct);
         progressManager.setIncorrect(stats.incorrect);
@@ -118,16 +169,11 @@ export default function FlatTyper({
 
     return (
         <div className="relative h-full w-full   rounded-md overflow-hidden">
-            <ScrollArea className="h-full  relative z-40">
+            <ScrollArea className="h-full  relative z-10 ">
                 <div className="w-full h-full ">
                     <div className="flex justify-start">
                         <div className="flex justify-center w-full py-24 relative">
-                            <div
-                                className="text-2xl font-semibold flex flex-col text-center px-1 sm:px-2"
-                                // className={
-                                //     queueWindowOpen ? "" : "pr-[15.5rem]"
-                                // }
-                            >
+                            <div className="text-2xl font-semibold flex flex-col text-center px-1 sm:px-2">
                                 {songData?.content.full != "" && elements}
                             </div>
 
@@ -142,6 +188,7 @@ export default function FlatTyper({
                                 disabled={progressManager.completed}
                                 onFocus={() => setFocusedOnInput(true)}
                                 onBlur={() => setFocusedOnInput(false)}
+                                onKeyDown={(e) => handleKeyDown(e)}
                             />
                         </div>
                     </div>
@@ -150,9 +197,19 @@ export default function FlatTyper({
 
             {/* TODO : Duplicate code with cylinder typer */}
             <Buttons handlers={handlers} />
-            {/* {generatorResult.errorIndex != null && ( */}
-            <ErrorAnim errorIndex={generatorResult.errorIndex} />
-            {/* )} */}
+
+            {generatorResult.errorIndex != null && (
+                <ErrorAnim errorIndex={generatorResult.errorIndex} />
+            )}
+            {generatorResult.errorIndex == null && (
+                <CorrectAnim
+                    index={
+                        progressManager.userInput.length > 0
+                            ? progressManager.userInput.length
+                            : null
+                    }
+                />
+            )}
             <Stats
                 focusedOnInput={focusedOnInput}
                 progressManager={progressManager}

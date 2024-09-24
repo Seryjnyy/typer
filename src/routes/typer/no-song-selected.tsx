@@ -1,20 +1,50 @@
 import SongCarousel from "@/components/song-carousel";
 import { Button } from "@/components/ui/button";
+import usePlaySong from "@/lib/hooks/use-play-song";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
-import { cn, shuffleArray } from "@/lib/utils";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { Song } from "@/lib/types";
+import { cn, shuffleArray, splitSongIntoVerses } from "@/lib/utils";
+import { PlayIcon, PlusIcon } from "@radix-ui/react-icons";
+import { shuffle } from "lodash";
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
 
 export default function NoSongSelected() {
     const songs = useSongStore.use.songs();
     const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
+    const playSong = usePlaySong();
+    const navigate = useNavigate();
+
+    const shuffled = useMemo(() => {
+        return shuffleArray(songs) as Song[];
+    }, [songs]);
 
     const shortened = useMemo(() => {
-        const shuffled = shuffleArray(songs);
         return shuffled.slice(0, Math.min(shuffled.length, 10));
-    }, [songs]);
+    }, [shuffled]);
+
+    const handlePlayRandomSong = () => {
+        if (shuffled.length > 0) {
+            playSong(shuffled[0].id);
+        }
+    };
+
+    const handlePlayRandomVerse = () => {
+        if (shuffled.length > 0) {
+            // playSong(shuffled[0].id);
+            const song = shuffled[0];
+            const verses = splitSongIntoVerses(song.content);
+            const randomVerse = (
+                verses.length > 0 ? shuffleArray(verses)[0] : ""
+            ) as string;
+
+            navigate("/verse", {
+                state: { content: randomVerse, id: song.id, cameFrom: "/" },
+            });
+        }
+    };
 
     return (
         <div
@@ -60,6 +90,26 @@ export default function NoSongSelected() {
                         <PlusIcon />
                         <span>Add new song</span>
                     </Button>
+                    <div className="pt-12 gap-2 flex flex-wrap justify-center">
+                        <Button
+                            className="space-x-2"
+                            variant={"outline"}
+                            disabled={songs.length == 0}
+                            onClick={handlePlayRandomSong}
+                        >
+                            <PlayIcon />
+                            <span>Play random song</span>
+                        </Button>
+                        <Button
+                            className="space-x-2"
+                            variant={"outline"}
+                            disabled={songs.length == 0}
+                            onClick={handlePlayRandomVerse}
+                        >
+                            <PlayIcon />
+                            <span>Play random verse</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

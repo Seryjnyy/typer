@@ -148,6 +148,10 @@ export const seeSizeOfStringInLocalStorage = (some: string) => {
     return some ? 3 + (some.length * 16) / (8 * 1024) + " KB" : "Empty (0 KB)";
 };
 
+export const splitSongIntoVerses = (song: String) => {
+    return song.split(/\n\s*\n/);
+};
+
 // I think leave as strings for now so its extendable, like punctuation = ".,/"
 
 // TODO : why isn't textmodificationoptions values optional????

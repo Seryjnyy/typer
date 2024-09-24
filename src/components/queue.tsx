@@ -214,7 +214,7 @@ export default function Queue() {
     return (
         <div
             className={cn(
-                "h-full border rounded-md py-4  w-[15rem]",
+                "h-full border rounded-md py-4  w-[15rem] ",
                 isQueueColour &&
                     `bg-gradient-to-b ${
                         songs.find((x) => x.id == current)?.cover.split(" ")[1]
@@ -252,8 +252,9 @@ export default function Queue() {
                                                     ? current == song.id
                                                         ? "backdrop-brightness-50"
                                                         : "backdrop-brightness-75"
-                                                    : current == song.id ??
-                                                          "bg-secondary"
+                                                    : current == song.id
+                                                    ? "bg-secondary"
+                                                    : ""
                                             )}
                                         >
                                             <div

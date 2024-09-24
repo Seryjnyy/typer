@@ -1,4 +1,10 @@
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
     Drawer,
     DrawerContent,
     DrawerDescription,
@@ -59,6 +65,8 @@ import { Song } from "@/lib/types";
 import SongPopover from "./song-popover";
 import StatsPage from "./stats-page";
 import { usePreferenceStore } from "@/lib/store/preferences-store";
+import { useUiStateStore } from "@/lib/store/ui-state-store";
+import useScreenSize from "@/lib/hooks/use-screen-size";
 
 export type Order = "asc" | "desc";
 export type ListStyle = "compact" | "list";
@@ -151,6 +159,11 @@ const SongLyricHoverCard = ({ song }: { song: Song }) => {
 };
 
 const SongStats = ({ song }: { song: Song }) => {
+    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
+    const { isLg } = useScreenSize();
+
+    if (isQueueWindowOpen && !isLg) return null;
+
     return (
         <div
             className=" gap-4 border border-dashed  p-2 rounded-lg hidden sm:flex"
@@ -261,7 +274,7 @@ const SongItem = ({
             </div>
 
             <div className="flex justify-between items-center gap-4">
-                <div className="flex items-center md:w-[22rem] justify-between">
+                <div className="flex items-center  justify-between">
                     <SongLyricHoverCard song={song} />
                     <SongStats song={song} />
                 </div>
@@ -318,6 +331,36 @@ const SongItem = ({
                 </div>
                 <SongPopover song={song} />
             </div>
+        </div>
+    );
+};
+
+const ResponsiveCount = ({
+    currentCount,
+    totalCount,
+}: {
+    currentCount: number;
+    totalCount: number;
+}) => {
+    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
+    const { isLg } = useScreenSize();
+
+    if (isQueueWindowOpen && !isLg) return null;
+
+    return (
+        <div>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger className="cursor-default">
+                        <span className="text-xs  items-center text-muted-foreground font-thin border-r pr-2 hidden sm:flex">
+                            {currentCount}/{totalCount}
+                        </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                        <p>Song count</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
         </div>
     );
 };
@@ -389,22 +432,32 @@ const AllSongs = () => {
     return (
         <>
             <div className="absolute right-3  -top-12  items-center gap-6 hidden lg:flex ">
-                <div>
-                    <span className="text-xs  items-center text-muted-foreground font-thin border-r pr-2 hidden sm:flex">
-                        {filteredSongs.length}/{songsList.length}
-                    </span>
-                </div>
+                <ResponsiveCount
+                    currentCount={filteredSongs.length}
+                    totalCount={songsList.length}
+                />
                 <div>
                     <Popover>
-                        <PopoverTrigger>
-                            <ListBulletIcon
-                                className={
-                                    songListPreferences.listStyle == "compact"
-                                        ? "text-primary"
-                                        : ""
-                                }
-                            />
-                        </PopoverTrigger>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <PopoverTrigger>
+                                        <ListBulletIcon
+                                            className={
+                                                songListPreferences.listStyle ==
+                                                "compact"
+                                                    ? "text-primary"
+                                                    : ""
+                                            }
+                                        />
+                                    </PopoverTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                    <p>List style</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
                         <PopoverContent className="space-y-2 w-fit">
                             <ToggleGroup
                                 value={songListPreferences.listStyle}
@@ -433,13 +486,24 @@ const AllSongs = () => {
                 <div className="flex items-center gap-8 border-l pl-6">
                     <div>
                         <Popover>
-                            <PopoverTrigger>
-                                <MixerHorizontalIcon
-                                    className={
-                                        isSortNotStandard ? "text-primary" : ""
-                                    }
-                                />
-                            </PopoverTrigger>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <PopoverTrigger>
+                                            <MixerHorizontalIcon
+                                                className={
+                                                    isSortNotStandard
+                                                        ? "text-primary"
+                                                        : ""
+                                                }
+                                            />
+                                        </PopoverTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom">
+                                        <p>Sort</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                             <PopoverContent className="space-y-2 w-fit">
                                 <ToggleGroup
                                     value={songListPreferences.sortBy}
@@ -516,21 +580,31 @@ const AllSongs = () => {
             </div>
 
             <div className="absolute right-3 -top-9 flex gap-8 lg:hidden ">
-                <div>
-                    <span className="text-xs  items-center text-muted-foreground font-thin border-r pr-2 hidden sm:flex">
-                        {filteredSongs.length}/{songsList.length}
-                    </span>
-                </div>
+                <ResponsiveCount
+                    currentCount={filteredSongs.length}
+                    totalCount={songsList.length}
+                />
                 <Popover>
-                    <PopoverTrigger>
-                        <ListBulletIcon
-                            className={
-                                songListPreferences.listStyle == "compact"
-                                    ? "text-primary"
-                                    : ""
-                            }
-                        />
-                    </PopoverTrigger>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <PopoverTrigger>
+                                    <ListBulletIcon
+                                        className={
+                                            songListPreferences.listStyle ==
+                                            "compact"
+                                                ? "text-primary"
+                                                : ""
+                                        }
+                                    />
+                                </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                                <p>List style</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
                     <PopoverContent className="space-y-2 w-fit">
                         <ToggleGroup
                             value={songListPreferences.listStyle}
@@ -553,15 +627,26 @@ const AllSongs = () => {
                     </PopoverContent>
                 </Popover>
                 <Drawer>
-                    <DrawerTrigger>
-                        <MixerHorizontalIcon
-                            className={
-                                searchTerm.length > 0 || isSortNotStandard
-                                    ? "text-primary"
-                                    : ""
-                            }
-                        />
-                    </DrawerTrigger>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DrawerTrigger>
+                                    <MixerHorizontalIcon
+                                        className={
+                                            searchTerm.length > 0 ||
+                                            isSortNotStandard
+                                                ? "text-primary"
+                                                : ""
+                                        }
+                                    />
+                                </DrawerTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                                <p>Search and sort</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
                     <DrawerContent className="h-[70vh] px-10">
                         <DrawerHeader>
                             <DrawerTitle className="sr-only">
