@@ -32,12 +32,13 @@ import ShuffleButton from "./shuffle-button";
 import { Button } from "./ui/button";
 import { SongBanner, SongDetail, SongHeader } from "./ui/song-header";
 import WindowControls from "./window-controls";
+import usePlaySong from "@/lib/hooks/use-play-song";
 
 const MediaControl = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const current = useQueueStore.use.current();
-    const setCurrent = useQueueStore.use.setCurrent();
+    const playSong = usePlaySong();
 
     const songs = useQueueStore.use.songs();
 
@@ -48,11 +49,8 @@ const MediaControl = () => {
             navigate("/");
         }
 
-        // If there is no current song but there are songs in the queue then play the first one
-        if (!current) {
-            if (songs.length > 0) {
-                setCurrent(songs[0]);
-            }
+        if (!current && songs.length > 0) {
+            playSong(songs[0]);
         }
     };
 

@@ -18,6 +18,29 @@ interface Store {
     editSong: (song: Song) => void;
 }
 
+// Breaks stuff in typer so very important it is done, therefore this is here
+// Split into lines, trim each line
+// Remove empty strings (where line was just space)
+const trimSongContent = (content: string) => {
+    const split = content.split("\n");
+
+    const replaced = split.map((x) => (x == "" ? "\n" : x));
+
+    const trimmed = replaced.map((x) => x.trim());
+
+    return trimmed.join("\n");
+};
+
+const formatTitleOrSource = (str: string) => {
+    // Replace new lines and tabs with a space
+    // Replace multiple spaces with a single space
+    // Remove leading and trailing whitespace
+    return str
+        .replace(/[\n\t\r]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+};
+
 const useSongStoreBase = create<Store>()(
     persist(
         (set, get) => ({
@@ -28,7 +51,17 @@ const useSongStoreBase = create<Store>()(
                         return { songs: get().songs };
                     }
 
-                    return { songs: [...get().songs, song] };
+                    return {
+                        songs: [
+                            ...get().songs,
+                            {
+                                ...song,
+                                content: trimSongContent(song.content),
+                                title: formatTitleOrSource(song.title),
+                                source: formatTitleOrSource(song.source),
+                            },
+                        ],
+                    };
                 }),
             setSongs: (songs) =>
                 set(() => {
@@ -70,8 +103,12 @@ const useSongStoreBase = create<Store>()(
             editSong: (song) =>
                 set(() => {
                     const filtered = get().songs.filter((x) => x.id != song.id);
+
                     return {
-                        songs: [...filtered, song],
+                        songs: [
+                            ...filtered,
+                            { ...song, content: trimSongContent(song.content) },
+                        ],
                     };
                 }),
         }),

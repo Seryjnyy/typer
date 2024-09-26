@@ -1,11 +1,6 @@
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
     Form,
     FormControl,
     FormDescription,
@@ -15,23 +10,15 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import useCreateSong from "@/lib/hooks/use-create-song";
 import { songSchema, songSchemaType } from "@/lib/schemas/song";
-import { useSongStore } from "@/lib/store/song-store";
 import { Song } from "@/lib/types";
-import {
-    cn,
-    generateGradient,
-    seeSizeOfStringInLocalStorage,
-    textModification,
-} from "@/lib/utils";
+import { cn, generateGradient } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CaretDownIcon, Cross1Icon, ResetIcon } from "@radix-ui/react-icons";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import SongContentFormField from "./song-content-form-field";
@@ -41,15 +28,16 @@ export default function CreateSongForm({
 }: {
     onSuccess?: () => void;
 }) {
-    const songStore = useSongStore();
+    const createSong = useCreateSong();
     const { toast } = useToast();
     const formRef = useRef<HTMLInputElement>(null);
     const [resetChildState, setResetChildState] = useState(false);
-    const artists = useMemo(() => {
-        const artistSet = new Set<string>();
-        songStore.songs.forEach((x) => artistSet.add(x.source));
-        return Array.from(artistSet.values());
-    }, [songStore.songs]);
+
+    // const artists = useMemo(() => {
+    //     const artistSet = new Set<string>();
+    //     songStore.songs.forEach((x) => artistSet.add(x.source));
+    //     return Array.from(artistSet.values());
+    // }, [songStore.songs]);
 
     const form = useForm<songSchemaType>({
         resolver: zodResolver(songSchema),
@@ -64,49 +52,20 @@ export default function CreateSongForm({
     function onSubmit(values: songSchemaType) {
         console.log(values);
 
-        const song: Song = {
-            id: uuidv4(),
+        const song = {
             title: values.title,
             content: values.content.trim(),
             source: values.source,
-            completion: 0,
-            record: { accuracy: 0, wpm: 0 },
             cover: values.cover,
-            createdAt: Date.now(),
-            lastModifiedAt: Date.now(),
         };
 
-        try {
-            songStore.addSong(song);
-        } catch (e) {
-            console.error("oh no this is not going to work");
-            console.log(
-                "SIZE::::::",
-                seeSizeOfStringInLocalStorage(JSON.stringify(song))
-            );
-            toast({
-                title: "Failed to add song.",
-                description: `It seems like storage is full or this song is too long. ${
-                    JSON.stringify(localStorage).length
-                }storage size ${JSON.stringify(song).length}`,
-                variant: "destructive",
-            });
-            return;
-        }
+        const result = createSong(song, true);
 
+        if (!result) return;
+
+        // Reset the state that doesn't get reset automatically
         form.reset({ cover: generateGradient() });
         setResetChildState((prev) => !prev);
-
-        toast({
-            title: "Successfully added your song.",
-            description: `${values.title} - ${values.source}`,
-            variant: "success",
-            action: (
-                <Link to={`/songs/${song.id}`}>
-                    <Button variant={"outline"}>View song</Button>
-                </Link>
-            ),
-        });
 
         formRef.current?.focus();
         if (onSuccess) onSuccess();

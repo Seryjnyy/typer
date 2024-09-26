@@ -11,6 +11,7 @@ import { cn, splitSongIntoVerses } from "@/lib/utils";
 
 export const convertSongToElements = (
     song: string,
+    songStripped: string,
     userInput: string,
     direction: "backward" | "forward",
     difficultyModifiers: HarderOptions,
@@ -65,7 +66,6 @@ export const convertSongToElements = (
                         let variant: chVariant = "not-covered";
 
                         if (k == 0) {
-                            variant = "start-of-line";
                             startOfLineIndexes.push(charIndex);
                         }
 
@@ -154,17 +154,10 @@ export const convertSongToElements = (
         );
     });
 
-    // console.log(currentCharIndex.length > 0 ? currentCharIndex[0] : "no");
-
-    // TODO : not 1000% sure but works
     let errorIndex = null;
     if (userInput.length - 1 >= 0) {
-        // console.log(
-        //     song.charAt(userInput.length - 1),
-        //     userInput.charAt(userInput.length - 1)
-        // );
         if (
-            song.charAt(userInput.length - 1) !=
+            songStripped.charAt(userInput.length - 1) !=
             userInput.charAt(userInput.length - 1)
         ) {
             errorIndex = userInput.length - 1;

@@ -62,7 +62,7 @@ export const MobileQueue = () => {
             enqueue(song.id);
         });
         if (randomSongs.length > 0) {
-            setCurrent(randomSongs[randomSongs.length - 1]);
+            setCurrent(randomSongs[0].id);
         }
     };
 
@@ -71,6 +71,7 @@ export const MobileQueue = () => {
             <ScrollArea className=" h-[calc(100%)]  pl-1 pr-3 pb-1 border-t">
                 {songs.map((song, index) => (
                     <div
+                        key={index}
                         className={cn(
                             "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
                             {
@@ -118,8 +119,9 @@ export const MobileQueue = () => {
                         </div>
                     </div>
                 ))}
-                {songs.length == 0 && queueSongsList.length > 0 && (
-                    <div>
+                {songs.length == 0 && songList.length > 0 && (
+                    <div className="mt-4">
+                        {/* TODO : doesn't close the drawer so you don't even know that it worked */}
                         {/* <Link to={"/songs"}>
                             <Button
                                 className="w-full mt-1 text-xs text-muted-foreground gap-2 flex justify-start"
@@ -136,6 +138,7 @@ export const MobileQueue = () => {
                             variant={"ghost"}
                             size={"sm"}
                             onClick={onAddRandomSongs}
+                            disabled={songList.length == 0}
                         >
                             <Icons.dice className="w-4 h-4" />
                             <span>Add random songs</span>
@@ -329,6 +332,7 @@ export default function Queue() {
                                         variant={"ghost"}
                                         size={"sm"}
                                         onClick={onAddRandomSongs}
+                                        disabled={songList.length == 0}
                                     >
                                         <Icons.dice className="w-4 h-4" />
                                         <span>Add random songs</span>

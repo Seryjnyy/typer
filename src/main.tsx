@@ -17,6 +17,7 @@ import TyperPage from "./routes/typer/typer-page";
 import EditSong from "./routes/song/edit-song";
 import TestPage from "./test-page";
 import Preferences from "./routes/settings/preferences";
+import ImportExport from "./routes/settings/import-export";
 
 const router = createBrowserRouter([
     {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
                     {
                         path: "preferences",
                         element: <Preferences />,
+                    },
+                    {
+                        path: "import-export",
+                        element: <ImportExport />,
                     },
                 ],
             },

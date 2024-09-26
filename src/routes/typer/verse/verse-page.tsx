@@ -6,9 +6,15 @@ import {
     SongHeader,
 } from "@/components/ui/song-header";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
-import { calculateAccuracy, chpm, cn, generateGradient } from "@/lib/utils";
+import {
+    calculateAccuracy,
+    chpm,
+    cn,
+    generateGradient,
+    textModification,
+} from "@/lib/utils";
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { useStopwatch } from "react-timer-hook";
@@ -82,7 +88,11 @@ export default function VersePage() {
     const songList = useSongStore.use.songs();
     const verseTyperTextDisplay =
         usePreferenceStore.use.verseTyperTextDisplay();
+
+    const isOpenEndScreenInitiallyVersePage =
+        usePreferenceStore.use.isOpenEndScreenInitiallyVersePage();
     const difficultyModifiers = useTextModificationsStore.use.harderOptions();
+    const textModifications = useTextModificationsStore.use.textModifications();
 
     const [userInput, setUserInput] = useState("");
     const [completed, setCompleted] = useState(false);
@@ -109,14 +119,16 @@ export default function VersePage() {
     const songData: SongData = useMemo(() => {
         if (!content) return null;
 
+        let txt = textModification(content, textModifications);
+
         return {
             song: song,
             content: {
-                full: content,
-                stripped: content.replace(/(\r\n|\n|\r)/gm, ""),
+                full: txt,
+                stripped: txt.replace(/(\r\n|\n|\r)/gm, ""),
             },
         };
-    }, [content]);
+    }, [content, difficultyModifiers, textModifications]);
 
     const {
         totalSeconds,
@@ -169,12 +181,43 @@ export default function VersePage() {
         onFinish: () => {
             pauseStopwatch();
         },
+        onChangeSong: () => {
+            onRestart();
+        },
     };
 
     const onRestart = () => {
         restartProgressState();
         resetStopwatch(undefined, false);
     };
+
+    const endScreen =
+        songData && completed ? (
+            <EndScreen
+                versePage
+                initialValue={isOpenEndScreenInitiallyVersePage}
+                song={songData.song}
+                stats={{
+                    errorMap: progressManager.errorMap,
+                    timeElapsed: progressManager.timeElapsed,
+                    typedChars: progressManager.typedChars,
+                    correct: progressManager.correct,
+                    incorrect: progressManager.incorrect,
+                }}
+                onRestart={onRestart}
+                userInputLength={userInput.length}
+            />
+        ) : null;
+
+    useEffect(() => {
+        handlers.onChangeSong?.();
+
+        progressManager.setTargetCharCount(
+            songData?.content.stripped != undefined
+                ? songData.content.stripped.length
+                : 0
+        );
+    }, [songData?.content.full]);
 
     return (
         <div
@@ -190,22 +233,7 @@ export default function VersePage() {
                     tryVerseOption={true}
                     difficultyModifiers={difficultyModifiers}
                 >
-                    {completed && (
-                        <EndScreen
-                            initialValue={false}
-                            onRestart={onRestart}
-                            userInputLength={userInput.length}
-                            song={song}
-                            stats={{
-                                errorMap: progressManager.errorMap,
-                                timeElapsed: progressManager.timeElapsed,
-                                typedChars: progressManager.typedChars,
-                                correct: progressManager.correct,
-                                incorrect: progressManager.incorrect,
-                            }}
-                            versePage
-                        />
-                    )}
+                    {endScreen}
                     <Top song={song} cameFrom={cameFrom} />
                 </CylinderTyper>
             )}
@@ -218,22 +246,7 @@ export default function VersePage() {
                     handlers={handlers}
                     difficultyModifiers={difficultyModifiers}
                 >
-                    {completed && (
-                        <EndScreen
-                            initialValue={false}
-                            onRestart={onRestart}
-                            userInputLength={userInput.length}
-                            song={song}
-                            stats={{
-                                errorMap: progressManager.errorMap,
-                                timeElapsed: progressManager.timeElapsed,
-                                typedChars: progressManager.typedChars,
-                                correct: progressManager.correct,
-                                incorrect: progressManager.incorrect,
-                            }}
-                            versePage
-                        />
-                    )}
+                    {endScreen}
                     <Top song={song} cameFrom={cameFrom} />
                 </FlatTyper>
             )}

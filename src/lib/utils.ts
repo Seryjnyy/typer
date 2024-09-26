@@ -59,58 +59,60 @@ export function calculateAccuracy(correct: number, total: number) {
     return round((correct / total) * 100, 2);
 }
 
-const dirOptions = [
-    "t",
-    "tr",
-    "r",
-    // "br",
-    // "b",
-    // "bl",
-    // "l",
-    // "tl"
-];
-const colourOptions = [
-    // "red",
-    // "green",
-    // "blue",
-    // "purple",
-    // "indigo",
-    "orange",
-    "rose",
-    // "cyan",
-    "sky",
-    // "fuschia",
-    // "pink",
-    // "lime",
-    "emerald",
-    // "teal",
-    "violet",
-];
-const stepOptions = [
-    // 50,
-    // 100,
-    200,
-    // 300,
-    400,
-    // 500,
-    // 600,
-    // 700,
-    800,
-    // 900,
-    950,
-];
+export const gradientOptions = {
+    directions: [
+        "t",
+        "tr",
+        "r",
+        // "br",
+        // "b",
+        // "bl",
+        // "l",
+        // "tl"
+    ],
+    colours: [
+        // "red",
+        // "green",
+        // "blue",
+        // "purple",
+        // "indigo",
+        "orange",
+        "rose",
+        // "cyan",
+        "sky",
+        // "fuschia",
+        // "pink",
+        // "lime",
+        "emerald",
+        // "teal",
+        "violet",
+    ],
+    steps: [
+        // 50,
+        // 100,
+        200,
+        // 300,
+        400,
+        // 500,
+        // 600,
+        // 700,
+        800,
+        // 900,
+        950,
+    ],
+};
 
 export function generateAllPossibleGradients() {
     const combinations = new Set<string>();
-    dirOptions.forEach((dir) => {
+    gradientOptions.directions.forEach((dir) => {
         // colour one
-        colourOptions.forEach((colourOption) => {
-            stepOptions.forEach((stepOptionOne) => {
+        gradientOptions.colours.forEach((colourOption) => {
+            gradientOptions.steps.forEach((stepOptionOne) => {
                 // pick second colour
-                colourOptions
+                gradientOptions.colours
                     .filter((x) => x != colourOption)
                     .forEach((colourOptionTwo) => {
-                        stepOptions.forEach((stepOptionTwo) => {
+                        gradientOptions.steps.forEach((stepOptionTwo) => {
                             combinations.add(
                                 `bg-gradient-to-${dir} from-${colourOption}-${stepOptionOne} to-${colourOptionTwo}-${stepOptionTwo}`
                             );
@@ -128,16 +130,25 @@ export function generateAllPossibleGradients() {
 }
 
 export function generateGradient() {
-    const dir = dirOptions[Math.floor(Math.random() * dirOptions.length)];
+    const dir =
+        gradientOptions.directions[
+            Math.floor(Math.random() * gradientOptions.directions.length)
+        ];
     const colourOne =
-        colourOptions[Math.floor(Math.random() * colourOptions.length)];
-    const colourTwo = colourOptions.filter((colour) => colour != colourOne)[
-        Math.floor(Math.random() * (colourOptions.length - 1))
-    ];
+        gradientOptions.colours[
+            Math.floor(Math.random() * gradientOptions.colours.length)
+        ];
+    const colourTwo = gradientOptions.colours.filter(
+        (colour) => colour != colourOne
+    )[Math.floor(Math.random() * (gradientOptions.colours.length - 1))];
     const colourOneStep =
-        stepOptions[Math.floor(Math.random() * stepOptions.length)];
+        gradientOptions.steps[
+            Math.floor(Math.random() * gradientOptions.steps.length)
+        ];
     const colourTwoStep =
-        stepOptions[Math.floor(Math.random() * stepOptions.length)];
+        gradientOptions.steps[
+            Math.floor(Math.random() * gradientOptions.steps.length)
+        ];
 
     const res = `bg-gradient-to-${dir} from-${colourOne}-${colourOneStep} to-${colourTwo}-${colourTwoStep}`;
 

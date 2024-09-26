@@ -763,7 +763,7 @@ const AllSongs = () => {
                                     listStyle={songListPreferences.listStyle}
                                 />
                             ))}
-                        {filteredSongs.length == 0 && (
+                        {songsList.length > 0 && filteredSongs.length == 0 && (
                             <div className="w-full flex items-center justify-center mt-12">
                                 <div className="flex flex-col text-center">
                                     <h3 className="font-semibold text-2xl">
@@ -771,6 +771,18 @@ const AllSongs = () => {
                                     </h3>
                                     <span className="text-muted-foreground ">
                                         Couldn't find what you searched for.
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        {songsList.length == 0 && (
+                            <div className="w-full flex items-center justify-center mt-12">
+                                <div className="flex flex-col text-center">
+                                    <h3 className="font-semibold text-2xl">
+                                        You don't have any songs
+                                    </h3>
+                                    <span className="text-muted-foreground ">
+                                        Add some.
                                     </span>
                                 </div>
                             </div>

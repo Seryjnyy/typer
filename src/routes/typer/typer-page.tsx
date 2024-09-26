@@ -49,7 +49,8 @@ export default function TyperPage() {
     const autoplay = useQueueStore.use.autoplay();
     const next = useQueueStore.use.next();
 
-    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
+    const isOpenEndScreenInitially =
+        usePreferenceStore.use.isOpenEndScreenInitially();
 
     const editSongCompletion = useSongStore.use.editSongCompletion();
     const editSongRecord = useSongStore.use.editSongRecord();
@@ -172,15 +173,39 @@ export default function TyperPage() {
     useEffect(() => {
         setTimeElapsed(totalSeconds);
 
-        console.log(
-            "WPM",
-            totalSeconds > 0 ? wpm(userInput.length, totalSeconds) : 0
-        );
+        // console.log(
+        //     "WPM",
+        //     totalSeconds > 0 ? wpm(userInput.length, totalSeconds) : 0
+        // );
     }, [totalSeconds]);
+
+    const endScreen =
+        songData && !autoplay && completed ? (
+            <EndScreen
+                isTxtModificationsOn={
+                    txtMods.letterCase != "normal" ||
+                    txtMods.numbers != "normal" ||
+                    txtMods.punctuation != "normal"
+                }
+                initialValue={isOpenEndScreenInitially}
+                song={songData.song}
+                stats={{
+                    errorMap: progressManager.errorMap,
+                    timeElapsed: progressManager.timeElapsed,
+                    typedChars: progressManager.typedChars,
+                    correct: progressManager.correct,
+                    incorrect: progressManager.incorrect,
+                }}
+                onRestart={onRestart}
+                userInputLength={userInput.length}
+            />
+        ) : null;
 
     return (
         <div
-            className={cn("h-[calc(100vh-4rem)] w-full flex overflow-hidden ")}
+            className={cn(
+                "h-[calc(100vh-4rem)] w-full flex overflow-hidden rounded-md"
+            )}
         >
             {songData == null && <NoSongSelected />}
             {songData != null && typerTextDisplay == "cylinder" && (
@@ -191,20 +216,7 @@ export default function TyperPage() {
                     tryVerseOption={true}
                     difficultyModifiers={difficultyModifiers}
                 >
-                    {!autoplay && completed && (
-                        <EndScreen
-                            song={songData.song}
-                            stats={{
-                                errorMap: progressManager.errorMap,
-                                timeElapsed: progressManager.timeElapsed,
-                                typedChars: progressManager.typedChars,
-                                correct: progressManager.correct,
-                                incorrect: progressManager.incorrect,
-                            }}
-                            onRestart={onRestart}
-                            userInputLength={userInput.length}
-                        />
-                    )}
+                    {endScreen}
                 </CylinderTyper>
             )}
             {songData != null && typerTextDisplay == "flat" && (
@@ -216,20 +228,7 @@ export default function TyperPage() {
                         tryVerseOption={true}
                         difficultyModifiers={difficultyModifiers}
                     >
-                        {!autoplay && completed && (
-                            <EndScreen
-                                song={songData.song}
-                                stats={{
-                                    errorMap: progressManager.errorMap,
-                                    timeElapsed: progressManager.timeElapsed,
-                                    typedChars: progressManager.typedChars,
-                                    correct: progressManager.correct,
-                                    incorrect: progressManager.incorrect,
-                                }}
-                                onRestart={onRestart}
-                                userInputLength={userInput.length}
-                            />
-                        )}
+                        {endScreen}
                     </FlatTyper>
                 </div>
             )}

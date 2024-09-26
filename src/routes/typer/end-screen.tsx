@@ -131,6 +131,7 @@ export default function EndScreen({
     song,
     stats: { timeElapsed, typedChars, correct, incorrect, errorMap },
     versePage,
+    isTxtModificationsOn: txtModifications,
 }: {
     onRestart: () => void;
     userInputLength: number;
@@ -144,6 +145,7 @@ export default function EndScreen({
         errorMap: Map<number, number>;
     };
     versePage?: boolean;
+    isTxtModificationsOn?: boolean;
 }) {
     const [open, setOpen] = useState(initialValue ?? true);
 
@@ -260,6 +262,12 @@ export default function EndScreen({
                                         />
                                     </div>
                                 </div>
+                                {txtModifications && !versePage && (
+                                    <span className="text-xs text-orange-400">
+                                        *Text modifications are on, so stats
+                                        will not be saved.
+                                    </span>
+                                )}
                             </div>
 
                             <EndScreenFooter

@@ -19,6 +19,7 @@ import {
 
 import {
     DotsHorizontalIcon,
+    DownloadIcon,
     EyeOpenIcon,
     Pencil1Icon,
     PlayIcon,
@@ -47,6 +48,19 @@ export default function SongPopover({ song, exclude }: SongPopoverProps) {
         enqueue(songId);
     };
     const navigate = useNavigate();
+
+    // const handleExportSong = () => {
+    //     const data = {
+    //         title: song.title,
+    //         source: song.source,
+    //         cover: song.cover,
+    //         content: song.content,
+    //     };
+    //     const jsonString = JSON.stringify(data, null, 2);
+    //     const blob = new Blob([jsonString], { type: "application/json" });
+    //     saveAs(blob, `${song.title}-${song.source}.json`);
+    // };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="p-2  rounded-sm">
@@ -113,6 +127,16 @@ export default function SongPopover({ song, exclude }: SongPopoverProps) {
                 >
                     <Pencil1Icon />
                     <span>Edit</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    className="space-x-1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleExportSong();
+                    }}
+                >
+                    <DownloadIcon />
+                    <span>Export</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="space-x-1 text-destructive">

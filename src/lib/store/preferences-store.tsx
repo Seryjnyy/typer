@@ -12,6 +12,20 @@ export type QueueStorage = "localStorage" | "sessionStorage";
 
 type SongList = { listStyle: ListStyle; sortBy: SortBy; order: Order };
 
+type ExportSongs = {
+    cover: boolean;
+    completion: boolean;
+    record: boolean;
+    createdAt: boolean;
+};
+
+type ImportSongs = {
+    cover: boolean;
+    completion: boolean;
+    record: boolean;
+    createdAt: boolean;
+};
+
 type State = {
     typerTextDisplay: TyperTextDisplay;
     verseTyperTextDisplay: TyperTextDisplay;
@@ -20,7 +34,11 @@ type State = {
     isErrorAnim: boolean;
     isCorrectAnim: boolean;
     isQueueColour: boolean;
+    isOpenEndScreenInitially: boolean;
+    isOpenEndScreenInitiallyVersePage: boolean;
     songList: SongList;
+    exportSongs: ExportSongs;
+    importSongs: ImportSongs;
 };
 
 type Actions = {
@@ -32,7 +50,13 @@ type Actions = {
     setCorrectAnim: (val: boolean) => void;
     setQueueColour: (val: boolean) => void;
     setSongListPref: (val: SongList) => void;
+    setOpenEndScreenInitially: (val: boolean) => void;
+    setOpenEndScreenInitiallyVersePage: (val: boolean) => void;
+    setExportSongs: (val: ExportSongs) => void;
+    setImportSongs: (val: ImportSongs) => void;
     resetPreferences: () => void;
+    resetImportPref: () => void;
+    resetExportPref: () => void;
 };
 
 const defaults: State = {
@@ -44,6 +68,20 @@ const defaults: State = {
     isErrorAnim: true,
     isCorrectAnim: true,
     songList: { listStyle: "list", sortBy: "created", order: "asc" },
+    isOpenEndScreenInitially: true,
+    isOpenEndScreenInitiallyVersePage: false,
+    exportSongs: {
+        cover: true,
+        completion: false,
+        record: false,
+        createdAt: true,
+    },
+    importSongs: {
+        cover: true,
+        completion: false,
+        createdAt: true,
+        record: false,
+    },
 };
 
 const usePreferenceStoreBase = create<State & Actions>()(
@@ -74,6 +112,14 @@ const usePreferenceStoreBase = create<State & Actions>()(
                 set(() => {
                     return { isCorrectAnim: val };
                 }),
+            setOpenEndScreenInitially: (val: boolean) =>
+                set(() => {
+                    return { isOpenEndScreenInitially: val };
+                }),
+            setOpenEndScreenInitiallyVersePage: (val: boolean) =>
+                set(() => {
+                    return { isOpenEndScreenInitiallyVersePage: val };
+                }),
             setSongListPref: (val: SongList) =>
                 set(() => {
                     return { songList: val };
@@ -81,6 +127,22 @@ const usePreferenceStoreBase = create<State & Actions>()(
             setQueueColour: (val: boolean) =>
                 set(() => {
                     return { isQueueColour: val };
+                }),
+            setExportSongs: (val: ExportSongs) =>
+                set(() => {
+                    return { exportSongs: val };
+                }),
+            setImportSongs: (val: ImportSongs) =>
+                set(() => {
+                    return { importSongs: val };
+                }),
+            resetExportPref: () =>
+                set(() => {
+                    return { exportSongs: defaults.exportSongs };
+                }),
+            resetImportPref: () =>
+                set(() => {
+                    return { importSongs: defaults.importSongs };
                 }),
             resetPreferences: () =>
                 set(() => {

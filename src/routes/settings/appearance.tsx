@@ -109,6 +109,16 @@ export default function Appearance() {
     const setCorrectAnim = usePreferenceStore.use.setCorrectAnim();
     const isCorrectAnim = usePreferenceStore.use.isCorrectAnim();
 
+    const setOpenEndScreenInitially =
+        usePreferenceStore.use.setOpenEndScreenInitially();
+    const isOpenEndScreenInitially =
+        usePreferenceStore.use.isOpenEndScreenInitially();
+
+    const setOpenEndScreenInitiallyVersePage =
+        usePreferenceStore.use.setOpenEndScreenInitiallyVersePage();
+    const isOpenEndScreenInitiallyVersePage =
+        usePreferenceStore.use.isOpenEndScreenInitiallyVersePage();
+
     const options = [
         {
             id: "complete_animation_toggle",
@@ -137,6 +147,21 @@ export default function Appearance() {
             value: isQueueColour,
             desc: "The queue gets a background gradient based on the song cover.",
             onCheckedChange: setQueueColour,
+        },
+
+        {
+            id: "open_end_screen_auto_toggle",
+            title: "Open End screen automatically",
+            value: isOpenEndScreenInitially,
+            desc: "Chose if you want the end screen to open when you complete the song.",
+            onCheckedChange: setOpenEndScreenInitially,
+        },
+        {
+            id: "open_end_screen_verse_page_auto_toggle",
+            title: "Open End screen automatically in Verse page",
+            value: isOpenEndScreenInitiallyVersePage,
+            desc: "Chose if you want the end screen to open when you complete the verse. ",
+            onCheckedChange: setOpenEndScreenInitiallyVersePage,
         },
     ];
 

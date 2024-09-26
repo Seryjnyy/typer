@@ -107,6 +107,7 @@ const calculateLineStyle = (
 
 const convertStuff = (
     songContent: string,
+    songContentStripped: string,
     userInput: string,
     curr: number,
     tryVerse: boolean,
@@ -138,7 +139,7 @@ const convertStuff = (
     newSplit.linesVerseMap.forEach((x, verseIndex) => {
         // render stops verses from being added, however it still does the computation and stuff
 
-        const lines = x.lines.map((line) => {
+        const lines = x.lines.map((line, j) => {
             const style = calculateLineStyle(
                 start,
                 lineIndex,
@@ -154,10 +155,11 @@ const convertStuff = (
             ) {
                 lineIndex++;
                 Array.from(line).forEach(() => chIndex++);
+                // console.log("result of line", chIndex);
                 return null;
             }
 
-            const formattedLine = Array.from(line).map((ch) => {
+            const formattedLine = Array.from(line).map((ch, k) => {
                 let variant: chVariant = "normal";
 
                 if (chIndex > userInput.length) {
@@ -199,13 +201,19 @@ const convertStuff = (
                     }
                 }
 
-                if (chIndex == userInput.length + 1) {
+                // Plus one so it moves to next line without having to type the first ch of new line
+                if (chIndex == userInput.length) {
+                    console.log(line);
                     currentLine = -lineIndex;
                 }
 
                 chIndex++;
 
-                return <Ch variant={variant}>{ch}</Ch>;
+                return (
+                    <Ch variant={variant} key={"" + verseIndex + "" + j + k}>
+                        {ch}
+                    </Ch>
+                );
             });
 
             lineIndex++;
@@ -230,6 +238,7 @@ const convertStuff = (
         if (lines.length != 0) {
             drawLines.push(
                 <div
+                    key={verseIndex}
                     className={cn("rounded-md", {
                         "hover:outline hover:outline-border group/verse relative  px-2":
                             lines.length > 0 && tryVerse,
@@ -271,7 +280,7 @@ const convertStuff = (
                 drawLines.push(
                     <div
                         className="text-center w-full opacity-50"
-                        key={lineIndex + chIndex}
+                        key={verseIndex + "empty"}
                         style={{
                             color: `rgb(255 255 255 / ${style.fontColourOffset})`,
                             fontWeight: style.fontWeight,
@@ -288,9 +297,10 @@ const convertStuff = (
     });
 
     let errorIndex = null;
+
     if (userInput.length - 1 >= 0) {
         if (
-            songContent.charAt(userInput.length - 1) !=
+            songContentStripped.charAt(userInput.length - 1) !=
             userInput.charAt(userInput.length - 1)
         ) {
             errorIndex = userInput.length - 1;
@@ -325,9 +335,12 @@ export default function CylinderTyper({
 
     const { isMd } = useScreenSize();
 
+    // console.log("actual curr", curr);
     const generatorResult = useMemo(() => {
+        // console.log("curr", curr);
         return convertStuff(
-            songData?.content.full ?? "no song",
+            songData?.content.full ?? "",
+            songData?.content.stripped ?? "",
             progressManager.userInput,
             curr,
             tryVerseOption ?? false,
@@ -342,6 +355,12 @@ export default function CylinderTyper({
         () => generatorResult,
         [generatorResult]
     );
+
+    useEffect(() => {
+        setCurr(currentLine);
+    }, [currentLine]);
+
+    // console.log("current line", currentLine);
 
     useEffect(() => {
         if (generatorResult.errorIndex != null) {
@@ -364,7 +383,6 @@ export default function CylinderTyper({
 
         progressManager.setTypedCharCount(input.length);
 
-        console.log("currentLine", currentLine);
         setCurr(currentLine);
     };
 
@@ -420,10 +438,11 @@ export default function CylinderTyper({
         const isLetter = /^[a-zA-Z]$/.test(key);
         const isNumber = /^[0-9]$/.test(key);
         const isPunctuation = /^[.,:;?!'"()\-_=+[\]{}<>/@#$%^&*~`]$/.test(key);
+        const isBackspace = key == "Backspace";
 
         // Only accept letters, numbers and punctuation
         // TODO : what happens with non standard characters, like from different alphabets?
-        if (isLetter || isNumber || isPunctuation) {
+        if (isLetter || isNumber || isPunctuation || isBackspace) {
             // focus
             inputRef.current?.focus();
 
@@ -435,7 +454,7 @@ export default function CylinderTyper({
     });
 
     useHotkeys(
-        "ArrowLeft",
+        "ArrowLeft,ArrowUp",
         () => {
             changeCurrVal(1);
         },
@@ -443,7 +462,7 @@ export default function CylinderTyper({
     );
 
     useHotkeys(
-        "ArrowRight",
+        "ArrowRight,ArrowDown",
         () => {
             changeCurrVal(-1);
         },
@@ -511,15 +530,16 @@ export default function CylinderTyper({
             {generatorResult.errorIndex != null && (
                 <ErrorAnim errorIndex={generatorResult.errorIndex} />
             )}
-            {generatorResult.errorIndex == null && (
-                <CorrectAnim
-                    index={
-                        progressManager.userInput.length > 0
-                            ? progressManager.userInput.length
-                            : null
-                    }
-                />
-            )}
+            {currentAction == "forward" &&
+                generatorResult.errorIndex == null && (
+                    <CorrectAnim
+                        index={
+                            progressManager.userInput.length > 0
+                                ? progressManager.userInput.length
+                                : null
+                        }
+                    />
+                )}
             <Buttons handlers={handlers} />
 
             <Stats

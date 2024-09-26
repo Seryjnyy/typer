@@ -48,6 +48,7 @@ export default function FlatTyper({
         console.log(currentAction);
         const res = convertSongToElements(
             songData?.content.full ?? "",
+            songData?.content.stripped ?? "",
             progressManager.userInput,
             currentAction,
             difficultyModifiers,
@@ -201,15 +202,16 @@ export default function FlatTyper({
             {generatorResult.errorIndex != null && (
                 <ErrorAnim errorIndex={generatorResult.errorIndex} />
             )}
-            {generatorResult.errorIndex == null && (
-                <CorrectAnim
-                    index={
-                        progressManager.userInput.length > 0
-                            ? progressManager.userInput.length
-                            : null
-                    }
-                />
-            )}
+            {currentAction == "forward" &&
+                generatorResult.errorIndex == null && (
+                    <CorrectAnim
+                        index={
+                            progressManager.userInput.length > 0
+                                ? progressManager.userInput.length
+                                : null
+                        }
+                    />
+                )}
             <Stats
                 focusedOnInput={focusedOnInput}
                 progressManager={progressManager}

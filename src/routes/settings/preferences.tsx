@@ -20,9 +20,9 @@ import { ReactNode } from "react";
 export default function Preferences() {
     const pref = usePreferenceStore();
 
-    console.log(
-        Object.entries(pref).filter(([key, val]) => typeof val != "function")
-    );
+    // console.log(
+    //     Object.entries(pref).filter(([key, val]) => typeof val != "function")
+    // );
 
     const preferences = Object.entries(pref).filter(
         ([key, val]) => typeof val != "function"
@@ -44,8 +44,8 @@ export default function Preferences() {
                         <CardContent className="backdrop-brightness-50 m-2 pt-4 rounded-md space-y-2">
                             <pre>
                                 <code>
-                                    {preferences.map((preference) => (
-                                        <span className="block">
+                                    {preferences.map((preference, index) => (
+                                        <span className="block" key={index}>
                                             <span className="text-primary opacity-50">
                                                 {preference[0]}
                                             </span>{" "}

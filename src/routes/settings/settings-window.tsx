@@ -84,6 +84,7 @@ export default function SettingsWindow() {
         current != "storage" &&
         current != "appearance" &&
         current != "preferences" &&
+        current != "import-export" &&
         current != "" &&
         split.length != 2
     ) {
@@ -94,12 +95,13 @@ export default function SettingsWindow() {
         { link: "appearance", label: "Appearance" },
         { link: "storage", label: "Storage" },
         { link: "preferences", label: "Preferences" },
+        { link: "import-export", label: "Import & Export" },
         // { link: "progress", label: "Progress" },
     ];
 
     return (
         <main className="min-h-[calc(100vh-4rem)]  flex-1 flex gap-4 flex-col sm:flex-row   md:gap-8 ">
-            <div className="mx-auto w-fit max-w-6xl gap-2  p-8 md:p-16 space-y-8 hidden sm:block">
+            <div className="mx-auto w-fit max-w-6xl gap-2  py-8 px-4 md:p-10 lg:p-16 space-y-8 hidden sm:block">
                 <h1 className="text-3xl font-semibold">Settings</h1>
                 <nav className="grid gap-4 text-sm text-muted-foreground ">
                     {links.map((link) => {
@@ -126,8 +128,8 @@ export default function SettingsWindow() {
             />
 
             <div className="w-full max-w-6xl items-start gap-6 h-full ">
-                <ScrollArea className="h-[calc(100vh-5rem)]  w-full px-3  rounded-md pb-16 sm:pb-12 md:pb-4">
-                    <div className="w-full py-12 md:px-18 lg:px-24">
+                <ScrollArea className="h-[calc(100vh-5rem)]  w-full px-3  ">
+                    <div className="w-full py-12  lg:px-20">
                         <Outlet />
                     </div>
                 </ScrollArea>
