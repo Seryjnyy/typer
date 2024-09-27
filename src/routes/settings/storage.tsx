@@ -33,6 +33,7 @@ import {
 } from "@/lib/store/preferences-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { formatBytes } from "@/lib/utils";
+import { useNavigate } from "react-router";
 import { LabelList, Pie, PieChart } from "recharts";
 
 const localStorageSpace = () => {
@@ -123,7 +124,7 @@ export default function Storage() {
     const localStorageUse = localStorageSpace();
     console.log(localStorageSpace());
     const setSongs = useSongStore.use.setSongs();
-
+    const navigate = useNavigate();
     const chartData = [
         {
             state: "used",
@@ -163,10 +164,14 @@ export default function Storage() {
     const onClearLocalStorage = () => {
         localStorage.clear();
 
-        toast({
-            title: "Cleared localStorage.",
-            description: `Successfully removed everything the app stored in localStorage.`,
-        });
+        // Need to reload page so stores reset too, there is probably a better way but eh
+        window.location.reload();
+
+        // TODO : Maybe could do it so after refresh we get toast somehow
+        // toast({
+        //     title: "Cleared localStorage.",
+        //     description: `Successfully removed everything the app stored in localStorage.`,
+        // });
     };
 
     return (

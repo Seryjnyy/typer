@@ -85,6 +85,8 @@ export default function SettingsWindow() {
         current != "appearance" &&
         current != "preferences" &&
         current != "import-export" &&
+        current != "spotify" &&
+        // current != "stats" &&
         current != "" &&
         split.length != 2
     ) {
@@ -96,6 +98,8 @@ export default function SettingsWindow() {
         { link: "storage", label: "Storage" },
         { link: "preferences", label: "Preferences" },
         { link: "import-export", label: "Import & Export" },
+        { link: "spotify", label: "Spotify" },
+        // { link: "stats", label: "Stats" },
         // { link: "progress", label: "Progress" },
     ];
 
@@ -127,8 +131,8 @@ export default function SettingsWindow() {
                 className="block sm:hidden"
             />
 
-            <div className="w-full max-w-6xl items-start gap-6 h-full ">
-                <ScrollArea className="h-[calc(100vh-5rem)]  w-full px-3  ">
+            <div className="w-full max-w-6xl items-start gap-6 h-full rounded-tr-md rounded-br-md overflow-hidden">
+                <ScrollArea className="h-[calc(100vh-5rem)]  w-full px-3 sm:pr-3 sm:pl-0    ">
                     <div className="w-full py-12  lg:px-20">
                         <Outlet />
                     </div>

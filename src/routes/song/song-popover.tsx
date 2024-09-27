@@ -32,6 +32,7 @@ import { useQueueStore } from "../../lib/store/queue-store";
 import { useSongStore } from "../../lib/store/song-store";
 import { Song } from "@/lib/types";
 import usePlaySong from "@/lib/hooks/use-play-song";
+import useExportSongs from "@/lib/hooks/use-export-song";
 
 interface SongPopoverProps {
     song: Song;
@@ -43,23 +44,16 @@ export default function SongPopover({ song, exclude }: SongPopoverProps) {
     const removeSong = useSongStore.use.removeSong();
     const enqueue = useQueueStore.use.enqueue();
     const playSong = usePlaySong();
+    const { exportSongs } = useExportSongs();
 
     const onAddToQueue = (songId: string) => {
         enqueue(songId);
     };
     const navigate = useNavigate();
 
-    // const handleExportSong = () => {
-    //     const data = {
-    //         title: song.title,
-    //         source: song.source,
-    //         cover: song.cover,
-    //         content: song.content,
-    //     };
-    //     const jsonString = JSON.stringify(data, null, 2);
-    //     const blob = new Blob([jsonString], { type: "application/json" });
-    //     saveAs(blob, `${song.title}-${song.source}.json`);
-    // };
+    const handleExportSong = () => {
+        exportSongs([song]);
+    };
 
     return (
         <DropdownMenu>

@@ -20,19 +20,20 @@ interface KeyboardButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement>,
         VariantProps<typeof buttonVariants> {}
 
-export default function KeyboardButton({
-    className,
-    variant,
-    ...props
-}: KeyboardButtonProps) {
-    return (
-        <Button
-            size={"sm"}
-            className={cn(buttonVariants({ variant, className }))}
-            {...props}
-        >
-            <KeyboardIcon />
-            <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform opacity-60" />
-        </Button>
-    );
-}
+const KeyboardButton = React.forwardRef<HTMLButtonElement, KeyboardButtonProps>(
+    ({ className, variant, ...props }, ref) => {
+        return (
+            <Button
+                size={"sm"}
+                className={cn(buttonVariants({ variant, className }))}
+                ref={ref}
+                {...props}
+            >
+                <KeyboardIcon />
+                <ArrowRightIcon className="group-hover/button:translate-x-1 transition-transform opacity-60" />
+            </Button>
+        );
+    }
+);
+
+export default KeyboardButton;

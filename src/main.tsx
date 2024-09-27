@@ -18,6 +18,8 @@ import EditSong from "./routes/song/edit-song";
 import TestPage from "./test-page";
 import Preferences from "./routes/settings/preferences";
 import ImportExport from "./routes/settings/import-export";
+import Spotify from "./routes/settings/spotify";
+import Stats from "./routes/settings/stats";
 
 const router = createBrowserRouter([
     {
@@ -38,7 +40,6 @@ const router = createBrowserRouter([
                 element: <SongsPage />,
                 children: [
                     {
-                        path: "/songs",
                         element: <Songs />,
                         index: true,
                     },
@@ -71,6 +72,14 @@ const router = createBrowserRouter([
                     {
                         path: "preferences",
                         element: <Preferences />,
+                    },
+                    {
+                        path: "spotify",
+                        element: <Spotify />,
+                    },
+                    {
+                        path: "stats",
+                        element: <Stats />,
                     },
                     {
                         path: "import-export",

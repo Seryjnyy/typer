@@ -28,6 +28,7 @@ import Stats from "./footer/stats";
 import { Handlers, ProgressManager, SongData } from "./types";
 import ErrorAnim from "./footer/error-anim";
 import CorrectAnim from "./footer/correct-anim";
+import { isTryingToType } from "./utils";
 
 interface CylinderTyperProps {
     progressManager: ProgressManager;
@@ -435,14 +436,9 @@ export default function CylinderTyper({
 
     useHotkeys("*", (event) => {
         const { key } = event;
-        const isLetter = /^[a-zA-Z]$/.test(key);
-        const isNumber = /^[0-9]$/.test(key);
-        const isPunctuation = /^[.,:;?!'"()\-_=+[\]{}<>/@#$%^&*~`]$/.test(key);
-        const isBackspace = key == "Backspace";
 
-        // Only accept letters, numbers and punctuation
-        // TODO : what happens with non standard characters, like from different alphabets?
-        if (isLetter || isNumber || isPunctuation || isBackspace) {
+        // Check if input is letters, numbers, punctuation or backspace
+        if (isTryingToType(key)) {
             // focus
             inputRef.current?.focus();
 

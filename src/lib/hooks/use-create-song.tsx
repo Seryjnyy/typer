@@ -6,11 +6,15 @@ import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { PlayIcon } from "@radix-ui/react-icons";
+import usePlaySong from "./use-play-song";
 
 // TODO : idk about this, seems very messy
 // also everything is all over the place, data layer business layer typa thing does not exist in this project :/
 export default function useCreateSong() {
     const addSong = useSongStore.use.addSong();
+    const playSong = usePlaySong();
+
     return (
         {
             title,
@@ -55,9 +59,20 @@ export default function useCreateSong() {
                     description: `${song.title} - ${song.source}`,
                     variant: "success",
                     action: (
-                        <Link to={`/songs/${song.id}`}>
-                            <Button variant={"outline"}>View song</Button>
-                        </Link>
+                        <div className="space-x-1">
+                            <Button
+                                variant={"outline"}
+                                size={"icon"}
+                                onClick={() => {
+                                    playSong(song.id);
+                                }}
+                            >
+                                <PlayIcon />
+                            </Button>
+                            <Link to={`/songs/${song.id}`}>
+                                <Button variant={"outline"}>View song</Button>
+                            </Link>
+                        </div>
                     ),
                 });
             }

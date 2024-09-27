@@ -10,6 +10,7 @@ import { PlayIcon, PlusIcon } from "@radix-ui/react-icons";
 import { shuffle } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 
 export default function NoSongSelected() {
     const songs = useSongStore.use.songs();
@@ -86,10 +87,15 @@ export default function NoSongSelected() {
                             </span>
                         </div>
                     )}
-                    <Button className="space-x-2" variant={"secondary"}>
-                        <PlusIcon />
-                        <span>Add new song</span>
-                    </Button>
+                    <Link to={"/songs/?tab=add-song"}>
+                        <Button
+                            className="space-x-2 w-full"
+                            variant={"secondary"}
+                        >
+                            <PlusIcon />
+                            <span>Add new song</span>
+                        </Button>
+                    </Link>
                     <div className="pt-12 gap-2 flex flex-wrap justify-center">
                         <Button
                             className="space-x-2"

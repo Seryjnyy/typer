@@ -50,7 +50,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ScrollArea } from "../../components/ui/scroll-area";
 import { useQueueStore } from "../../lib/store/queue-store";
 import { useSongStore } from "../../lib/store/song-store";
@@ -796,10 +796,21 @@ const AllSongs = () => {
 };
 
 export default function Songs() {
+    const [searchParams] = useSearchParams();
+    console.log();
+
+    let tab = searchParams.get("tab");
+
+    if (tab) {
+        if (tab != "all-songs" && tab != "add-song" && tab != "stats") {
+            tab = null;
+        }
+    }
+
     return (
-        <Tabs defaultValue="all-songs" className="py-12 h-full ">
+        <Tabs defaultValue={tab ? tab : "all-songs"} className="py-12 h-full ">
             <TabsList className="mx-2 sm:mx-6 md:mx-12">
-                <TabsTrigger value="all-songs">All songs</TabsTrigger>
+                <TabsTrigger value={"all-songs"}>All songs</TabsTrigger>
                 {/* <TabsTrigger value="playlists">Playlists</TabsTrigger> */}
                 <TabsTrigger
                     value="add-song"
@@ -822,10 +833,7 @@ export default function Songs() {
             <TabsContent value="add-song" className=" h-[100%] ">
                 <CreateSongForm />
             </TabsContent>
-            <TabsContent
-                value="stats"
-                className=" h-[100%] px-2 sm:px-6 md:px-12 border-t"
-            >
+            <TabsContent value="stats" className=" h-[100%]  border-t">
                 <StatsPage />
             </TabsContent>
         </Tabs>

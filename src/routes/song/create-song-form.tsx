@@ -12,16 +12,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/components/ui/use-toast";
-import useCreateSong from "@/lib/hooks/use-create-song";
+
 import { songSchema, songSchemaType } from "@/lib/schemas/song";
-import { Song } from "@/lib/types";
 import { cn, generateGradient } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 import SongContentFormField from "./song-content-form-field";
+import useCreateSong from "@/lib/hooks/use-create-song";
 
 export default function CreateSongForm({
     onSuccess,

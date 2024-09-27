@@ -17,7 +17,7 @@ const windowControlVariants = cva(
     {
         variants: {
             variant: {
-                default: "rounded-md",
+                default: "rounded-sm",
                 square: "rounded-none",
             },
         },

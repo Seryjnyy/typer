@@ -107,15 +107,15 @@ const SongContent = ({ song, verseMode }: SongContentProps) => {
     return (
         <pre className="font-sans sm:px-4 max-w-[calc(100vw-1rem)] text-wrap">
             {verseMode && (
-                <div className="py-4 text-muted-foreground flex items-center justify-between  border-b mb-4">
-                    <div className="flex items-center gap-2">
+                <div className="py-2 px-2 text-muted-foreground flex items-center justify-between  border-b mb-4">
+                    <div className="flex items-center gap-2 text-sm">
                         <span>{selected.length} selected</span>
                         <Button
                             size={"icon"}
                             variant={"ghost"}
                             onClick={onResetSelected}
                         >
-                            <ReloadIcon />
+                            <ReloadIcon className="size-3" />
                         </Button>
                     </div>
                     <KeyboardButton

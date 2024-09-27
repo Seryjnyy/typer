@@ -16,7 +16,7 @@ interface ButtonsProps {
 
 export default function Buttons({ handlers }: ButtonsProps) {
     return (
-        <div className="absolute sm:bottom-1 bottom-14 right-2 z-40 flex items-center gap-4">
+        <div className="absolute sm:bottom-1 bottom-14 right-2 z-40 flex items-center gap-2">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>

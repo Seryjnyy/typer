@@ -41,7 +41,7 @@ export default function Preferences() {
                                 other parts of settings.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="backdrop-brightness-50 m-2 pt-4 rounded-md space-y-2">
+                        <CardContent className="backdrop-brightness-50 m-2 pt-4 rounded-md space-y-2 text-xs md:text-sm">
                             <pre>
                                 <code>
                                     {preferences.map((preference, index) => (
