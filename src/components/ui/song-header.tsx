@@ -39,7 +39,7 @@ const SongBanner = ({
             className={cn(
                 songBannerVariants({ size: size }),
                 song.cover,
-                "rounded-md flex justify-center items-center relative",
+                "rounded-md flex justify-center items-center relative overflow-hidden",
                 className
                 // "bg-gradient-to-bl from-yellow-200 to-violet-800"
             )}
@@ -51,7 +51,7 @@ const SongBanner = ({
                 </div>
             )}
             {playButton && (
-                <div className="w-full h-full hover:backdrop-brightness-75 absolute rounded-md z-20 peer-hover:backdrop-brightness-75"></div>
+                <div className="w-full h-full hover:backdrop-brightness-75 absolute  z-20 peer-hover:backdrop-brightness-75"></div>
             )}
         </div>
     );

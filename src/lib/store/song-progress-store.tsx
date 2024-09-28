@@ -39,6 +39,7 @@ const defaults: State = {
     errorMap: new Map<number, number>(),
 };
 
+// TODO : remove zusty middleware, not used anymore
 const useSongProgressStoreBase = create<State & Actions>(
     zustymiddlewarets((set) => ({
         ...defaults,

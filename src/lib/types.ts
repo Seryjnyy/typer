@@ -17,6 +17,16 @@ export type Song = {
     lastModifiedAt: number;
 };
 
+export type Order = "asc" | "desc";
+export type ListStyle = "compact" | "list";
+export type SortBy =
+    | "title"
+    | "source"
+    | "completions"
+    | "length"
+    | "created"
+    | "modified";
+
 // export interface GeneratorFunction {
 //     elements: ReactNode[];
 //     stats: { correct: number; incorrect: number };

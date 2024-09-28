@@ -20,6 +20,7 @@ import Preferences from "./routes/settings/preferences";
 import ImportExport from "./routes/settings/import-export";
 import Spotify from "./routes/settings/spotify";
 import Stats from "./routes/settings/stats";
+import PlaylistPage from "./routes/song/playlist/playlist-page";
 
 const router = createBrowserRouter([
     {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
                     {
                         path: "/songs/:songID",
                         element: <Song />,
+                    },
+                    {
+                        path: "/songs/playlist/:playlistID",
+                        element: <PlaylistPage />,
                     },
                     {
                         path: "/songs/:songID/edit",

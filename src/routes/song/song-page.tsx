@@ -167,11 +167,11 @@ export default function Song() {
     if (!song) return <SomethingWentWrong />;
 
     return (
-        <div className={` h-[100%]  `}>
+        <div className={` h-[100%]  overflow-hidden sm:rounded-md`}>
             <ScrollArea
                 className={`h-[100%] px-2 sm:px-12 pb-2  flex flex-col relative bg-gradient-to-b  ${
                     song.cover.split(" ")[1]
-                } sm:rounded-md from-[5%] to-[30%]`}
+                } from-[5%] to-[30%]`}
             >
                 <div className="flex flex-col items-start justify-start space-y-12 pt-12 w-full ">
                     <BackButton link="/songs" />

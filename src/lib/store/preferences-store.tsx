@@ -1,9 +1,8 @@
 import { create } from "zustand";
 
-import { Windows } from "../types";
+import { ListStyle, Order, SortBy, Windows } from "../types";
 import { createSelectors } from "./create-selectors";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { ListStyle, Order, SortBy } from "@/routes/song/songs";
 
 export type TyperTextDisplay = "cylinder" | "flat";
 export type QueueStorage = "localStorage" | "sessionStorage";
