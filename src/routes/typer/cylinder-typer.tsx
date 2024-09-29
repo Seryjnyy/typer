@@ -501,7 +501,7 @@ export default function CylinderTyper({
             <div className="absolute   top-2    right-[50%] translate-x-[50%] opacity-60 flex items-center gap-2 text-primary">
                 <ChevronLeftIcon />
                 <Progress
-                    value={((-curr + 1) / linesCount) * 100}
+                    value={(-curr / linesCount) * 100}
                     className="w-[5rem]"
                 />
                 <ChevronRightIcon />

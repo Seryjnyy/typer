@@ -15,9 +15,54 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { textModification } from "@/lib/utils";
-import { CaretDownIcon, Cross1Icon, ResetIcon } from "@radix-ui/react-icons";
+import {
+    CaretDownIcon,
+    Cross1Icon,
+    InfoCircledIcon,
+    ResetIcon,
+} from "@radix-ui/react-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+
+const SongContentInfo = () => {
+    return (
+        <div className="inline">
+            <Popover>
+                <PopoverTrigger>
+                    <InfoCircledIcon />
+                </PopoverTrigger>
+                <PopoverContent>
+                    <span className="font-semibold">
+                        How to format song lyrics?
+                    </span>
+                    <div>
+                        <p className="text-muted-foreground pb-5 pt-2 text-sm ">
+                            Lines placed together without a empty line between
+                            them form a verse.
+                        </p>
+
+                        <div className="w-full border rounded-sm p-4  bg-background space-y-1">
+                            <div className="h-1 w-[100%] bg-foreground/50 rounded-sm"></div>
+                            <div className="h-1 w-[90%] bg-foreground/50 rounded-sm"></div>
+                            <div className="h-1 w-[70%] bg-foreground/50 rounded-sm"></div>
+                            <div className="h-1 w-[85%] bg-foreground/50 rounded-sm"></div>
+                            <div className="w-full h-1"> </div>
+                            <div className="h-1 w-[97%] bg-foreground/50 rounded-sm"></div>
+                            <div className="h-1 w-[30%] bg-foreground/50 rounded-sm"></div>
+                            <div className="h-1 w-[56%] bg-foreground/50 rounded-sm"></div>
+                            <div className="h-1 w-[90%] bg-foreground/50 rounded-sm"></div>
+                        </div>
+                    </div>
+                </PopoverContent>
+            </Popover>
+        </div>
+    );
+};
 
 export default function SongContentFormField({
     form,
@@ -50,7 +95,7 @@ export default function SongContentFormField({
         return currVal;
     }, [history]);
 
-    // Bit of a hack but eh
+    // TODO: Bit of a hack but eh
     useEffect(() => {
         if (resetState == undefined) return;
         setHistory([]);
@@ -204,6 +249,7 @@ export default function SongContentFormField({
                         <span className="text-xs text-muted-foreground">
                             (Lyrics)
                         </span>
+                        <SongContentInfo />
                     </FormLabel>
                     <FormControl>
                         <div className="mx-1">

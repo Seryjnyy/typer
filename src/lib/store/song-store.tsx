@@ -28,6 +28,8 @@ const trimSongContent = (content: string) => {
 
     const trimmed = replaced.map((x) => x.trim());
 
+    // join verses with new lines, but replace multiple new lines into a single one
+    // not sure why there are multiple new lines sometimes, have to check, but this is a quick fix for it
     return trimmed.join("\n");
 };
 

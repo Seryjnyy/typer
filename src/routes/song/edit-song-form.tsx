@@ -24,6 +24,7 @@ import { Song } from "@/lib/types";
 import { Icons } from "@/components/icons";
 import { Link, useNavigate } from "react-router-dom";
 import SongContentFormField from "./song-content-form-field";
+import { SourceAutocomplete, TitleAutocomplete } from "./create-song-form";
 
 export default function EditSongForm({
     onSuccess,
@@ -38,6 +39,7 @@ export default function EditSongForm({
     const navigate = useNavigate();
     const [coverForRerender, setCoverForRerender] = useState(song.cover);
     const [contentRerender, setContentRerender] = useState(false);
+    const [rerenderChildren, setRerenderChildren] = useState(false);
 
     const form = useForm<songSchemaType>({
         resolver: zodResolver(songSchema),
@@ -87,6 +89,8 @@ export default function EditSongForm({
 
         formRef.current?.focus();
         if (onSuccess) onSuccess();
+
+        setRerenderChildren(true);
     }
 
     const handleContentChange = () => {
@@ -96,13 +100,11 @@ export default function EditSongForm({
 
     return (
         <Form {...form}>
-            {/* <Autocomplete /> */}
-            {/* <Test /> */}
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-8 mt-8"
             >
-                <div className="flex gap-16 items-end flex-wrap">
+                <div className="flex gap-8 items-end flex-wrap w-full">
                     <FormField
                         control={form.control}
                         name="cover"
@@ -150,7 +152,7 @@ export default function EditSongForm({
                             </FormItem>
                         )}
                     />
-                    <div className="flex gap-8 flex-wrap mx-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mx-1">
                         <FormField
                             control={form.control}
                             name="title"
@@ -171,7 +173,12 @@ export default function EditSongForm({
                                         </span>
                                     </FormLabel>
                                     <FormControl>
-                                        <Input {...field} ref={formRef} />
+                                        {/* <Input {...field} ref={formRef} /> */}
+                                        <TitleAutocomplete
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            resetState={rerenderChildren}
+                                        />
                                     </FormControl>
                                     <FormDescription className="sr-only">
                                         This is the name of the song.
@@ -200,7 +207,11 @@ export default function EditSongForm({
                                         </span>
                                     </FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <SourceAutocomplete
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            resetState={rerenderChildren}
+                                        />
                                     </FormControl>
                                     <FormDescription className="sr-only">
                                         This is the name of the source of the

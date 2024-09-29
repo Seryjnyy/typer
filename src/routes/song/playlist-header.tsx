@@ -77,7 +77,7 @@ const PlaylistBanner = ({
         );
     }
 
-    if (playlistSongs.length >= 3) {
+    if (playlistSongs.length == 3) {
         const s = songsList.find((x) => x.id == playlistSongs[0]);
         const s2 = songsList.find((x) => x.id == playlistSongs[1]);
         const s3 = songsList.find((x) => x.id == playlistSongs[2]);
@@ -140,7 +140,7 @@ const PlaylistBanner = ({
             className={cn(
                 playlistBannerVariants({ size: size }),
                 "relative",
-                "rounded-[10px] overflow-hidden group",
+                "rounded-[10px] overflow-hidden group ",
                 className
             )}
             {...props}
@@ -203,12 +203,22 @@ const PlaylistDetail = ({
     return (
         <div
             className={cn(
-                "flex flex-col leading-tight justify-center ",
+                "flex flex-col leading-tight justify-center",
                 className
             )}
             {...props}
         >
-            <span className={cn(playlistDetailVariants({ length }))}>
+            <span
+                className={cn(
+                    "text-muted-foreground text-xs",
+                    playlistDetailVariants({ length })
+                )}
+            >
+                Playlist
+            </span>
+            <span
+                className={cn(playlistDetailVariants({ length }), "pb-2 pl-1")}
+            >
                 {playlist.title}
             </span>
         </div>

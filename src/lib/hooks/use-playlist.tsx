@@ -5,18 +5,27 @@ import { useSongStore } from "../store/song-store";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function usePlaylist() {
-    const editPlaylist = usePlaylistStore.use.editPlaylist();
+    // IDK what to name the funcs since they do the same stuff, editPlaylist and editPlaylist, so maybe _ prefix for from store
+    const _editPlaylist = usePlaylistStore.use.editPlaylist();
     const playlists = usePlaylistStore.use.playlists();
-    const deletePlaylistForever = usePlaylistStore.use.deletePlaylist();
+    const _deleteAllPlaylists = usePlaylistStore.use.deleteAllPlaylists();
+
+    const _deletePlaylist = usePlaylistStore.use.deletePlaylist();
     const enqueue = useQueueStore.use.enqueue();
+    const setCurrent = useQueueStore.use.setCurrent();
     const setSongs = useQueueStore.use.setSongs();
     const songsList = useSongStore.use.songs();
     const addPlaylist = usePlaylistStore.use.addPlaylist();
+    const navigate = useNavigate();
 
-    const playPlaylist = (playlistID: string, enqueuePlaylist?: boolean) => {
+    const playPlaylist = (
+        playlistID: string,
+        enqueuePlaylist?: boolean,
+        playFirstSong?: boolean
+    ) => {
         const playlist = getPlaylist(playlistID);
 
         if (!playlist) {
@@ -31,11 +40,19 @@ export default function usePlaylist() {
 
         // Need to check if songs exist before playing them
         // TODO : probably not efficient to reverse but eh
-        playlist.dontUsesDirectlySongs.reverse().forEach((songID) => {
+
+        const playlistSongs = getPlaylistSongs(playlist.id);
+
+        playlistSongs.reverse().forEach((songID) => {
             if (songsList.find((x) => x.id == songID) != undefined) {
                 enqueue(songID);
             }
         });
+
+        if (!enqueuePlaylist && playlistSongs.length > 0) {
+            setCurrent(playlistSongs[0]);
+            navigate("/");
+        }
     };
 
     const getPlaylist = (playlistID: string) => {
@@ -69,6 +86,12 @@ export default function usePlaylist() {
         });
         toast({
             title: "Song added to playlist.",
+            description: `Playlist: ${playlist.title}`,
+            action: (
+                <Link to={`/songs/playlist/${playlist.id}`}>
+                    <Button variant={"outline"}>View playlist</Button>
+                </Link>
+            ),
         });
     };
 
@@ -112,6 +135,14 @@ export default function usePlaylist() {
         return validSongIDs;
     };
 
+    const getPlaylistSongsWithData = (playlistID: string) => {
+        const validPlaylistSongs = getPlaylistSongs(playlistID);
+
+        return validPlaylistSongs
+            .map((songID) => songsList.find((song) => song.id == songID))
+            .filter((song) => song != undefined);
+    };
+
     const createPlaylist = ({
         title,
         songs,
@@ -148,15 +179,28 @@ export default function usePlaylist() {
     };
 
     const deletePlaylist = (playlistID: string) => {
-        deletePlaylistForever(playlistID);
+        _deletePlaylist(playlistID);
     };
 
+    const deleteAllPlaylists = () => {
+        _deleteAllPlaylists();
+    };
+
+    const editPlaylist = (playlist: Playlist) => {
+        _editPlaylist({ ...playlist, lastModifiedAt: Date.now() });
+    };
+
+    // TODO : should I use immer for stuff like editPlaylist, should it be directly on the store or here?
     return {
+        getPlaylist,
         addToPlaylist,
         removeFromPlaylist,
         deletePlaylist,
         playPlaylist,
         createPlaylist,
         getPlaylistSongs,
+        getPlaylistSongsWithData,
+        editPlaylist,
+        deleteAllPlaylists,
     };
 }

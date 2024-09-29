@@ -1,6 +1,8 @@
 import SongCarousel from "@/components/song-carousel";
 import { Button } from "@/components/ui/button";
 import usePlaySong from "@/lib/hooks/use-play-song";
+import usePlaylist from "@/lib/hooks/use-playlist";
+import { usePlaylistStore } from "@/lib/store/playlist-store";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
@@ -17,6 +19,8 @@ export default function NoSongSelected() {
     const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const playSong = usePlaySong();
     const navigate = useNavigate();
+    const playlists = usePlaylistStore.use.playlists();
+    const { playPlaylist } = usePlaylist();
 
     const shuffled = useMemo(() => {
         return shuffleArray(songs) as Song[];
@@ -29,6 +33,14 @@ export default function NoSongSelected() {
     const handlePlayRandomSong = () => {
         if (shuffled.length > 0) {
             playSong(shuffled[0].id);
+        }
+    };
+
+    const handlePlayRandomPlaylist = () => {
+        if (playlists.length > 0) {
+            const rand =
+                playlists[Math.floor(Math.random() * playlists.length)];
+            playPlaylist(rand.id);
         }
     };
 
@@ -115,6 +127,17 @@ export default function NoSongSelected() {
                             <PlayIcon />
                             <span>Play random verse</span>
                         </Button>
+                        {playlists.length > 0 && (
+                            <Button
+                                className="space-x-2"
+                                variant={"outline"}
+                                disabled={songs.length == 0}
+                                onClick={handlePlayRandomPlaylist}
+                            >
+                                <PlayIcon />
+                                <span>Play random playlist</span>
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

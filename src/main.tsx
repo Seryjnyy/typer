@@ -21,6 +21,7 @@ import ImportExport from "./routes/settings/import-export";
 import Spotify from "./routes/settings/spotify";
 import Stats from "./routes/settings/stats";
 import PlaylistPage from "./routes/song/playlist/playlist-page";
+import PlaylistEdit from "./routes/song/playlist/playlist-edit";
 
 const router = createBrowserRouter([
     {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
                     {
                         path: "/songs/playlist/:playlistID",
                         element: <PlaylistPage />,
+                    },
+                    {
+                        path: "/songs/playlist/:playlistID/edit",
+                        element: <PlaylistEdit />,
                     },
                     {
                         path: "/songs/:songID/edit",

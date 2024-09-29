@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/chart";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
+import usePlaylist from "@/lib/hooks/use-playlist";
 import {
     QueueStorage as QueueStorageType,
     usePreferenceStore,
@@ -124,6 +125,8 @@ export default function Storage() {
     const localStorageUse = localStorageSpace();
     console.log(localStorageSpace());
     const setSongs = useSongStore.use.setSongs();
+    const { deleteAllPlaylists } = usePlaylist();
+
     const navigate = useNavigate();
     const chartData = [
         {
@@ -158,6 +161,15 @@ export default function Storage() {
         toast({
             title: "Cleared songs.",
             description: `Successfully cleared all stored songs.`,
+        });
+    };
+
+    const handleClearPlaylists = () => {
+        deleteAllPlaylists();
+
+        toast({
+            title: "Cleared playlists.",
+            description: `Successfully cleared all stored playlists.`,
         });
     };
 
@@ -266,6 +278,43 @@ export default function Storage() {
                                         Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction onClick={onClearSongs}>
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </CardFooter>
+                </Card>
+                <Card className="flex justify-between items-center border border-destructive">
+                    <CardHeader>
+                        <CardTitle>Clear playlists</CardTitle>
+                        <CardDescription>
+                            This will remove ALL playlists in localStorage.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="p-0 pr-4">
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant={"destructive"}>Clear</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will
+                                        permanently delete your stored
+                                        playlists.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleClearPlaylists}
+                                    >
                                         Continue
                                     </AlertDialogAction>
                                 </AlertDialogFooter>

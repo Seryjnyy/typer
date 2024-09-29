@@ -29,8 +29,8 @@ export default function Songs() {
     return (
         <Tabs defaultValue={tab ? tab : "all-songs"} className="py-12 h-full ">
             <TabsList className="mx-2 sm:mx-6 md:mx-12">
-                <TabsTrigger value={"all-songs"}>All songs</TabsTrigger>
-                {/* <TabsTrigger value="playlists">Playlists</TabsTrigger> */}
+                <TabsTrigger value={"all-songs"}>Songs</TabsTrigger>
+
                 <TabsTrigger
                     value="add-song"
                     className="flex items-center gap-1"

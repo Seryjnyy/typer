@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router";
 import usePlaylist from "@/lib/hooks/use-playlist";
+import useExportSongs from "@/lib/hooks/use-export-song";
 
 interface PlaylistPopoverProps {
     playlist: Playlist;
@@ -39,7 +40,9 @@ interface PlaylistPopoverProps {
 
 const PlaylistPopover = ({ playlist, exclude }: PlaylistPopoverProps) => {
     const navigate = useNavigate();
-    const { deletePlaylist, playPlaylist } = usePlaylist();
+    const { deletePlaylist, playPlaylist, getPlaylistSongsWithData } =
+        usePlaylist();
+    const { exportSongs } = useExportSongs();
 
     const handleDeletePlaylist = () => {
         deletePlaylist(playlist.id);
@@ -48,6 +51,12 @@ const PlaylistPopover = ({ playlist, exclude }: PlaylistPopoverProps) => {
 
     const handleEnqueue = () => {
         playPlaylist(playlist.id, true);
+    };
+
+    const handleExportPlaylist = () => {
+        const playlistSongs = getPlaylistSongsWithData(playlist.id);
+        // TODO : modify export songs to take a name to use for the filename
+        exportSongs(playlistSongs);
     };
 
     return (
@@ -111,9 +120,8 @@ const PlaylistPopover = ({ playlist, exclude }: PlaylistPopoverProps) => {
                     className="space-x-1"
                     onClick={(e) => {
                         e.stopPropagation();
-                        // navigate(`/songs/${song.id}/edit`);
+                        navigate(`/songs/playlist/${playlist.id}/edit`);
                     }}
-                    disabled
                 >
                     <Pencil1Icon />
                     <span>Edit</span>
@@ -125,9 +133,8 @@ const PlaylistPopover = ({ playlist, exclude }: PlaylistPopoverProps) => {
                     className="space-x-1"
                     onClick={(e) => {
                         e.stopPropagation();
-                        // handleExportSong();
+                        handleExportPlaylist();
                     }}
-                    disabled
                 >
                     <DownloadIcon />
                     <span>Export</span>

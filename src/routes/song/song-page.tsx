@@ -32,7 +32,7 @@ import {
     PlusIcon,
     ReloadIcon,
 } from "@radix-ui/react-icons";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
 
@@ -166,14 +166,16 @@ export default function Song() {
     // TODO : Could be better
     if (!song) return <SomethingWentWrong />;
 
+    const headBgGradient = useMemo(() => {
+        return song.cover.split(" ")[1];
+    }, [song]);
     return (
         <div className={` h-[100%]  overflow-hidden sm:rounded-md`}>
-            <ScrollArea
-                className={`h-[100%] px-2 sm:px-12 pb-2  flex flex-col relative bg-gradient-to-b  ${
-                    song.cover.split(" ")[1]
-                } from-[5%] to-[30%]`}
-            >
-                <div className="flex flex-col items-start justify-start space-y-12 pt-12 w-full ">
+            <ScrollArea className={`h-[100%]  pb-2  flex flex-col relative `}>
+                <div
+                    className={`flex flex-col  items-start justify-start space-y-12 pt-12 w-full  px-2 sm:px-12  bg-gradient-to-b  ${headBgGradient}
+                from-[5%] to-[60%]`}
+                >
                     <BackButton link="/songs" />
                     <div className="space-y-4 w-full">
                         <div>
@@ -252,11 +254,11 @@ export default function Song() {
                     </div>
                 </div>
 
-                <div className="pt-12 text-sm sm:text-md md:text-lg">
+                <div className="pt-12 text-sm sm:text-md md:text-lg px-[1.75rem] sm:px-[4.25rem]">
                     <SongContent song={song} verseMode={verseMode} />
                 </div>
 
-                <div className="w-full px-2 flex items-center pt-24 flex-wrap gap-2 sm:gap-12">
+                <div className="w-full px-[1.75rem] sm:px-[4.25rem] flex items-center pt-24 flex-wrap gap-2 sm:gap-12">
                     <div className="flex  text-muted-foreground gap-1">
                         <span className="text-xs opacity-70">created at: </span>
                         <span className="text-xs">

@@ -162,12 +162,6 @@ export default function Playlists() {
                 <div className="flex flex-col gap-2 ">
                     {filteredAndSorted.length > 0 &&
                         filteredAndSorted.map((playlist, index) => (
-                            // <SongItem
-                            //     key={song.id}
-                            //     song={song}
-                            //     index={index}
-                            //     listStyle={songListPreferences.listStyle}
-                            // />
                             <PlaylistItem
                                 playlist={playlist}
                                 index={index}
@@ -195,10 +189,10 @@ export default function Playlists() {
                                 <span className="text-muted-foreground ">
                                     Create one.
                                 </span>
-                                <Button variant={"secondary"} className="mt-8">
+                                {/* <Button variant={"secondary"} className="mt-8">
                                     <PlusIcon />
                                     New playlist
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                     )}

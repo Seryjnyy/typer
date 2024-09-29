@@ -10,21 +10,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import usePlaylist from "@/lib/hooks/use-playlist";
+import {
+    createPlaylistSchemaType,
+    playlistSchema,
+} from "@/lib/schemas/playlist";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-export const createPlaylistSchema = z.object({
-    title: z
-        .string()
-        .min(1, "Title must be at least 1 character.")
-        .max(150, "Title must be less than 150 characters.")
-        .regex(/\S+/, {
-            message: "Title cannot be just whitespace characters.",
-        }),
-});
-
-export type createPlaylistSchemaType = z.infer<typeof createPlaylistSchema>;
 
 export default function CreatePlaylistForm({
     onCancel,
@@ -37,7 +28,7 @@ export default function CreatePlaylistForm({
 }) {
     const { createPlaylist } = usePlaylist();
     const form = useForm<createPlaylistSchemaType>({
-        resolver: zodResolver(createPlaylistSchema),
+        resolver: zodResolver(playlistSchema),
         defaultValues: {
             title: "",
         },
@@ -48,19 +39,6 @@ export default function CreatePlaylistForm({
 
         form.reset();
         onSave?.();
-        // const song = {
-        //     title: values.title,
-        //     content: values.content.trim(),
-        //     source: values.source,
-        //     cover: values.cover,
-        // };
-        // const result = createSong(song, true);
-        // if (!result) return;
-        // Reset the state that doesn't get reset automatically
-        // form.reset({ cover: generateGradient() });
-        // setResetChildState((prev) => !prev);
-        // formRef.current?.focus();
-        // if (onSuccess) onSuccess();
     }
 
     return (

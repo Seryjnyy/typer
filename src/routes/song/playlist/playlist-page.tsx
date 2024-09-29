@@ -1,36 +1,22 @@
-import KeyboardButton from "@/components/keyboard-button";
 import BackButton from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SongBanner, SongHeader } from "@/components/ui/song-header";
-import { Switch } from "@/components/ui/switch";
-import { usePlaylistStore } from "@/lib/store/playlist-store";
-import { useSongStore } from "@/lib/store/song-store";
-import { Song, Song as SongType } from "@/lib/types";
-import { cn, formatTimestamp } from "@/lib/utils";
-import {
-    Cross1Icon,
-    Pencil1Icon,
-    PlayIcon,
-    PlusIcon,
-    ReloadIcon,
-} from "@radix-ui/react-icons";
-import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import {
-    PlaylistBanner,
-    PlaylistDetail,
-    PlaylistHeader,
-} from "../playlist-header";
-import PlaylistPopover from "../playlist-popover";
-import { Link } from "react-router-dom";
-import SongsList from "../songs-list";
 import {
     DropdownMenuItem,
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import usePlaylist from "@/lib/hooks/use-playlist";
+import { usePlaylistStore } from "@/lib/store/playlist-store";
+import { useSongStore } from "@/lib/store/song-store";
+import { Song } from "@/lib/types";
+import { formatTimestamp } from "@/lib/utils";
+import { Cross1Icon, Pencil1Icon } from "@radix-ui/react-icons";
+import { useMemo } from "react";
+import { useParams } from "react-router";
+import { PlaylistBanner, PlaylistHeader } from "../playlist-header";
+import PlaylistPopover from "../playlist-popover";
+import SongsList from "../songs-list";
+import { Link } from "react-router-dom";
 
 const SomethingWentWrong = () => {
     return (
@@ -98,7 +84,7 @@ export default function PlaylistPage() {
                                     size={"extraLarge"}
                                 />
                                 <div className="flex flex-col justify-center items-start px-8">
-                                    <span className="text-foreground/80">
+                                    <span className="text-foreground/80 select-none">
                                         Playlist
                                     </span>
                                     <h1 className="text-2xl font-bold">
@@ -117,9 +103,13 @@ export default function PlaylistPage() {
 
                             <div className="flex gap-2   items-center  justify-between">
                                 <div className="w-fit">
-                                    <Button size={"icon"} variant={"ghost"}>
-                                        <Pencil1Icon />
-                                    </Button>
+                                    <Link
+                                        to={`/songs/playlist/${playlist.id}/edit`}
+                                    >
+                                        <Button size={"icon"} variant={"ghost"}>
+                                            <Pencil1Icon />
+                                        </Button>
+                                    </Link>
                                 </div>
 
                                 <PlaylistPopover
@@ -132,7 +122,7 @@ export default function PlaylistPage() {
                 </div>
 
                 <div className="pt-12 px-[1.75rem] sm:px-[4.25rem]">
-                    <h2 className="text-3xl font-bold text-muted-foreground pb-8">
+                    <h2 className="text-3xl font-bold text-muted-foreground pb-8 select-none">
                         Songs
                     </h2>
                     {playlistSongs.length > 0 && (
