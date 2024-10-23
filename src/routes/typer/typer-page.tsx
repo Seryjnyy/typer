@@ -204,7 +204,7 @@ export default function TyperPage() {
     return (
         <div
             className={cn(
-                "h-[calc(100vh-4rem)] w-full flex overflow-hidden rounded-md"
+                "h-[calc(100vh-5rem)] w-full flex overflow-hidden rounded-md  "
             )}
         >
             {songData == null && <NoSongSelected />}
@@ -220,7 +220,7 @@ export default function TyperPage() {
                 </CylinderTyper>
             )}
             {songData != null && typerTextDisplay == "flat" && (
-                <div className="w-full pb-4">
+                <div className="w-full  backdrop-brightness-50">
                     <FlatTyper
                         songData={songData}
                         progressManager={progressManager}

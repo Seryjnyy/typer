@@ -493,7 +493,7 @@ export default function CylinderTyper({
     return (
         <div
             className={cn(
-                " w-full h-[calc(100vh-5rem)] relative  overflow-hidden rounded-md",
+                " w-full h-[calc(100vh-5rem)] relative  overflow-hidden rounded-md ",
                 className
             )}
             ref={scrollDivRef}

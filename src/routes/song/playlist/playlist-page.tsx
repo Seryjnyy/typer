@@ -18,19 +18,7 @@ import PlaylistPopover from "../playlist-popover";
 import SongsList from "../songs-list";
 import { Link } from "react-router-dom";
 
-const SomethingWentWrong = () => {
-    return (
-        <div className="flex justify-center items-center h-full flex-col gap-12">
-            <div className="text-center">
-                <h1 className="text-xl font-semibold">
-                    Sorry something went wrong.
-                </h1>
-                <p>The song might not exist anymore.</p>
-            </div>
-            <BackButton link="/songs" />
-        </div>
-    );
-};
+
 
 // TODO : on smaller screens text will be too long fix that
 export default function PlaylistPage() {
@@ -182,3 +170,17 @@ export default function PlaylistPage() {
         </div>
     );
 }
+
+const SomethingWentWrong = () => {
+    return (
+        <div className="flex justify-center items-center h-full flex-col gap-12">
+            <div className="text-center">
+                <h1 className="text-xl font-semibold">
+                    Sorry something went wrong.
+                </h1>
+                <p>The song might not exist anymore.</p>
+            </div>
+            <BackButton link="/songs" />
+        </div>
+    );
+};
