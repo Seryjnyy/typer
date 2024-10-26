@@ -21,111 +21,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import SongContentFormField from "./song-content-form-field";
+import { Input } from "@/components/ui/input";
 
 interface SourceAutocompleteProps {
     value: string;
     onChange: (value: string) => void;
     resetState: boolean;
 }
-
-// TODO : Probably should take field props, then this should probably pass it to the search
-export const SourceAutocomplete = ({
-    value,
-    onChange,
-    resetState,
-}: SourceAutocompleteProps) => {
-    const songsList = useSongStore.use.songs();
-    const [searchValue, setSearchValue] = useState<string>(value);
-    const [selectedValue, setSelectedValue] = useState<string>(value);
-
-    const artistsSet = useMemo(() => {
-        const artistSet = new Set<string>();
-        songsList.forEach((x) => artistSet.add(x.source));
-        return Array.from(artistSet.values());
-    }, [songsList]);
-
-    // Sometimes artistSet won't change when song list changes, so I think its a bit more efficient like this
-    const data = useMemo(() => {
-        return artistsSet.map((artist) => ({ value: artist, label: artist }));
-    }, [artistsSet]);
-
-    const handleSelectedValueChange = (val: string) => {
-        // setSelectedValue(val);
-        onChange(val);
-    };
-
-    // TODO : Bit of a hack but eh
-    // useEffect(() => {
-    //     if (resetState == undefined) return;
-    //     setSearchValue("");
-    //     setSelectedValue("");
-    // }, [resetState]);
-
-    return (
-        <AutoComplete
-            listTitle={
-                <span className="text-xs flex justify-center text-muted-foreground py-1">
-                    Existing sources
-                </span>
-            }
-            saveInputAsSelected
-            selectedValue={selectedValue}
-            onSelectedValueChange={handleSelectedValueChange}
-            searchValue={searchValue}
-            onSearchValueChange={setSearchValue}
-            items={data ?? []}
-        />
-    );
-};
-
-export const TitleAutocomplete = ({
-    value,
-    onChange,
-    resetState,
-}: SourceAutocompleteProps) => {
-    const songsList = useSongStore.use.songs();
-    const [searchValue, setSearchValue] = useState<string>(value);
-    const [selectedValue, setSelectedValue] = useState<string>(value);
-
-    const titlesSet = useMemo(() => {
-        const titlesSet = new Set<string>(songsList.map((x) => x.title));
-        // songsList.forEach((x) => titlesSet.add(x.source));
-        return Array.from(titlesSet.values());
-    }, [songsList]);
-
-    // Sometimes artistSet won't change when song list changes, so I think its a bit more efficient like this
-    const data = useMemo(() => {
-        return titlesSet.map((title) => ({ value: title, label: title }));
-    }, [titlesSet]);
-
-    const handleSelectedValueChange = (val: string) => {
-        setSelectedValue(val);
-        onChange(val);
-    };
-
-    // TODO : Bit of a hack but eh
-    useEffect(() => {
-        if (resetState == undefined) return;
-        setSearchValue("");
-        setSelectedValue("");
-    }, [resetState]);
-
-    return (
-        <AutoComplete
-            listTitle={
-                <span className="text-xs flex justify-center text-muted-foreground py-1">
-                    Existing song titles
-                </span>
-            }
-            saveInputAsSelected
-            selectedValue={selectedValue}
-            onSelectedValueChange={handleSelectedValueChange}
-            searchValue={searchValue}
-            onSearchValueChange={setSearchValue}
-            items={data ?? []}
-        />
-    );
-};
 
 export default function CreateSongForm({
     onSuccess,
@@ -134,7 +36,7 @@ export default function CreateSongForm({
 }) {
     const createSong = useCreateSong();
     const { toast } = useToast();
-    const formRef = useRef<HTMLInputElement>(null);
+    const titleInputRef = useRef<HTMLInputElement>(null);
     const [resetChildState, setResetChildState] = useState(false);
 
     const form = useForm<songSchemaType>({
@@ -166,7 +68,7 @@ export default function CreateSongForm({
         form.reset({ source: "" });
         setResetChildState((prev) => !prev);
 
-        formRef.current?.focus();
+        titleInputRef.current?.focus();
         if (onSuccess) onSuccess();
     }
 
@@ -214,27 +116,6 @@ export default function CreateSongForm({
                             )}
                         />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mx-1">
-                            {/* <FormField
-                                control={form.control}
-                                name={"title"}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="space-x-1">
-                                            <span>Title</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                (Song name)
-                                            </span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input {...field} ref={formRef} />
-                                        </FormControl>
-                                        <FormDescription className="sr-only">
-                                            This is the name of the song.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
                             <FormField
                                 control={form.control}
                                 name={"title"}
@@ -247,10 +128,9 @@ export default function CreateSongForm({
                                             </span>
                                         </FormLabel>
                                         <FormControl>
-                                            <TitleAutocomplete
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                resetState={resetChildState}
+                                            <Input
+                                                {...field}
+                                                ref={titleInputRef}
                                             />
                                         </FormControl>
                                         <FormDescription className="sr-only">
@@ -260,7 +140,8 @@ export default function CreateSongForm({
                                     </FormItem>
                                 )}
                             />
-                            {/* <FormField
+
+                            <FormField
                                 control={form.control}
                                 name="source"
                                 render={({ field }) => (
@@ -273,33 +154,6 @@ export default function CreateSongForm({
                                         </FormLabel>
                                         <FormControl>
                                             <Input {...field} />
-                                        </FormControl>
-                                        <FormDescription className="sr-only">
-                                            This is the name of the source of
-                                            the song.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
-                            <FormField
-                                control={form.control}
-                                name="source"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="space-x-1">
-                                            <span>Source</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                (Artist)
-                                            </span>
-                                        </FormLabel>
-                                        <FormControl>
-                                            {/* <Input {...field} /> */}
-                                            <SourceAutocomplete
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                resetState={resetChildState}
-                                            />
                                         </FormControl>
                                         <FormDescription className="sr-only">
                                             This is the name of the source of
