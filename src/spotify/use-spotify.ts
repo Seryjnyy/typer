@@ -4,6 +4,7 @@ import {
     SpotifyApi,
 } from "@spotify/web-api-ts-sdk";
 import { useEffect, useState } from "react";
+import { useSpotifyStore } from "./spotify-store";
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string;
 const redirectUrl = import.meta.env.VITE_SPOTIFY_REDIRECT_URL as string;
@@ -12,7 +13,8 @@ const scopes = Scopes.all;
 
 // TODO : it might redirect the user to spotify auth, not sure yet, will have to test for longer
 export const useSpotify = ({ enabled = false }: { enabled?: boolean }) => {
-    const [apiSDK, setApiSDK] = useState<SpotifyApi | null>(null);
+    const apiSDK = useSpotifyStore.use.apiSDK();
+    const setApiSDK = useSpotifyStore.use.setApiSDK();
 
     const authenticate = async () => {
         if (apiSDK) return;
@@ -64,5 +66,6 @@ export const useSpotify = ({ enabled = false }: { enabled?: boolean }) => {
         apiSDK,
         logout,
         authenticate,
+        isReady: !!apiSDK,
     };
 };
