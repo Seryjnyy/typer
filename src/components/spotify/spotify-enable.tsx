@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { useSpotify } from "@/spotify/use-spotify";
+import { RedirectPath, useSpotify } from "@/spotify/use-spotify";
 import { Check, Cross, Music, XIcon } from "lucide-react";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Icons } from "../icons";
 
-export default function SpotifyEnable() {
+// TODO : Error, idk how major it is
+// POST https://accounts.spotify.com/api/token 500 (Internal Server Error)
+// use-spotify.ts:32 Error: Failed to refresh token: , {"error":"server_error","error_description":"Failed to remove token"}
+export default function SpotifyEnable({
+    redirectPath,
+}: {
+    redirectPath: RedirectPath;
+}) {
     let [searchParams] = useSearchParams();
 
     const isCodeSearchParam = searchParams.get("code") ? true : false;
@@ -21,15 +29,13 @@ export default function SpotifyEnable() {
 
     const { isReady } = useSpotify({
         enabled: enabled,
+        redirectPath: redirectPath,
     });
 
     return (
         <div className="border px-6 py-1 flex items-center gap-3 w-fit  rounded-3xl ">
             <div className="flex gap-1 justify-between">
-                <img
-                    src="https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green.png"
-                    className="w-6 relative block"
-                />
+                <Icons.spotify className="size-6 " />
                 {isReady ? (
                     <Check className="size-6 text-muted-foreground" />
                 ) : (
@@ -38,7 +44,9 @@ export default function SpotifyEnable() {
             </div>
             {!isReady && (
                 <div className="w-full justify-center flex">
-                    <Button onClick={() => setEnabled(true)}>Enable</Button>
+                    <Button onClick={() => setEnabled(true)} type="button">
+                        Enable
+                    </Button>
                 </div>
             )}
         </div>

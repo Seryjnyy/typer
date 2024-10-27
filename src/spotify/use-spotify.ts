@@ -7,12 +7,21 @@ import { useEffect, useState } from "react";
 import { useSpotifyStore } from "./spotify-store";
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string;
-const redirectUrl = import.meta.env.VITE_SPOTIFY_REDIRECT_URL as string;
+const redirectUrl = import.meta.env.VITE_SPOTIFY_BASE_REDIRECT_URL as string;
 const scopes = Scopes.all;
 // const apiSDKConfig  = SdkOptions
 
+// TODO : This needs to be inserted into with spotify api allow list, otherwise it won't work
+export type RedirectPath = "/songs?tab=add-song";
+
 // TODO : it might redirect the user to spotify auth, not sure yet, will have to test for longer
-export const useSpotify = ({ enabled = false }: { enabled?: boolean }) => {
+export const useSpotify = ({
+    enabled = false,
+    redirectPath,
+}: {
+    enabled?: boolean;
+    redirectPath?: RedirectPath;
+}) => {
     const apiSDK = useSpotifyStore.use.apiSDK();
     const setApiSDK = useSpotifyStore.use.setApiSDK();
 
@@ -21,7 +30,7 @@ export const useSpotify = ({ enabled = false }: { enabled?: boolean }) => {
 
         const auth = new AuthorizationCodeWithPKCEStrategy(
             clientId,
-            redirectUrl,
+            redirectUrl + redirectPath,
             scopes
         );
 

@@ -211,7 +211,7 @@ const SpotifyArtistTrack = ({
     return (
         <div className="space-y-6 px-1">
             <div className="pt-2">
-                <SpotifyEnable />
+                <SpotifyEnable redirectPath="/songs?tab=add-song" />
             </div>
             {apiSDK && (
                 <FindSongUsingSpotify
