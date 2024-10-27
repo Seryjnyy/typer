@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { SpotifyApi, Track } from "@spotify/web-api-ts-sdk";
 import { debounce } from "lodash";
@@ -7,23 +7,19 @@ import { Loader2 } from "lucide-react";
 import { ChangeEvent, useCallback } from "react";
 import { Label } from "../ui/label";
 
+interface FindSongUsingSpotifyProps {
+    apiSDK: SpotifyApi;
+    onSelectSong: (song: { title: string; artist: string }) => void;
+    initialArtist?: string;
+    initialTitle?: string;
+}
+
 const FindSongUsingSpotify = ({
     apiSDK,
     onSelectSong,
     initialArtist,
     initialTitle,
-}: {
-    apiSDK: SpotifyApi;
-    initialArtist?: string;
-    initialTitle?: string;
-    onSelectSong: ({
-        title,
-        artist,
-    }: {
-        title: string;
-        artist: string;
-    }) => void;
-}) => {
+}: FindSongUsingSpotifyProps) => {
     const [results, setResults] = useState<Track[]>([]);
     const [search, setSearch] = useState(initialTitle || "");
 

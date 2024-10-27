@@ -24,22 +24,23 @@ export default function SpotifyEnable() {
     });
 
     return (
-        <div className="border p-3 flex items-center gap-3 min-w-[9rem] max-w-[9rem] rounded-md">
-            <div className="flex gap-1">
-                <Music className="size-4" />
+        <div className="border px-6 py-1 flex items-center gap-3 w-fit  rounded-3xl ">
+            <div className="flex gap-1 justify-between">
+                <img
+                    src="https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green.png"
+                    className="w-6 relative block"
+                />
                 {isReady ? (
-                    <Check className="size-4" />
+                    <Check className="size-6 text-muted-foreground" />
                 ) : (
-                    <XIcon className="size-4" />
+                    <XIcon className="size-6 text-muted-foreground" />
                 )}
             </div>
-            <div className="w-full justify-center flex">
-                {!isReady ? (
+            {!isReady && (
+                <div className="w-full justify-center flex">
                     <Button onClick={() => setEnabled(true)}>Enable</Button>
-                ) : (
-                    "Ready"
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
