@@ -24,7 +24,6 @@ import { Song } from "@/lib/types";
 import { Icons } from "@/components/icons";
 import { Link, useNavigate } from "react-router-dom";
 import SongContentFormField from "./song-content-form-field";
-import { SourceAutocomplete, TitleAutocomplete } from "./create-song-form";
 
 export default function EditSongForm({
     onSuccess,
@@ -173,12 +172,7 @@ export default function EditSongForm({
                                         </span>
                                     </FormLabel>
                                     <FormControl>
-                                        {/* <Input {...field} ref={formRef} /> */}
-                                        <TitleAutocomplete
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            resetState={rerenderChildren}
-                                        />
+                                        <Input {...field} ref={formRef} />
                                     </FormControl>
                                     <FormDescription className="sr-only">
                                         This is the name of the song.
@@ -207,11 +201,7 @@ export default function EditSongForm({
                                         </span>
                                     </FormLabel>
                                     <FormControl>
-                                        <SourceAutocomplete
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            resetState={rerenderChildren}
-                                        />
+                                        <Input {...field} />
                                     </FormControl>
                                     <FormDescription className="sr-only">
                                         This is the name of the source of the

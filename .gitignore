@@ -26,3 +26,6 @@ dist-ssr
 # Content for the typer
 content.ts
 rename.bat
+
+
+.env
