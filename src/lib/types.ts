@@ -1,5 +1,8 @@
 import { ReactNode } from "react";
 
+// https://stackoverflow.com/a/61108377
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
 export type Windows = "typer" | "song_list" | "settings";
 
 export type Song = {
@@ -15,6 +18,7 @@ export type Song = {
     };
     createdAt: number;
     lastModifiedAt: number;
+    spotifyUri?: string;
 };
 
 export type Order = "asc" | "desc";
