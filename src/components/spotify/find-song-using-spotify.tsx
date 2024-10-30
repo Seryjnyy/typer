@@ -9,7 +9,7 @@ import { Label } from "../ui/label";
 
 interface FindSongUsingSpotifyProps {
     apiSDK: SpotifyApi;
-    onSelectSong: (song: { title: string; artist: string }) => void;
+    onSelectSong: (track: Track) => void;
     initialArtist?: string;
     initialTitle?: string;
 }
@@ -25,6 +25,7 @@ const FindSongUsingSpotify = ({
 
     const [isSearchLoading, setIsSearchLoading] = useState(false);
 
+    // TODO : should this use useQuery?
     const debouncedSearch = useCallback(
         debounce(async (search: string) => {
             if (search.trim()) {
@@ -56,7 +57,7 @@ const FindSongUsingSpotify = ({
     };
 
     const handleSelect = (track: Track) => {
-        onSelectSong({ title: track.name, artist: track.artists[0].name });
+        onSelectSong(track);
         setSearch(track.name);
         setResults([]);
     };
@@ -74,6 +75,7 @@ const FindSongUsingSpotify = ({
                     onChange={handleInput}
                     value={search}
                     disabled={!apiSDK}
+                    onFocus={() => debouncedSearch(search)}
                 />
             </div>
             <ul className="flex flex-col gap-3 pt-2">
