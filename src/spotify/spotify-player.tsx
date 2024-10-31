@@ -4,8 +4,9 @@ import {
     useSpotifyPlayer,
     WebPlaybackSDK,
 } from "react-spotify-web-playback-sdk";
-import { useAvailableDevices } from "./spotify-api";
+import MyDevices from "./my-devices";
 import { useSpotify } from "./use-spotify";
+import { useAvailableDevices } from "./spotify-api";
 
 export default function SpotifyPlayer() {
     return (
@@ -36,6 +37,7 @@ const Player = () => {
 const Testing = () => {
     return (
         <div>
+            <MyDevices />
             <ConnectButton />
         </div>
     );
