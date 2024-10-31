@@ -3,7 +3,7 @@ import {
     Scopes,
     SpotifyApi,
 } from "@spotify/web-api-ts-sdk";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useSpotifyStore } from "./spotify-store";
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string;
@@ -12,7 +12,7 @@ const scopes = Scopes.all;
 // const apiSDKConfig  = SdkOptions
 
 // TODO : This needs to be inserted into with spotify api allow list, otherwise it won't work
-export type RedirectPath = "/songs?tab=add-song";
+export type RedirectPath = "/songs?tab=add-song" | "test";
 
 // TODO : it might redirect the user to spotify auth, not sure yet, will have to test for longer
 export const useSpotify = ({
@@ -24,6 +24,13 @@ export const useSpotify = ({
 }) => {
     const apiSDK = useSpotifyStore.use.apiSDK();
     const setApiSDK = useSpotifyStore.use.setApiSDK();
+
+    const getAccessToken = useCallback(async () => {
+        if (!apiSDK) return null;
+
+        const accessToken = await apiSDK.getAccessToken();
+        return accessToken?.access_token ?? null;
+    }, [apiSDK]);
 
     const authenticate = async () => {
         if (apiSDK) return;
@@ -69,12 +76,13 @@ export const useSpotify = ({
 
     useEffect(() => {
         if (enabled) authenticate();
-    }, [clientId, redirectUrl, scopes, enabled]);
+    }, [enabled]);
 
     return {
         apiSDK,
         logout,
         authenticate,
+        getAccessToken,
         isReady: !!apiSDK,
     };
 };
