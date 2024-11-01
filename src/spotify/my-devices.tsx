@@ -1,8 +1,16 @@
 import { Device as DeviceType } from "@spotify/web-api-ts-sdk";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAvailableDevices } from "./spotify-api";
 import { useSpotify } from "./use-spotify";
-import { Computer, Keyboard, Laptop, Smartphone, Speaker } from "lucide-react";
+import {
+    Computer,
+    Keyboard,
+    Laptop,
+    Loader2,
+    MonitorSmartphone,
+    Smartphone,
+    Speaker,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
     Popover,
@@ -11,23 +19,53 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 
+// TODO : still not the best, some could still not know when its connected or not, or how to fix that its not connected
+// TODO : When device is changed, it changes the device properly, but doesn't not update the UI Here
+// TODO : Could do with a tooltip
+// TODO : unhandeled error
 const MyDevices = () => {
+    const [open, setOpen] = useState(false);
     const { data, isLoading, isError, refetch } = useAvailableDevices();
-    const onChangeDevice = useCallback(() => {
+
+    const onChangeDevice = () => {
         refetch();
-    }, [refetch]);
+    };
+
+    const activeDevice = useMemo(
+        () => data?.devices.find((device) => device.is_active),
+        [data?.devices]
+    );
+    const isTyperActive = useMemo(
+        () => activeDevice?.name.includes("typer") ?? false,
+        [activeDevice?.name]
+    );
+
+    useEffect(() => {
+        if (open) {
+            refetch();
+        }
+    }, [open]);
 
     return (
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button variant={"ghost"} size={"icon"}>
-                    <Laptop />
+                    <MonitorSmartphone
+                        className={cn(
+                            isTyperActive ? "text-green-600" : "text-red-600"
+                        )}
+                    />
                 </Button>
             </PopoverTrigger>
             <PopoverContent>
                 <div>
-                    <h2>Available devices</h2>
+                    <h2 className="font-semibold">Available devices</h2>
                     <ul className="space-y-2 pt-2">
+                        {isLoading && (
+                            <li className="flex justify-center">
+                                <Loader2 className="animate-spin" />
+                            </li>
+                        )}
                         {data?.devices.map((device) => (
                             <li key={device.id}>
                                 <Device
@@ -70,7 +108,7 @@ const Device = ({
     return (
         <div
             className={cn(
-                "border p-2 cursor-pointer flex gap-2 hover:bg-secondary rounded-md",
+                "border p-2 cursor-pointer flex gap-2 hover:bg-secondary rounded-md  items-center",
                 isActive && "text-green-500"
             )}
             onClick={handleClick}
@@ -81,6 +119,11 @@ const Device = ({
             {deviceType == "Smartphone" && <Smartphone size={24} />}
             {deviceType == "Computer" && <Computer size={24} />}
             <span>{device.name}</span>
+            {deviceType == "Typer" && (
+                <span className="text-[0.6rem] text-muted-foreground">
+                    (This app)
+                </span>
+            )}
         </div>
     );
 };
