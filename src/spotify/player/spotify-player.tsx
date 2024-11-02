@@ -12,6 +12,8 @@ import VolumeControl from "./volume-control";
 import { useAvailableDevices } from "../spotify-api";
 import { useSpotify } from "../use-spotify";
 import PlaybackControl from "./playback-control";
+import { usePlayableSongStore } from "./playable-song-store";
+import usePlaySongURI from "../use-play-song-uri";
 import SpotifyEnable from "@/components/spotify/spotify-enable";
 
 export default function SpotifyPlayer() {
@@ -41,6 +43,16 @@ const Player = () => {
 
 const Testing = () => {
     const webPlaybackSDKReady = useWebPlaybackSDKReady();
+    const playableSong = usePlayableSongStore.use.playableSong();
+    const { togglePlayURI, isPlayingURI } = usePlaySongURI(
+        playableSong?.spotifyUri ?? ""
+    );
+
+    useEffect(() => {
+        if (!playableSong || !playableSong.spotifyUri) return;
+
+        togglePlayURI();
+    }, [playableSong]);
 
     if (!webPlaybackSDKReady) return <div>Loading...</div>;
 
@@ -59,7 +71,11 @@ const Testing = () => {
             <div className="w-[10rem] ml-auto">
                 <VolumeControl />
             </div>
-
+            {/* {playableSong && (
+                <Button onClick={() => togglePlayURI()} disabled={isPlayingURI}>
+                    Play song
+                </Button>
+            )} */}
             {/* <ConnectButton /> */}
         </div>
     );
