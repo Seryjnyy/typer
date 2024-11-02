@@ -1,7 +1,7 @@
 import { Device as DeviceType } from "@spotify/web-api-ts-sdk";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAvailableDevices } from "./spotify-api";
-import { useSpotify } from "./use-spotify";
+import { useAvailableDevices } from "../spotify-api";
+import { useSpotify } from "../use-spotify";
 import {
     Computer,
     Keyboard,
