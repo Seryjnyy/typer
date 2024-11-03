@@ -1,23 +1,21 @@
 import { Song } from "@/lib/types";
-import { usePlayableSongStore } from "@/spotify/player/playable-song-store";
 import { Icons } from "../icons";
 import { Button, ButtonProps } from "../ui/button";
 import MusicPlaying from "../music-playing";
 import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
+import { usePlaySongThroughSpotify } from "./use-play-song-through-spotify";
 
 type PlayThroughSpotifyButtonProps = {
     song: Song;
 } & Omit<ButtonProps, "children">;
 
-export default function PlayThroughSpotifyButton({
-    song,
-    variant,
-    size,
-    className,
-    ...props
-}: PlayThroughSpotifyButtonProps) {
-    const setPlayableSong = usePlayableSongStore.use.setPlayableSong();
-    const playableSong = usePlayableSongStore.use.playableSong();
+const PlayThroughSpotifyButton = forwardRef<
+    HTMLButtonElement,
+    PlayThroughSpotifyButtonProps
+>(({ song, variant, size, className, ...props }, ref) => {
+    const { setPlayableSong, currentPlayableSong } =
+        usePlaySongThroughSpotify();
 
     if (song.spotifyUri == null) return null;
 
@@ -25,19 +23,23 @@ export default function PlayThroughSpotifyButton({
         setPlayableSong(song);
     };
 
-    const isCurrentlyPlaying = playableSong?.id === song.id;
-    /* TODO : only show if web player is enabled, only if its open. Or maybe allow then ask the user to enable it and open it  */
+    const isCurrentlyPlaying = currentPlayableSong?.id === song.id;
+
     return (
         <Button
+            ref={ref}
             variant={variant}
             size={size}
             className={cn("flex items-center gap-2", className)}
             onClick={handleClick}
-            // disabled={playableSong.id === song.id}
             {...props}
         >
             <Icons.spotify className="size-4 fill-primary-foreground " /> Play
             {isCurrentlyPlaying && <MusicPlaying variant={"primary"} />}
         </Button>
     );
-}
+});
+
+PlayThroughSpotifyButton.displayName = "PlayThroughSpotifyButton";
+
+export default PlayThroughSpotifyButton;
