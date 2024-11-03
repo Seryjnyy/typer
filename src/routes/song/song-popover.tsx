@@ -27,12 +27,10 @@ import {
     TrashIcon,
 } from "@radix-ui/react-icons";
 
-import { useNavigate } from "react-router-dom";
-import { useQueueStore } from "../../lib/store/queue-store";
-import { useSongStore } from "../../lib/store/song-store";
-import { Song } from "@/lib/types";
-import usePlaySong from "@/lib/hooks/use-play-song";
-import useExportSongs from "@/lib/hooks/use-export-song";
+import { Icons } from "@/components/icons";
+import MusicPlaying from "@/components/music-playing";
+import { usePlaySongThroughSpotify } from "@/components/spotify/use-play-song-through-spotify";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -42,13 +40,17 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { ReactNode, useState } from "react";
-import { Input } from "@/components/ui/input";
-import CreatePlaylistForm from "./create-playlist-form";
-import { usePlaylistStore } from "@/lib/store/playlist-store";
-import { cn } from "@/lib/utils";
+import useExportSongs from "@/lib/hooks/use-export-song";
+import usePlaySong from "@/lib/hooks/use-play-song";
 import usePlaylist from "@/lib/hooks/use-playlist";
+import { usePlaylistStore } from "@/lib/store/playlist-store";
+import { Song } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQueueStore } from "../../lib/store/queue-store";
+import { useSongStore } from "../../lib/store/song-store";
+import CreatePlaylistForm from "./create-playlist-form";
 
 const PlaylistSongMosaic = ({ songs }: { songs: string[] }) => {
     const songsList = useSongStore.use.songs();
@@ -276,6 +278,9 @@ export default function SongPopover({
     const playSong = usePlaySong();
     const { exportSongs } = useExportSongs();
 
+    const { setPlayableSong, currentPlayableSong } =
+        usePlaySongThroughSpotify();
+
     const onAddToQueue = (songId: string) => {
         enqueue(songId);
     };
@@ -312,6 +317,24 @@ export default function SongPopover({
                     <PlusIcon />
                     <span> Queue</span>
                 </DropdownMenuItem>
+                {song.spotifyUri && (
+                    <DropdownMenuItem
+                        className="flex gap-1 items-center"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setPlayableSong(song);
+                        }}
+                    >
+                        <Icons.spotify className="size-4 fill-primary-foreground " />{" "}
+                        Play
+                        {song.id === currentPlayableSong?.id && (
+                            <MusicPlaying
+                                variant={"primary"}
+                                className="ml-1"
+                            />
+                        )}
+                    </DropdownMenuItem>
+                )}
 
                 <DropdownMenuItem
                     className="space-x-1"

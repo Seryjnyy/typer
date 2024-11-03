@@ -22,6 +22,11 @@ import Spotify from "./routes/settings/spotify";
 import Stats from "./routes/settings/stats";
 import PlaylistPage from "./routes/song/playlist/playlist-page";
 import PlaylistEdit from "./routes/song/playlist/playlist-edit";
+import TestPage2 from "./test-page-2";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
     {
@@ -99,7 +104,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/test",
-                element: <TestPage />,
+                element: <TestPage2 />,
             },
         ],
     },
@@ -107,6 +112,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+        </QueryClientProvider>
     </React.StrictMode>
 );

@@ -24,6 +24,7 @@ export const songSchema = z.object({
             message: "Content cannot be just whitespace characters.",
         }),
     cover: z.string(),
+    spotifyURI: z.string().optional(),
 });
 
 export type songSchemaType = z.infer<typeof songSchema>;
