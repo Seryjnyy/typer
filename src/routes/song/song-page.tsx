@@ -1,24 +1,6 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import KeyboardButton from "@/components/keyboard-button";
 import BackButton from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SongBanner, SongHeader } from "@/components/ui/song-header";
@@ -26,23 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { useSongStore } from "@/lib/store/song-store";
 import { Song as SongType } from "@/lib/types";
 import { cn, formatTimestamp } from "@/lib/utils";
-import {
-    Pencil1Icon,
-    PlayIcon,
-    PlusIcon,
-    ReloadIcon,
-} from "@radix-ui/react-icons";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { Link } from "react-router-dom";
 
-import {
-    DotsHorizontalIcon,
-    EyeOpenIcon,
-    TrashIcon,
-} from "@radix-ui/react-icons";
-
-import { useQueueStore } from "../../lib/store/queue-store";
+import PlayThroughSpotifyButton from "@/components/spotify/play-through-spotify-button";
 import SongPopover from "./song-popover";
 
 interface SongContentProps {
@@ -221,6 +191,7 @@ export default function Song() {
                                     <span className="text-xs">Queue</span>
                                 </Button>
                             </div> */}
+
                             <div className="flex gap-2  w-[9rem] items-center  justify-between">
                                 <div className=" flex items-center gap-1 flex-col sm:flex-row">
                                     <Label
@@ -250,6 +221,13 @@ export default function Song() {
                                     exclude={{ viewMore: true }}
                                 />
                             </div>
+                        </div>
+                        <div className="w-full flex justify-end">
+                            <PlayThroughSpotifyButton
+                                song={song}
+                                variant={"outline"}
+                                size={"sm"}
+                            />
                         </div>
                     </div>
                 </div>

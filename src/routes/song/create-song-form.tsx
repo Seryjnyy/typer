@@ -236,6 +236,7 @@ const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
                 <SpotifyEnable redirectPath="/songs?tab=add-song" />
             </div>
             {apiSDK && (
+                // TODO : feels very hacky
                 <FindSongUsingSpotify
                     key={triggerRerender ? "r" : "n"}
                     apiSDK={apiSDK}
