@@ -15,10 +15,12 @@ import PlaybackControl from "./playback-control";
 import { usePlayableSongStore } from "./playable-song-store";
 import usePlaySongURI from "../use-play-song-uri";
 import SpotifyEnable from "@/components/spotify/spotify-enable";
+import { usePlaySongThroughSpotify } from "@/components/spotify/use-play-song-through-spotify";
+import { useColor } from "color-thief-react";
 
 export default function SpotifyPlayer() {
     return (
-        <div className="p-3 ">
+        <div>
             <WithSpotifySDK render={() => <Player />} />
         </div>
     );
@@ -41,12 +43,37 @@ const Player = () => {
     );
 };
 
+const BackgroundGradientFromTrack = () => {
+    const playbackState = usePlaybackState();
+
+    const currentTrack = playbackState?.track_window.current_track;
+    const { data, loading, error } = useColor(
+        currentTrack?.album.images[0].url ?? "",
+        "hex",
+        {
+            crossOrigin: "anonymous",
+        }
+    );
+
+    if (currentTrack === null || !data || error || loading) return null;
+
+    return (
+        <div
+            className="w-full h-full absolute top-0 left-0 -z-10 opacity-60"
+            style={{
+                backgroundImage: `linear-gradient(to bottom, ${data}, transparent)`,
+            }}
+        ></div>
+    );
+};
+
 const Testing = () => {
     const webPlaybackSDKReady = useWebPlaybackSDKReady();
     const playableSong = usePlayableSongStore.use.playableSong();
     const { togglePlayURI, isPlayingURI } = usePlaySongURI(
         playableSong?.spotifyUri ?? ""
     );
+    useCurrentTrackAndCurrentSongChecker();
 
     useEffect(() => {
         if (!playableSong || !playableSong.spotifyUri) return;
@@ -57,7 +84,8 @@ const Testing = () => {
     if (!webPlaybackSDKReady) return <div>Loading...</div>;
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 p-3 rounded-lg relative overflow-hidden">
+            <BackgroundGradientFromTrack />
             <CurrentTrack />
             <div className="grid grid-cols-2 ">
                 <div className="justify-self-end">
@@ -79,6 +107,23 @@ const Testing = () => {
             {/* <ConnectButton /> */}
         </div>
     );
+};
+
+const useCurrentTrackAndCurrentSongChecker = () => {
+    const playbackState = usePlaybackState();
+    const { currentPlayableSong, setPlayableSong } =
+        usePlaySongThroughSpotify();
+
+    useEffect(() => {
+        if (!playbackState || !currentPlayableSong) return;
+
+        const currentTrack = playbackState.track_window.current_track;
+        const currentSong = currentPlayableSong;
+
+        if (currentTrack.uri !== currentSong.spotifyUri) {
+            setPlayableSong(null);
+        }
+    }, [playbackState, currentPlayableSong]);
 };
 
 // This only shows playback when the device is active
