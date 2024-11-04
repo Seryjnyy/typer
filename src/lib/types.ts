@@ -31,6 +31,12 @@ export type SortBy =
     | "created"
     | "modified";
 
+export type GeneratedCover = {
+    type: "linear-gradient";
+    dir: number;
+    colours: string[];
+};
+
 // export interface GeneratorFunction {
 //     elements: ReactNode[];
 //     stats: { correct: number; incorrect: number };
