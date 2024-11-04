@@ -31,7 +31,6 @@ function Root() {
                     <Toaster />
                 </TooltipProvider>
             </ThemeProvider>
-            <TailwindGradientHack />
         </div>
     );
 }
