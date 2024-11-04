@@ -6,7 +6,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Button } from "@/components/ui/button";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { useSongStore } from "@/lib/store/song-store";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
+import { coverAsStyle, parseGeneratedCoverString } from "@/lib/gradient";
 
 const playlistBannerVariants = cva("", {
     variants: {
@@ -43,7 +44,7 @@ const PlaylistBanner = ({
     let element = <></>;
 
     const songsList = useSongStore.use.songs();
-    const { playPlaylist, getPlaylistSongs } = usePlaylist();
+    const { playPlaylist, getPlaylistSongs } = usePlaylists();
 
     const playlistSongs = useMemo(() => {
         return getPlaylistSongs(playlist.id);

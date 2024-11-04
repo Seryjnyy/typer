@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function usePlaylist() {
+export default function usePlaylists() {
     // IDK what to name the funcs since they do the same stuff, editPlaylist and editPlaylist, so maybe _ prefix for from store
     const _editPlaylist = usePlaylistStore.use.editPlaylist();
     const playlists = usePlaylistStore.use.playlists();

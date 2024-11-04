@@ -1,7 +1,7 @@
 import SongCarousel from "@/components/song-carousel";
 import { Button } from "@/components/ui/button";
 import usePlaySong from "@/lib/hooks/use-play-song";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import { usePlaylistStore } from "@/lib/store/playlist-store";
 import { useQueueStore } from "@/lib/store/queue-store";
 import { useSongStore } from "@/lib/store/song-store";
@@ -20,7 +20,7 @@ export default function NoSongSelected() {
     const playSong = usePlaySong();
     const navigate = useNavigate();
     const playlists = usePlaylistStore.use.playlists();
-    const { playPlaylist } = usePlaylist();
+    const { playPlaylist } = usePlaylists();
 
     const shuffled = useMemo(() => {
         return shuffleArray(songs) as Song[];

@@ -42,7 +42,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import useExportSongs from "@/lib/hooks/use-export-song";
 import usePlaySong from "@/lib/hooks/use-play-song";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import { usePlaylistStore } from "@/lib/store/playlist-store";
 import { Song } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -175,7 +175,7 @@ const PlaylistSongMosaic = ({ songs }: { songs: string[] }) => {
 const AddToPlaylistDialog = ({ song }: { song: Song }) => {
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false);
     const playlists = usePlaylistStore.use.playlists();
-    const { addToPlaylist, getPlaylistSongs } = usePlaylist();
+    const { addToPlaylist, getPlaylistSongs } = usePlaylists();
     const [open, setOpen] = useState(false);
 
     return (

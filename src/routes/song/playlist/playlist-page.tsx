@@ -5,7 +5,7 @@ import {
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import { usePlaylistStore } from "@/lib/store/playlist-store";
 import { useSongStore } from "@/lib/store/song-store";
 import { Song } from "@/lib/types";
@@ -26,7 +26,7 @@ export default function PlaylistPage() {
     const { playlistID } = useParams();
     const getSongData = useSongStore.use.getSongData();
 
-    const { removeFromPlaylist, getPlaylistSongs } = usePlaylist();
+    const { removeFromPlaylist, getPlaylistSongs } = usePlaylists();
 
     if (!playlistID) {
         throw Error("No playlist ID provided.");

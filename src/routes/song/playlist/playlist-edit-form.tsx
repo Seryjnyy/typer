@@ -9,7 +9,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import {
     createPlaylistSchemaType,
     playlistSchema,
@@ -21,7 +21,7 @@ import { PlaylistBanner, PlaylistHeader } from "../playlist-header";
 import { useNavigate } from "react-router";
 
 export default function PlaylistEditForm({ playlist }: { playlist: Playlist }) {
-    const { editPlaylist } = usePlaylist();
+    const { editPlaylist } = usePlaylists();
     const navigate = useNavigate();
 
     const form = useForm<createPlaylistSchemaType>({
@@ -48,10 +48,7 @@ export default function PlaylistEditForm({ playlist }: { playlist: Playlist }) {
             >
                 <div className="flex items-end justify-start gap-12 flex-wrap">
                     <PlaylistHeader className="w-fit">
-                        <PlaylistBanner
-                            playlist={playlist}
-                            size={"extraLarge"}
-                        />
+                        <PlaylistBanner playlist={playlist} size={"xl"} />
                     </PlaylistHeader>
                     <FormField
                         control={form.control}
