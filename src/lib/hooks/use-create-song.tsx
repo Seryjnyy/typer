@@ -7,12 +7,14 @@ import { useSongStore } from "../store/song-store";
 import { Optional, Song } from "../types";
 import { generateGradient } from "../utils";
 import usePlaySong from "./use-play-song";
+import useRandomCoverGradient from "./use-random-cover-gradient";
 
 // TODO : Needs testing with localStorage, like when its full etc.
 export default function useCreateSong() {
     const addSong = useSongStore.use.addSong();
     const playSong = usePlaySong();
     const { toast } = useToast();
+    const { cover, generateRandomCover } = useRandomCoverGradient();
 
     return (
         song: Optional<
@@ -29,7 +31,7 @@ export default function useCreateSong() {
         const newSong: Song = {
             ...song,
             id: song.id ?? uuidv4(),
-            cover: song.cover ?? generateGradient(),
+            cover: song.cover ?? JSON.stringify(cover),
             completion: song.completion ?? 0,
             createdAt: song.createdAt ?? Date.now(),
             lastModifiedAt: song.lastModifiedAt ?? Date.now(),
@@ -61,6 +63,9 @@ export default function useCreateSong() {
                     </div>
                 ),
             });
+
+            // TODO : I don't like how this is done, it doesn't seem right
+            generateRandomCover();
         } catch (e) {
             // TODO : This is untested
             toast({
