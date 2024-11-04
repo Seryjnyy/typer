@@ -22,13 +22,14 @@ import { Icons } from "./icons";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { SongBanner, SongDetail, SongHeader } from "./ui/song-header";
+import { useSongCover } from "@/lib/hooks/use-song-cover";
 
 // TODO : is this needed anywhere else?
 const useQueue = () => {
     const queueSongsList = useQueueStore.use.songs();
     const setQueueSongsList = useQueueStore.use.setSongs();
     const removeSong = useQueueStore.use.removeSong();
-    const current = useQueueStore.use.current();
+    const currentID = useQueueStore.use.current();
     const enqueue = useQueueStore.use.enqueue();
     const setCurrent = useQueueStore.use.setCurrent();
     const setQueueSongs = useQueueStore.use.setSongs();
@@ -61,10 +62,15 @@ const useQueue = () => {
         }
     };
 
+    const currentSong = useMemo(() => {
+        return songList.find((x) => x.id == currentID);
+    }, [songList, currentID]);
+
     return {
         queue,
         setQueue: setQueueSongsList,
-        current,
+        currentID,
+        currentSong,
         removeFromQueue,
         clearQueue,
         enqueueRandomSongs,
@@ -77,32 +83,43 @@ export const MobileQueue = () => {
     const focus = useUiStateStore.use.focus();
     const {
         queue,
-        current,
+        currentID,
+        currentSong,
         clearQueue,
         enqueueRandomSongs,
         removeFromQueue,
         totalAvailableSongs,
     } = useQueue();
 
+    const { coverAsBgGradientStyle } = useSongCover(currentSong);
+    const isQueueColoured = usePreferenceStore.use.isQueueColour();
+
     if (queueWindowOpen || focus) return <></>;
 
     return (
-        <div className="h-full    w-full ">
-            <ScrollArea className=" h-[calc(100%)]  pl-1 pr-3 pb-1 border-t">
+        <div className="h-full rounded-t-sm    w-full overflow-hidden">
+            <ScrollArea
+                className=" h-[calc(100%)]  pl-1 pr-3 pb-1 border-t"
+                style={isQueueColoured ? coverAsBgGradientStyle : undefined}
+            >
                 {queue.map((song, index) => (
                     <div
-                        key={index}
+                        key={song.id}
                         className={cn(
-                            "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
-                            {
-                                "bg-secondary ": current == song.id,
-                            }
+                            "border p-4 rounded-md space-y-2 group mt-2 bg-transparent flex ",
+                            isQueueColoured
+                                ? currentID == song.id
+                                    ? "backdrop-brightness-50"
+                                    : "backdrop-brightness-75"
+                                : currentID == song.id
+                                ? "bg-secondary"
+                                : ""
                         )}
                     >
                         <div
                             className={
                                 "flex items-center " +
-                                (current == song.id
+                                (currentID == song.id
                                     ? "text-foreground"
                                     : "text-muted")
                             }
@@ -113,7 +130,7 @@ export const MobileQueue = () => {
                             <SongBanner song={song} playButton />
                             <SongDetail
                                 song={song}
-                                isCurrent={song.id == current}
+                                isCurrent={song.id == currentID}
                             />
                         </SongHeader>
                         <div className="flex items-center">
@@ -187,7 +204,8 @@ export default function Queue() {
 
     const {
         queue,
-        current,
+        currentID,
+        currentSong,
         clearQueue,
         enqueueRandomSongs,
         removeFromQueue,
@@ -195,7 +213,7 @@ export default function Queue() {
         totalAvailableSongs,
     } = useQueue();
 
-    if (!queueWindowOpen || focus) return <></>;
+    const { coverAsBgGradientStyle } = useSongCover(currentSong);
 
     const onDragEnd = (result: DropResult) => {
         if (!result.destination) return;
@@ -206,15 +224,14 @@ export default function Queue() {
         setQueue(newArr.map((x) => x.id));
     };
 
+    if (!queueWindowOpen || focus) return <></>;
+
     return (
         <div
             className={cn(
-                "h-full border rounded-md py-4  w-[15rem] overflow-hidden",
-                isQueueColoured &&
-                    `bg-gradient-to-b ${
-                        queue.find((x) => x.id == current)?.cover.split(" ")[1]
-                    } to-85%`
+                "h-full border rounded-md py-4  w-[15rem] overflow-hidden"
             )}
+            style={isQueueColoured ? coverAsBgGradientStyle : undefined}
         >
             <div className="flex justify-between px-2 pb-2">
                 <h3 className="font-semibold text-xl pl-1">Up next</h3>
@@ -243,10 +260,10 @@ export default function Queue() {
                                             className={cn(
                                                 "border p-4 rounded-md space-y-2 group mt-2 bg-transparent flex ",
                                                 isQueueColoured
-                                                    ? current == song.id
+                                                    ? currentID == song.id
                                                         ? "backdrop-brightness-50"
                                                         : "backdrop-brightness-75"
-                                                    : current == song.id
+                                                    : currentID == song.id
                                                     ? "bg-secondary"
                                                     : ""
                                             )}
@@ -254,7 +271,7 @@ export default function Queue() {
                                             <div
                                                 className={
                                                     "flex items-center " +
-                                                    (current == song.id
+                                                    (currentID == song.id
                                                         ? "text-foreground"
                                                         : "text-muted")
                                                 }
@@ -271,7 +288,7 @@ export default function Queue() {
                                                 <SongDetail
                                                     song={song}
                                                     isCurrent={
-                                                        song.id == current
+                                                        song.id == currentID
                                                     }
                                                 />
                                             </SongHeader>

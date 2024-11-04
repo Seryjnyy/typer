@@ -215,7 +215,6 @@ export default function EditSongForm({
                 </div>
 
                 <SongContentFormField
-                    form={form}
                     initialVal={song.content}
                     onContentChange={handleContentChange}
                     changeIndicator
