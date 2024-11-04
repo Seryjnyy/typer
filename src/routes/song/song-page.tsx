@@ -13,6 +13,7 @@ import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
 import PlayThroughSpotifyButton from "@/components/spotify/play-through-spotify-button";
+import { useSongCover } from "@/lib/hooks/use-song-cover";
 import SongPopover from "./song-popover";
 
 interface SongContentProps {
@@ -127,30 +128,29 @@ export default function Song() {
     const songs = useSongStore.use.songs();
     const { songID } = useParams();
 
+    const song = useMemo(() => {
+        return songs.find((x) => x.id == songID);
+    }, [songs, songID]);
+    const { coverAsBgGradientStyle } = useSongCover(song);
+
     if (!songID) {
         throw Error("No song ID provided.");
     }
-
-    const song = songs.find((x) => x.id == songID);
-
     // TODO : Could be better
     if (!song) return <SomethingWentWrong />;
 
-    const headBgGradient = useMemo(() => {
-        return song.cover.split(" ")[1];
-    }, [song]);
     return (
         <div className={` h-[100%]  overflow-hidden sm:rounded-md`}>
             <ScrollArea className={`h-[100%]  pb-2  flex flex-col relative `}>
                 <div
-                    className={`flex flex-col  items-start justify-start space-y-12 pt-12 w-full  px-2 sm:px-12  bg-gradient-to-b  ${headBgGradient}
-                from-[5%] to-[60%]`}
+                    className={`flex flex-col  items-start justify-start space-y-12 pt-12 w-full  px-2 sm:px-12`}
+                    style={coverAsBgGradientStyle}
                 >
                     <BackButton link="/songs" />
                     <div className="space-y-4 w-full">
                         <div>
                             <SongHeader>
-                                <SongBanner song={song} size={"extraLarge"} />
+                                <SongBanner song={song} size={"xl"} />
                                 <div className="flex flex-col justify-center items-start px-8">
                                     <h1 className="text-2xl font-bold">
                                         {song.title}

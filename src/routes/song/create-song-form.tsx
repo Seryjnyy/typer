@@ -15,7 +15,7 @@ import SpotifyEnable from "@/components/spotify/spotify-enable";
 import { Input } from "@/components/ui/input";
 import useCreateSong from "@/lib/hooks/use-create-song";
 import { songSchema, songSchemaType } from "@/lib/schemas/song";
-import { cn, generateGradient } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useSpotify } from "@/spotify/use-spotify";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { forwardRef, useContext, useMemo, useRef, useState } from "react";
@@ -24,13 +24,16 @@ import SongContentFormField from "./song-content-form-field";
 
 import FindSongUsingSpotify from "@/components/spotify/find-song-using-spotify";
 import SearchForLyrics from "@/components/spotify/search-for-lyrics";
-import { UseFormReturn } from "react-hook-form";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    coverAsStyle,
+    createRandomCover,
+    parseGeneratedCoverString,
+} from "@/lib/gradient";
 import { Track } from "@spotify/web-api-ts-sdk";
 import { createContext } from "react";
 import CreateSongFormSongAssociation from "./create-song-form-song-association";
-import { Song } from "@/lib/types";
 
 // TODO : this whole thing seems messy
 // I think I need separate context from form for this because if the user uses spotify option I need to associate it with the spotify song
@@ -67,7 +70,7 @@ export default function CreateSongForm({
 
     const [resetChildState, setResetChildState] = useState(false);
 
-    const randomGradient = useMemo(() => generateGradient(), []);
+    const randomCoverGradient = useMemo(() => createRandomCover(), []);
 
     const form = useForm<songSchemaType>({
         resolver: zodResolver(songSchema),
@@ -75,7 +78,7 @@ export default function CreateSongForm({
             source: "",
             title: "",
             content: "",
-            cover: randomGradient,
+            cover: JSON.stringify(randomCoverGradient),
             spotifyURI: "",
         },
     });
@@ -96,12 +99,15 @@ export default function CreateSongForm({
 
         if (!result) return;
 
+        // console.log();
+
         form.reset({
             title: "",
             source: "",
             content: "",
-            cover: generateGradient(),
+            cover: JSON.stringify(createRandomCover()),
         });
+
         setResetChildState((prev) => !prev);
 
         setSongAssociation(null);
@@ -134,8 +140,12 @@ export default function CreateSongForm({
                                                 <div className="flex gap-2 items-end">
                                                     <div
                                                         className={cn(
-                                                            field.value,
                                                             "w-20 h-20 rounded-md"
+                                                        )}
+                                                        style={coverAsStyle(
+                                                            parseGeneratedCoverString(
+                                                                field.value
+                                                            )
                                                         )}
                                                     ></div>
                                                     <Button
@@ -144,7 +154,9 @@ export default function CreateSongForm({
                                                         onClick={() =>
                                                             form.setValue(
                                                                 "cover",
-                                                                generateGradient()
+                                                                JSON.stringify(
+                                                                    createRandomCover()
+                                                                )
                                                             )
                                                         }
                                                     >
@@ -201,10 +213,7 @@ export default function CreateSongForm({
                             </Tabs>
                         </div>
                         <CreateSongFormSongAssociation />
-                        <SongContentFormField
-                            form={form}
-                            resetState={resetChildState}
-                        />
+                        <SongContentFormField resetState={resetChildState} />
                         <SearchForLyrics artist={source} track={title} />
                         <Button type="submit">Submit</Button>
                     </form>

@@ -109,8 +109,6 @@ const SongInfo = () => {
 };
 
 const MobileMenu = ({ className }: { className?: string }) => {
-    const currSong = useQueueStore.use.current();
-    const song = useSongStore.use.songs().find((x) => x.id == currSong);
     const setQueueWindowOpen = useUiStateStore.use.setQueueWindowOpen();
 
     const focus = useUiStateStore.use.focus();
@@ -123,9 +121,6 @@ const MobileMenu = ({ className }: { className?: string }) => {
     };
 
     if (focus) return null;
-
-    const from = song?.cover.split(" ")[1];
-    const to = song?.cover.split(" ")[2];
 
     return (
         <div

@@ -6,13 +6,7 @@ import {
     SongHeader,
 } from "@/components/ui/song-header";
 import { useUiStateStore } from "@/lib/store/ui-state-store";
-import {
-    calculateAccuracy,
-    chpm,
-    cn,
-    generateGradient,
-    textModification,
-} from "@/lib/utils";
+import { calculateAccuracy, chpm, cn, textModification } from "@/lib/utils";
 import { ArrowLeftIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
@@ -67,7 +61,7 @@ const Top = ({ song, cameFrom }: TopProps) => {
                 {song && (
                     <SongBanner
                         song={song}
-                        size={"small"}
+                        size={"sm"}
                         className="rounded-[2px]"
                     />
                 )}

@@ -1,23 +1,27 @@
+import { useSongCover } from "@/lib/hooks/use-song-cover";
+import { Song } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
 import React, { ReactNode } from "react";
 import PlayButton from "../play-button";
-import { Song } from "@/lib/types";
-import { cva, type VariantProps } from "class-variance-authority";
 
-const songBannerVariants = cva("", {
-    variants: {
-        size: {
-            default: "min-h-12 min-w-12 max-h-12 max-w-12",
-            small: "min-h-4 min-w-4 max-h-4 max-w-4",
-            large: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem]",
-            extraLarge:
-                "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem]",
+const songBannerVariants = cva(
+    "rounded-md flex justify-center items-center relative overflow-hidden",
+    {
+        variants: {
+            size: {
+                xs: "min-h-4 min-w-4 max-h-4 max-w-4",
+                sm: "min-h-8 min-w-8 max-h-8 max-w-8",
+                md: "min-h-12 min-w-12 max-h-12 max-w-12",
+                lg: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem]",
+                xl: "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem]",
+            },
         },
-    },
-    defaultVariants: {
-        size: "default",
-    },
-});
+        defaultVariants: {
+            size: "md",
+        },
+    }
+);
 
 interface SongBannerProps
     extends React.ButtonHTMLAttributes<HTMLDivElement>,
@@ -34,16 +38,13 @@ const SongBanner = ({
     playButton = false,
     ...props
 }: SongBannerProps) => {
+    const { coverAsAvatarStyle } = useSongCover(song);
+
     return (
         <div
-            className={cn(
-                songBannerVariants({ size: size }),
-                song.cover,
-                "rounded-md flex justify-center items-center relative overflow-hidden",
-                className
-                // "bg-gradient-to-bl from-yellow-200 to-violet-800"
-            )}
+            className={cn(songBannerVariants({ size, className }))}
             {...props}
+            style={coverAsAvatarStyle}
         >
             {playButton && (
                 <div className="z-40 peer">
@@ -51,7 +52,7 @@ const SongBanner = ({
                 </div>
             )}
             {playButton && (
-                <div className="w-full h-full hover:backdrop-brightness-75 absolute  z-20 peer-hover:backdrop-brightness-75"></div>
+                <div className="w-full h-full hover:backdrop-brightness-75 absolute  z-20 peer-hover:backdrop-brightness-75 rounded-md"></div>
             )}
         </div>
     );
@@ -131,4 +132,4 @@ const SongHeader = ({
     );
 };
 
-export { SongHeader, SongBanner, SongDetail };
+export { SongBanner, SongDetail, SongHeader };

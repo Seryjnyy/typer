@@ -5,15 +5,34 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { z } from "zod";
-import { gradientOptions } from "../utils";
 import { usePreferenceStore } from "../store/preferences-store";
 
-// Dynamically create the regex from the allowed options
-const dirPattern = gradientOptions.directions.join("|");
-const colourPattern = gradientOptions.colours.join("|");
+// Regex for validating "rgb(n1, n2, n3)" format
+const rgbColorRegex = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/;
 
-const coverRegexString = `^bg-gradient-to-(${dirPattern}) from-(${colourPattern})-(\\d{3}) to-(${colourPattern})-(\\d{3})$`;
-const coverRegex = new RegExp(coverRegexString);
+const coverSchema = z
+    .object({
+        type: z.literal("linear-gradient"),
+        dir: z.number(),
+        colours: z.array(
+            z.string().refine(
+                (color) => {
+                    const match = color.match(rgbColorRegex);
+                    if (!match) return false;
+                    // Extract RGB values and ensure each is between 0 and 255
+                    const [r, g, b] = match.slice(1).map(Number);
+                    return [r, g, b].every(
+                        (value) => value >= 0 && value <= 255
+                    );
+                },
+                {
+                    message:
+                        "Colours must be in the format 'rgb(n, n, n)' with n between 0 and 255",
+                }
+            )
+        ),
+    })
+    .optional();
 
 const importSongSchema = z.object({
     title: z.string().min(1).max(150).regex(/\S+/, {
@@ -25,41 +44,11 @@ const importSongSchema = z.object({
     content: z.string().min(1).max(8000).regex(/\S+/, {
         message: "Content cannot be just whitespace characters",
     }),
-    cover: z
-        .string()
-        .regex(coverRegex, { message: "Invalid cover format" })
-        .refine((cover) => {
-            const match = cover.match(coverRegex);
-
-            // Regex doesn't match
-            if (!match) {
-                return false;
-            }
-
-            const [, dir, fromColour, fromColourNum, toColour, toColourNum] =
-                match;
-
-            const isValidDir = gradientOptions.directions.includes(dir);
-            const isValidFromColour =
-                gradientOptions.colours.includes(fromColour);
-            const isValidToColour = gradientOptions.colours.includes(toColour);
-            const isValidFromColourNum = gradientOptions.steps.includes(
-                Number(fromColourNum)
-            );
-            const isValidToColourNum = gradientOptions.steps.includes(
-                Number(toColourNum)
-            );
-
-            return (
-                isValidDir &&
-                isValidFromColour &&
-                isValidToColour &&
-                isValidFromColourNum &&
-                isValidToColourNum
-            );
-        })
-        .optional()
-        .catch(undefined),
+    cover: z.preprocess((data) => {
+        if (typeof data !== "string") return undefined;
+        const parsedCover = coverSchema.safeParse(JSON.parse(data));
+        return parsedCover.success ? parsedCover.data : undefined;
+    }, coverSchema),
     completion: z.number().int().nonnegative().optional().catch(undefined),
     record: z
         .object({
@@ -141,7 +130,7 @@ export default function useImportSongs() {
                     createSong({
                         ...song,
                         cover: importSongPreferences.cover
-                            ? song.cover
+                            ? JSON.stringify(song.cover)
                             : undefined,
                         completion: importSongPreferences.completion
                             ? song.completion
@@ -155,8 +144,6 @@ export default function useImportSongs() {
                     });
                 }
             });
-
-            console.log(validSongs);
 
             toast({
                 title: `Successfully imported songs.`,

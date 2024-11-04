@@ -13,7 +13,13 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { songSchemaType } from "@/lib/schemas/song";
 import { textModification } from "@/lib/utils";
 import {
     CaretDownIcon,
@@ -22,12 +28,7 @@ import {
     ResetIcon,
 } from "@radix-ui/react-icons";
 import React, { useEffect, useMemo, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
+import { useFormContext } from "react-hook-form";
 
 const SongContentInfo = () => {
     return (
@@ -64,29 +65,21 @@ const SongContentInfo = () => {
     );
 };
 
+// TODO : turn redo/undo into hook, or use the one from useHooks
 export default function SongContentFormField({
-    form,
     resetState,
     initialVal,
     changeIndicator,
     onContentChange,
 }: {
-    form: UseFormReturn<
-        {
-            source: string;
-            title: string;
-            content: string;
-            cover: string;
-        },
-        any,
-        undefined
-    >;
     resetState?: boolean;
     initialVal?: string;
     changeIndicator?: boolean;
     onContentChange?: (content: string) => void;
 }) {
+    const form = useFormContext<songSchemaType>();
     const maxLength = 10;
+
     const [history, setHistory] = useState<string[]>([initialVal ?? ""]);
     const [redoHistory, setRedoHistory] = useState<string[]>([]);
     const currentValue = useMemo(() => {

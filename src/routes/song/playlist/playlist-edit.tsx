@@ -3,11 +3,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import PlaylistEditForm from "./playlist-edit-form";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 
 export default function PlaylistEdit() {
     const { playlistID } = useParams();
-    const { getPlaylist } = usePlaylist();
+    const { getPlaylist } = usePlaylists();
 
     if (!playlistID) {
         throw Error("No playlist ID provided.");

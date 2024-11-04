@@ -25,7 +25,7 @@ import {
     PlaylistHeader,
 } from "./playlist-header";
 import PlaylistPopover from "./playlist-popover";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 
 const PlaylistItem = ({
     playlist,
@@ -35,7 +35,7 @@ const PlaylistItem = ({
     index: number;
 }) => {
     const navigate = useNavigate();
-    const { deletePlaylist, playPlaylist, getPlaylistSongs } = usePlaylist();
+    const { deletePlaylist, playPlaylist, getPlaylistSongs } = usePlaylists();
 
     const handleDeletePlaylist = () => {
         deletePlaylist(playlist.id);

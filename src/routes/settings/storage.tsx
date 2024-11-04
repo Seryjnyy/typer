@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/chart";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/use-toast";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import {
     QueueStorage as QueueStorageType,
     usePreferenceStore,
@@ -125,7 +125,7 @@ export default function Storage() {
     const localStorageUse = localStorageSpace();
     console.log(localStorageSpace());
     const setSongs = useSongStore.use.setSongs();
-    const { deleteAllPlaylists } = usePlaylist();
+    const { deleteAllPlaylists } = usePlaylists();
 
     const navigate = useNavigate();
     const chartData = [

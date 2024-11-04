@@ -1,4 +1,10 @@
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { usePreferenceStore } from "@/lib/store/preferences-store";
+import {
     DragDropContext,
     Draggable,
     Droppable,
@@ -6,38 +12,30 @@ import {
 } from "@hello-pangea/dnd";
 import { Cross1Icon, FileTextIcon } from "@radix-ui/react-icons";
 import { useMemo } from "react";
-import PlayButton from "./play-button";
-import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 import { useQueueStore } from "../lib/store/queue-store";
 import { useSongStore } from "../lib/store/song-store";
 import { useUiStateStore } from "../lib/store/ui-state-store";
 import { cn, shuffleArray } from "../lib/utils";
 import AutoplayButton from "./autoplay-button";
-import { SongHeader, SongBanner, SongDetail } from "./ui/song-header";
-import { ScrollArea } from "./ui/scroll-area";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useToast } from "./ui/use-toast";
 import { Icons } from "./icons";
-import { Link } from "react-router-dom";
-import { usePreferenceStore } from "@/lib/store/preferences-store";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+import { SongBanner, SongDetail, SongHeader } from "./ui/song-header";
+import { useSongCover } from "@/lib/hooks/use-song-cover";
 
-export const MobileQueue = () => {
-    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
-    const focus = useUiStateStore.use.focus();
-
+// TODO : is this needed anywhere else?
+const useQueue = () => {
     const queueSongsList = useQueueStore.use.songs();
+    const setQueueSongsList = useQueueStore.use.setSongs();
     const removeSong = useQueueStore.use.removeSong();
-    const current = useQueueStore.use.current();
+    const currentID = useQueueStore.use.current();
     const enqueue = useQueueStore.use.enqueue();
     const setCurrent = useQueueStore.use.setCurrent();
     const setQueueSongs = useQueueStore.use.setSongs();
 
     const songList = useSongStore.use.songs();
-    const songs = useMemo(() => {
+    const queue = useMemo(() => {
         const res = queueSongsList.map((songId) =>
             songList.find((x) => x.id == songId)
         );
@@ -45,17 +43,15 @@ export const MobileQueue = () => {
         return res.filter((x) => x != undefined);
     }, [queueSongsList, songList]);
 
-    const onRemoveFromQueue = (songId: string) => {
+    const removeFromQueue = (songId: string) => {
         removeSong(songId);
     };
 
-    if (queueWindowOpen || focus) return <></>;
-
-    const onClearQueue = () => {
+    const clearQueue = () => {
         setQueueSongs([]);
     };
 
-    const onAddRandomSongs = () => {
+    const enqueueRandomSongs = () => {
         const randomSongs = shuffleArray(songList).slice(0, 5);
 
         randomSongs.forEach((song) => {
@@ -66,23 +62,64 @@ export const MobileQueue = () => {
         }
     };
 
+    const currentSong = useMemo(() => {
+        return songList.find((x) => x.id == currentID);
+    }, [songList, currentID]);
+
+    return {
+        queue,
+        setQueue: setQueueSongsList,
+        currentID,
+        currentSong,
+        removeFromQueue,
+        clearQueue,
+        enqueueRandomSongs,
+        totalAvailableSongs: songList.length,
+    };
+};
+
+export const MobileQueue = () => {
+    const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
+    const focus = useUiStateStore.use.focus();
+    const {
+        queue,
+        currentID,
+        currentSong,
+        clearQueue,
+        enqueueRandomSongs,
+        removeFromQueue,
+        totalAvailableSongs,
+    } = useQueue();
+
+    const { coverAsBgGradientStyle } = useSongCover(currentSong);
+    const isQueueColoured = usePreferenceStore.use.isQueueColour();
+
+    if (queueWindowOpen || focus) return <></>;
+
     return (
-        <div className="h-full    w-full ">
-            <ScrollArea className=" h-[calc(100%)]  pl-1 pr-3 pb-1 border-t">
-                {songs.map((song, index) => (
+        <div className="h-full rounded-t-sm    w-full overflow-hidden">
+            <ScrollArea
+                className=" h-[calc(100%)]  pl-1 pr-3 pb-1 border-t"
+                style={isQueueColoured ? coverAsBgGradientStyle : undefined}
+            >
+                {queue.map((song, index) => (
                     <div
-                        key={index}
+                        key={song.id}
                         className={cn(
-                            "border p-4 rounded-md space-y-2 group mt-2 bg-background flex",
-                            {
-                                "bg-secondary ": current == song.id,
-                            }
+                            "border p-4 rounded-md space-y-2 group mt-2 bg-transparent flex ",
+                            isQueueColoured
+                                ? currentID == song.id
+                                    ? "backdrop-brightness-50"
+                                    : "backdrop-brightness-75"
+                                : currentID == song.id
+                                ? "bg-secondary"
+                                : ""
                         )}
                     >
                         <div
                             className={
                                 "flex items-center " +
-                                (current == song.id
+                                (currentID == song.id
                                     ? "text-foreground"
                                     : "text-muted")
                             }
@@ -93,7 +130,7 @@ export const MobileQueue = () => {
                             <SongBanner song={song} playButton />
                             <SongDetail
                                 song={song}
-                                isCurrent={song.id == current}
+                                isCurrent={song.id == currentID}
                             />
                         </SongHeader>
                         <div className="flex items-center">
@@ -102,7 +139,7 @@ export const MobileQueue = () => {
                                     <TooltipTrigger asChild>
                                         <Button
                                             onClick={() =>
-                                                onRemoveFromQueue(song.id)
+                                                removeFromQueue(song.id)
                                             }
                                             size={"icon"}
                                             variant={"ghost"}
@@ -119,7 +156,7 @@ export const MobileQueue = () => {
                         </div>
                     </div>
                 ))}
-                {songs.length == 0 && songList.length > 0 && (
+                {queue.length == 0 && totalAvailableSongs > 0 && (
                     <div className="mt-4">
                         {/* TODO : doesn't close the drawer so you don't even know that it worked */}
                         {/* <Link to={"/songs"}>
@@ -137,20 +174,20 @@ export const MobileQueue = () => {
                             className="w-full mt-1 text-xs text-muted-foreground gap-2 flex justify-start"
                             variant={"ghost"}
                             size={"sm"}
-                            onClick={onAddRandomSongs}
-                            disabled={songList.length == 0}
+                            onClick={enqueueRandomSongs}
+                            disabled={totalAvailableSongs == 0}
                         >
                             <Icons.dice className="w-4 h-4" />
                             <span>Add random songs</span>
                         </Button>
                     </div>
                 )}
-                {songs.length > 0 && (
+                {queue.length > 0 && (
                     <Button
                         className="w-full mt-1 text-xs text-muted-foreground"
                         variant={"ghost"}
                         size={"sm"}
-                        onClick={onClearQueue}
+                        onClick={clearQueue}
                     >
                         Clear queue
                     </Button>
@@ -161,68 +198,40 @@ export const MobileQueue = () => {
 };
 
 export default function Queue() {
+    const isQueueColoured = usePreferenceStore.use.isQueueColour();
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen();
     const focus = useUiStateStore.use.focus();
 
-    const queueSongsList = useQueueStore.use.songs();
-    const removeSong = useQueueStore.use.removeSong();
-    const current = useQueueStore.use.current();
-    const setSongs = useQueueStore.use.setSongs();
-    const enqueue = useQueueStore.use.enqueue();
-    const setCurrent = useQueueStore.use.setCurrent();
-    const setQueueSongs = useQueueStore.use.setSongs();
-    const isQueueColour = usePreferenceStore.use.isQueueColour();
+    const {
+        queue,
+        currentID,
+        currentSong,
+        clearQueue,
+        enqueueRandomSongs,
+        removeFromQueue,
+        setQueue,
+        totalAvailableSongs,
+    } = useQueue();
 
-    const songList = useSongStore.use.songs();
-    const songs = useMemo(() => {
-        const res = queueSongsList.map((songId) =>
-            songList.find((x) => x.id == songId)
-        );
-
-        return res.filter((x) => x != undefined);
-    }, [queueSongsList, songList]);
-
-    const onRemoveFromQueue = (songId: string) => {
-        removeSong(songId);
-    };
-
-    if (!queueWindowOpen || focus) return <></>;
+    const { coverAsBgGradientStyle } = useSongCover(currentSong);
 
     const onDragEnd = (result: DropResult) => {
         if (!result.destination) return;
 
-        const newArr = Array.from(songs);
+        const newArr = Array.from(queue);
         const [draggedItem] = newArr.splice(result.source.index, 1);
         newArr.splice(result.destination.index, 0, draggedItem);
-        setSongs(newArr.map((x) => x.id));
+        setQueue(newArr.map((x) => x.id));
     };
 
-    const onClearQueue = () => {
-        setQueueSongs([]);
-    };
-
-    const onAddRandomSongs = () => {
-        const randomSongs = shuffleArray(songList).slice(0, 5);
-
-        randomSongs.forEach((song) => {
-            enqueue(song.id);
-        });
-        if (randomSongs.length > 0) {
-            setCurrent(randomSongs[0].id);
-        }
-    };
-
-    // TODO : have option for styled queue
+    if (!queueWindowOpen || focus) return <></>;
 
     return (
         <div
             className={cn(
-                "h-full border rounded-md py-4  w-[15rem] ",
-                isQueueColour &&
-                    `bg-gradient-to-b ${
-                        songs.find((x) => x.id == current)?.cover.split(" ")[1]
-                    } to-85%`
+                "h-full border rounded-md py-4  w-[15rem] overflow-hidden"
             )}
+            style={isQueueColoured ? coverAsBgGradientStyle : undefined}
         >
             <div className="flex justify-between px-2 pb-2">
                 <h3 className="font-semibold text-xl pl-1">Up next</h3>
@@ -230,15 +239,14 @@ export default function Queue() {
             </div>
 
             <DragDropContext onDragEnd={onDragEnd}>
-                {/* <ScrollArea className="h-full w-[250px]  "> */}
                 <Droppable droppableId="queue">
                     {(provided) => (
                         <ScrollArea
-                            className=" h-[calc(100%-1rem)]  pl-1 pr-3 pb-1 border-t"
+                            className=" h-[calc(100%-1.3rem)]    pl-1 pr-3 pb-1 border-t"
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                         >
-                            {songs.map((song, index) => (
+                            {queue.map((song, index) => (
                                 <Draggable
                                     draggableId={song.id}
                                     index={index}
@@ -251,11 +259,11 @@ export default function Queue() {
                                             {...provided.draggableProps}
                                             className={cn(
                                                 "border p-4 rounded-md space-y-2 group mt-2 bg-transparent flex ",
-                                                isQueueColour
-                                                    ? current == song.id
+                                                isQueueColoured
+                                                    ? currentID == song.id
                                                         ? "backdrop-brightness-50"
                                                         : "backdrop-brightness-75"
-                                                    : current == song.id
+                                                    : currentID == song.id
                                                     ? "bg-secondary"
                                                     : ""
                                             )}
@@ -263,7 +271,7 @@ export default function Queue() {
                                             <div
                                                 className={
                                                     "flex items-center " +
-                                                    (current == song.id
+                                                    (currentID == song.id
                                                         ? "text-foreground"
                                                         : "text-muted")
                                                 }
@@ -280,7 +288,7 @@ export default function Queue() {
                                                 <SongDetail
                                                     song={song}
                                                     isCurrent={
-                                                        song.id == current
+                                                        song.id == currentID
                                                     }
                                                 />
                                             </SongHeader>
@@ -290,7 +298,7 @@ export default function Queue() {
                                                         <TooltipTrigger asChild>
                                                             <Button
                                                                 onClick={() =>
-                                                                    onRemoveFromQueue(
+                                                                    removeFromQueue(
                                                                         song.id
                                                                     )
                                                                 }
@@ -314,14 +322,14 @@ export default function Queue() {
                                 </Draggable>
                             ))}
                             {provided.placeholder}
-                            {songs.length == 0 && (
+                            {queue.length == 0 && (
                                 <div className="mt-[72vh]">
                                     <Link to={"/songs"}>
                                         <Button
                                             className="w-full mt-1 text-xs text-muted-foreground gap-2 flex justify-start"
                                             variant={"ghost"}
                                             size={"sm"}
-                                            onClick={onClearQueue}
+                                            onClick={clearQueue}
                                         >
                                             <FileTextIcon />
                                             <span>View song list</span>
@@ -331,20 +339,20 @@ export default function Queue() {
                                         className="w-full mt-1 text-xs text-muted-foreground gap-2 flex justify-start"
                                         variant={"ghost"}
                                         size={"sm"}
-                                        onClick={onAddRandomSongs}
-                                        disabled={songList.length == 0}
+                                        onClick={enqueueRandomSongs}
+                                        disabled={totalAvailableSongs == 0}
                                     >
                                         <Icons.dice className="w-4 h-4" />
                                         <span>Add random songs</span>
                                     </Button>
                                 </div>
                             )}
-                            {songs.length > 0 && (
+                            {queue.length > 0 && (
                                 <Button
                                     className="w-full mt-1 text-xs text-muted-foreground"
                                     variant={"ghost"}
                                     size={"sm"}
-                                    onClick={onClearQueue}
+                                    onClick={clearQueue}
                                 >
                                     Clear queue
                                 </Button>
@@ -352,7 +360,6 @@ export default function Queue() {
                         </ScrollArea>
                     )}
                 </Droppable>
-                {/* </ScrollArea> */}
             </DragDropContext>
         </div>
     );

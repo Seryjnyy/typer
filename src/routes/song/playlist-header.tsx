@@ -6,20 +6,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Button } from "@/components/ui/button";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { useSongStore } from "@/lib/store/song-store";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
+import { coverAsStyle, parseGeneratedCoverString } from "@/lib/gradient";
 
 const playlistBannerVariants = cva("", {
     variants: {
         size: {
-            default: "min-h-12 min-w-12 max-h-12 max-w-12",
-            small: "min-h-4 min-w-4 max-h-4 max-w-4",
-            large: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem]",
-            extraLarge:
-                "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem]",
+            xs: "min-h-4 min-w-4 max-h-4 max-w-4 w-4 h-4",
+            sm: "min-h-4 min-w-4 max-h-8 max-w-8 w-8 h-8",
+            md: "min-h-12 min-w-12 max-h-12 max-w-12 w-12 h-12",
+            lg: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem] w-[6rem] h-[6rem]",
+            xl: "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem] w-[10rem] h-[10rem]",
         },
     },
     defaultVariants: {
-        size: "default",
+        size: "md",
     },
 });
 
@@ -40,94 +41,149 @@ const PlaylistBanner = ({
     playButtonHover = false,
     ...props
 }: PlaylistBannerProps) => {
-    let element = <></>;
-
     const songsList = useSongStore.use.songs();
-    const { playPlaylist, getPlaylistSongs } = usePlaylist();
+    const { playPlaylist, getPlaylistSongs } = usePlaylists();
 
     const playlistSongs = useMemo(() => {
         return getPlaylistSongs(playlist.id);
     }, [playlist]);
 
-    if (playlistSongs.length == 0) {
-        element = <div className="w-full h-full bg-popover/50"></div>;
-    }
-
-    if (playlistSongs.length == 1) {
-        const s = songsList.find((x) => x.id == playlistSongs[0]);
-
-        element = <div className={cn("w-full h-full  ", s?.cover ?? "")}></div>;
-    }
-
-    if (playlistSongs.length == 2) {
-        const s = songsList.find((x) => x.id == playlistSongs[0]);
-        const s2 = songsList.find((x) => x.id == playlistSongs[1]);
-
-        element = (
-            <div className="w-full h-full  ">
-                <div className="grid grid-cols-2  w-full h-full ">
+    const renderBanner = () => {
+        switch (playlistSongs.length) {
+            case 0:
+                return <div className="w-full h-full bg-popover/50"></div>;
+            case 1: {
+                const s = songsList.find((x) => x.id == playlistSongs[0]);
+                return (
                     <div
-                        className={cn("w-full h-full  ", s?.cover ?? "")}
+                        className="w-full h-full"
+                        style={
+                            s &&
+                            coverAsStyle(parseGeneratedCoverString(s.cover))
+                        }
                     ></div>
-                    <div
-                        className={cn("w-full  h-full  ", s2?.cover ?? "")}
-                    ></div>
-                </div>
-            </div>
-        );
-    }
-
-    if (playlistSongs.length == 3) {
-        const s = songsList.find((x) => x.id == playlistSongs[0]);
-        const s2 = songsList.find((x) => x.id == playlistSongs[1]);
-        const s3 = songsList.find((x) => x.id == playlistSongs[2]);
-
-        element = (
-            <div className="grid grid-rows-2 h-full w-full  ">
-                <div className="grid grid-cols-2  w-full h-full ">
-                    <div
-                        className={cn("w-full h-full  ", s?.cover ?? "")}
-                    ></div>
-                    <div
-                        className={cn("w-full  h-full  ", s2?.cover ?? "")}
-                    ></div>
-                </div>
-                <div className="w-full ">
-                    <div
-                        className={cn("w-full h-full  ", s3?.cover ?? "")}
-                    ></div>
-                </div>
-            </div>
-        );
-    }
-
-    if (playlistSongs.length >= 4) {
-        const s = songsList.find((x) => x.id == playlistSongs[0]);
-        const s2 = songsList.find((x) => x.id == playlistSongs[1]);
-        const s3 = songsList.find((x) => x.id == playlistSongs[2]);
-        const s4 = songsList.find((x) => x.id == playlistSongs[3]);
-
-        element = (
-            <div className="grid grid-rows-2 w-full h-full  ">
-                <div className="grid grid-cols-2  w-full h-full ">
-                    <div
-                        className={cn("w-full h-full  ", s?.cover ?? "")}
-                    ></div>
-                    <div
-                        className={cn("w-full  h-full  ", s2?.cover ?? "")}
-                    ></div>
-                </div>
-                <div className="grid grid-cols-2   w-full ">
-                    <div
-                        className={cn("w-full h-full  ", s3?.cover ?? "")}
-                    ></div>
-                    <div
-                        className={cn("w-full  h-full  ", s4?.cover ?? "")}
-                    ></div>
-                </div>
-            </div>
-        );
-    }
+                );
+            }
+            case 2: {
+                const [s1, s2] = playlistSongs.map((id) =>
+                    songsList.find((x) => x.id == id)
+                );
+                return (
+                    <div className="w-full h-full">
+                        <div className="grid grid-cols-2 w-full h-full">
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s1 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s1.cover)
+                                    )
+                                }
+                            ></div>
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s2 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s2.cover)
+                                    )
+                                }
+                            ></div>
+                        </div>
+                    </div>
+                );
+            }
+            case 3: {
+                const [s1, s2, s3] = playlistSongs.map((id) =>
+                    songsList.find((x) => x.id == id)
+                );
+                return (
+                    <div className="grid grid-rows-2 h-full w-full">
+                        <div className="grid grid-cols-2 w-full h-full">
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s1 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s1.cover)
+                                    )
+                                }
+                            ></div>
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s2 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s2.cover)
+                                    )
+                                }
+                            ></div>
+                        </div>
+                        <div className="w-full">
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s3 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s3.cover)
+                                    )
+                                }
+                            ></div>
+                        </div>
+                    </div>
+                );
+            }
+            default: {
+                const [s1, s2, s3, s4] = playlistSongs
+                    .slice(0, 4)
+                    .map((id) => songsList.find((x) => x.id == id));
+                return (
+                    <div className="grid grid-rows-2 w-full h-full">
+                        <div className="grid grid-cols-2 w-full h-full">
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s1 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s1.cover)
+                                    )
+                                }
+                            ></div>
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s2 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s2.cover)
+                                    )
+                                }
+                            ></div>
+                        </div>
+                        <div className="grid grid-cols-2 w-full">
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s3 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s3.cover)
+                                    )
+                                }
+                            ></div>
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s4 &&
+                                    coverAsStyle(
+                                        parseGeneratedCoverString(s4.cover)
+                                    )
+                                }
+                            ></div>
+                        </div>
+                    </div>
+                );
+            }
+        }
+    };
 
     // TODO : should this be here?
     const handlePlay = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -145,7 +201,8 @@ const PlaylistBanner = ({
             )}
             {...props}
         >
-            {element}
+            {/* {element} */}
+            {renderBanner()}
             {(playButtonHover || playButton) && (
                 <div
                     className={cn(

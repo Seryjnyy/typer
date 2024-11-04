@@ -9,7 +9,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import {
     createPlaylistSchemaType,
     playlistSchema,
@@ -26,7 +26,7 @@ export default function CreatePlaylistForm({
     onSave?: () => void;
     songs?: string[];
 }) {
-    const { createPlaylist } = usePlaylist();
+    const { createPlaylist } = usePlaylists();
     const form = useForm<createPlaylistSchemaType>({
         resolver: zodResolver(playlistSchema),
         defaultValues: {

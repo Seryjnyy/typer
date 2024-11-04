@@ -30,7 +30,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router";
-import usePlaylist from "@/lib/hooks/use-playlist";
+import usePlaylists from "@/lib/hooks/use-playlists";
 import useExportSongs from "@/lib/hooks/use-export-song";
 
 interface PlaylistPopoverProps {
@@ -41,7 +41,7 @@ interface PlaylistPopoverProps {
 const PlaylistPopover = ({ playlist, exclude }: PlaylistPopoverProps) => {
     const navigate = useNavigate();
     const { deletePlaylist, playPlaylist, getPlaylistSongsWithData } =
-        usePlaylist();
+        usePlaylists();
     const { exportSongs } = useExportSongs();
 
     const handleDeletePlaylist = () => {
