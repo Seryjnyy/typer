@@ -5,11 +5,12 @@ import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { useSongStore } from "../store/song-store";
 import { Optional, Song } from "../types";
-import { generateGradient } from "../utils";
 import usePlaySong from "./use-play-song";
 import useRandomCoverGradient from "./use-random-cover-gradient";
 
 // TODO : Needs testing with localStorage, like when its full etc.
+// TODO : Since cover is passed in as a string it can be anything, should validate it, if wrong then generate a new one
+// use-import-songs already has validation for parsing cover
 export default function useCreateSong() {
     const addSong = useSongStore.use.addSong();
     const playSong = usePlaySong();

@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { Song } from "../types";
 import saveAs from "file-saver";
+import { useState } from "react";
 import { usePreferenceStore } from "../store/preferences-store";
-import { toast } from "@/components/ui/use-toast";
+import { Song } from "../types";
 
 export default function useExportSongs() {
     const [exported, setExported] = useState(0);
@@ -11,17 +10,17 @@ export default function useExportSongs() {
     const exportSongs = async (songs: Song[]) => {
         if (songs.length == 0) return;
 
-        const songsConverted = songs.map((s) => ({
-            title: s.title,
-            source: s.source,
-            content: s.content,
-            cover: exportSongPreferences.cover ? s.cover : undefined,
+        const songsConverted = songs.map((song) => ({
+            title: song.title,
+            source: song.source,
+            content: song.content,
+            cover: exportSongPreferences.cover ? song.cover : undefined,
             completion: exportSongPreferences.completion
-                ? s.completion
+                ? song.completion
                 : undefined,
-            record: exportSongPreferences.record ? s.record : undefined,
+            record: exportSongPreferences.record ? song.record : undefined,
             createdAt: exportSongPreferences.createdAt
-                ? s.createdAt
+                ? song.createdAt
                 : undefined,
         }));
 
