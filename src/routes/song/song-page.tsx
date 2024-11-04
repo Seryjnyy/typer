@@ -150,7 +150,7 @@ export default function Song() {
                     <div className="space-y-4 w-full">
                         <div>
                             <SongHeader>
-                                <SongBanner song={song} size={"extraLarge"} />
+                                <SongBanner song={song} size={"xl"} />
                                 <div className="flex flex-col justify-center items-start px-8">
                                     <h1 className="text-2xl font-bold">
                                         {song.title}

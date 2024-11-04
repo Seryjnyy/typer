@@ -50,7 +50,7 @@ export default function SongCarousel({ songs }: SongCarouselProps) {
                         <div className="bg-card flex  rounded-md relative">
                             <SongHeader className="p-3  w-fit">
                                 <SongBanner
-                                    size={"large"}
+                                    size={"lg"}
                                     song={song}
                                     playButton
                                 />

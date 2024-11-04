@@ -12,14 +12,13 @@ const songBannerVariants = cva(
             size: {
                 xs: "min-h-4 min-w-4 max-h-4 max-w-4",
                 sm: "min-h-8 min-w-8 max-h-8 max-w-8",
-                default: "min-h-12 min-w-12 max-h-12 max-w-12",
-                large: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem]",
-                extraLarge:
-                    "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem]",
+                md: "min-h-12 min-w-12 max-h-12 max-w-12",
+                lg: "min-h-[6rem] min-w-[6rem] max-h-[6rem] max-w-[6rem]",
+                xl: "min-h-[10rem] min-w-[10rem] max-h-[10rem] max-w-[10rem]",
             },
         },
         defaultVariants: {
-            size: "default",
+            size: "md",
         },
     }
 );

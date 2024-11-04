@@ -67,7 +67,7 @@ const Top = ({ song, cameFrom }: TopProps) => {
                 {song && (
                     <SongBanner
                         song={song}
-                        size={"small"}
+                        size={"sm"}
                         className="rounded-[2px]"
                     />
                 )}
