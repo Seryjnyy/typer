@@ -17,8 +17,7 @@ import { PlaylistBanner, PlaylistHeader } from "../playlist-header";
 import PlaylistPopover from "../playlist-popover";
 import SongsList from "../songs-list";
 import { Link } from "react-router-dom";
-
-
+import { useSongCover } from "@/lib/hooks/use-song-cover";
 
 // TODO : on smaller screens text will be too long fix that
 export default function PlaylistPage() {
@@ -40,16 +39,17 @@ export default function PlaylistPage() {
         return getPlaylistSongs(playlist.id);
     }, [playlist]);
 
-    const randomBgGradient = useMemo(() => {
+    const randomSong = useMemo(() => {
         const randomSong =
             playlistSongs.length > 0
                 ? playlistSongs[
                       Math.floor(Math.random() * playlistSongs.length)
                   ]
                 : null;
-
-        return randomSong ? getSongData(randomSong)?.cover.split(" ")[1] : "";
+        return randomSong ? getSongData(randomSong) : undefined;
     }, [playlists]);
+
+    const { coverAsBgGradientStyle } = useSongCover(randomSong);
 
     const handleRemoveSongFromPlaylist = (song: Song) => {
         removeFromPlaylist(playlist.id, song.id);
@@ -59,8 +59,8 @@ export default function PlaylistPage() {
         <div className={` h-[100%] sm:rounded-md overflow-hidden`}>
             <ScrollArea className={`h-[100%]  pb-2  flex flex-col relative `}>
                 <div
-                    className={`flex flex-col items-start justify-start space-y-12 pt-12 w-full  px-2 sm:px-12  bg-gradient-to-b  ${randomBgGradient}
-                from-[5%] to-[60%]`}
+                    className={`flex flex-col items-start justify-start space-y-12 pt-12 w-full  px-2 sm:px-12 `}
+                    style={coverAsBgGradientStyle}
                 >
                     <BackButton link="/songs?tab=playlists" />
                     <div className="space-y-4 w-full">
@@ -69,7 +69,7 @@ export default function PlaylistPage() {
                                 <PlaylistBanner
                                     playButtonHover
                                     playlist={playlist}
-                                    size={"extraLarge"}
+                                    size={"xl"}
                                 />
                                 <div className="flex flex-col justify-center items-start px-8">
                                     <span className="text-foreground/80 select-none">

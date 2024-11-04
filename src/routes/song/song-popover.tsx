@@ -51,126 +51,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueueStore } from "../../lib/store/queue-store";
 import { useSongStore } from "../../lib/store/song-store";
 import CreatePlaylistForm from "./create-playlist-form";
-
-const PlaylistSongMosaic = ({ songs }: { songs: string[] }) => {
-    const songsList = useSongStore.use.songs();
-
-    if (songs.length == 0) {
-        return <div className="w-6 h-6 bg-popover/50 rounded-[2px]"></div>;
-    }
-
-    if (songs.length == 1) {
-        const s = songsList.find((x) => x.id == songs[0]);
-        return (
-            <div
-                className={cn(
-                    "w-6 h-6  rounded-[2px]",
-                    s?.cover ? s.cover : "bg-gray-600"
-                )}
-            ></div>
-        );
-    }
-
-    if (songs.length == 2) {
-        const s = songsList.find((x) => x.id == songs[0]);
-        const s2 = songsList.find((x) => x.id == songs[1]);
-        return (
-            <div className={cn("w-6 h-6   rounded-[2px] bg-gray-600 flex")}>
-                <div
-                    className={cn(
-                        "w-[0.68rem]  h-6 rounded-l-[2px] ",
-                        s?.cover ?? ""
-                    )}
-                ></div>
-                <div
-                    className={cn(
-                        "w-[0.68rem]  h-6 rounded-r-[2px] ",
-                        s2?.cover ?? ""
-                    )}
-                ></div>
-            </div>
-        );
-    }
-
-    if (songs.length == 3) {
-        const s = songsList.find((x) => x.id == songs[0]);
-        const s2 = songsList.find((x) => x.id == songs[1]);
-        const s3 = songsList.find((x) => x.id == songs[2]);
-        return (
-            <div
-                className={cn(
-                    "w-6 h-6   rounded-[2px] bg-gray-600 flex flex-col"
-                )}
-            >
-                <div className="flex">
-                    <div
-                        className={cn(
-                            "w-[0.68rem]  h-3 rounded-l-[2px] ",
-                            s?.cover ?? ""
-                        )}
-                    ></div>
-                    <div
-                        className={cn(
-                            "w-[0.68rem]  h-3 rounded-r-[2px] ",
-                            s2?.cover ?? ""
-                        )}
-                    ></div>
-                </div>
-                <div
-                    className={cn(
-                        "w-[1.35rem]  h-3 rounded-b-[2px] ",
-                        s3?.cover ?? ""
-                    )}
-                ></div>
-            </div>
-        );
-    }
-
-    if (songs.length >= 4) {
-        const s = songsList.find((x) => x.id == songs[0]);
-        const s2 = songsList.find((x) => x.id == songs[1]);
-        const s3 = songsList.find((x) => x.id == songs[2]);
-        const s4 = songsList.find((x) => x.id == songs[3]);
-        return (
-            <div
-                className={cn(
-                    "w-6 h-6   rounded-[2px] bg-gray-600 flex flex-col"
-                )}
-            >
-                <div className="flex">
-                    <div
-                        className={cn(
-                            "w-[0.68rem]  h-3 rounded-tl-[2px] ",
-                            s?.cover ?? ""
-                        )}
-                    ></div>
-                    <div
-                        className={cn(
-                            "w-[0.68rem]  h-3 rounded-tr-[2px] ",
-                            s2?.cover ?? ""
-                        )}
-                    ></div>
-                </div>
-                <div className="flex">
-                    <div
-                        className={cn(
-                            "w-[0.68rem]  h-3 rounded-bl-[2px] ",
-                            s3?.cover ?? ""
-                        )}
-                    ></div>
-                    <div
-                        className={cn(
-                            "w-[0.68rem]  h-3 rounded-br-[2px] ",
-                            s4?.cover ?? ""
-                        )}
-                    ></div>
-                </div>
-            </div>
-        );
-    }
-
-    // return ()
-};
+import { PlaylistBanner } from "./playlist-header";
 
 const AddToPlaylistDialog = ({ song }: { song: Song }) => {
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false);
@@ -243,9 +124,12 @@ const AddToPlaylistDialog = ({ song }: { song: Song }) => {
                                             setOpen(false);
                                         }}
                                     >
-                                        <PlaylistSongMosaic
-                                            songs={playlistSongs}
-                                        />
+                                        <div>
+                                            <PlaylistBanner
+                                                size={"sm"}
+                                                playlist={playlist}
+                                            />
+                                        </div>
                                         <span className="w-full ">
                                             {playlist.title} -{" "}
                                             {playlistSongs.length}
