@@ -1,3 +1,4 @@
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -9,19 +10,19 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { useSongStore } from "@/lib/store/song-store";
-import { cn, generateGradient } from "@/lib/utils";
+import {
+    coverAsStyle,
+    createRandomCover,
+    parseGeneratedCoverString,
+} from "@/lib/gradient";
 import { songSchema, songSchemaType } from "@/lib/schemas/song";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSongStore } from "@/lib/store/song-store";
 import { Song } from "@/lib/types";
-import { Icons } from "@/components/icons";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import SongContentFormField from "./song-content-form-field";
 
@@ -36,7 +37,7 @@ export default function EditSongForm({
     const { toast } = useToast();
     const formRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const [coverForRerender, setCoverForRerender] = useState(song.cover);
+
     const [contentRerender, setContentRerender] = useState(false);
     const [rerenderChildren, setRerenderChildren] = useState(false);
 
@@ -93,7 +94,6 @@ export default function EditSongForm({
     }
 
     const handleContentChange = () => {
-        console.log("change");
         setContentRerender((prev) => !prev);
     };
 
@@ -121,22 +121,23 @@ export default function EditSongForm({
                                     <div className="flex gap-2 items-end">
                                         <div
                                             className={cn(
-                                                field.value,
                                                 "w-20 h-20 rounded-md"
+                                            )}
+                                            style={coverAsStyle(
+                                                parseGeneratedCoverString(
+                                                    field.value
+                                                )
                                             )}
                                         ></div>
                                         <Button
                                             type="button"
                                             variant={"outline"}
                                             onClick={() => {
-                                                const newGradient =
-                                                    generateGradient();
                                                 form.setValue(
                                                     "cover",
-                                                    newGradient
-                                                );
-                                                setCoverForRerender(
-                                                    newGradient
+                                                    JSON.stringify(
+                                                        createRandomCover()
+                                                    )
                                                 );
                                             }}
                                         >

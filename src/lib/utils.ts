@@ -7,10 +7,9 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-// https://stackoverflow.com/a/48764436
 export function round(num: number, decimalPlaces: number = 0) {
-    num = Math.round(num + "e" + decimalPlaces);
-    return Number(num + "e" + -decimalPlaces);
+    const multiplier = Math.pow(10, decimalPlaces);
+    return Math.round(num * multiplier) / multiplier;
 }
 
 // TODO : Maybe reshuffle again if shuffled array is the same as original
@@ -57,102 +56,6 @@ export function calculateAccuracy(correct: number, total: number) {
     if (total == 0) return 0;
 
     return round((correct / total) * 100, 2);
-}
-
-export const gradientOptions = {
-    directions: [
-        "t",
-        "tr",
-        "r",
-        // "br",
-        // "b",
-        // "bl",
-        // "l",
-        // "tl"
-    ],
-    colours: [
-        // "red",
-        // "green",
-        // "blue",
-        // "purple",
-        // "indigo",
-        "orange",
-        "rose",
-        // "cyan",
-        "sky",
-        // "fuschia",
-        // "pink",
-        // "lime",
-        "emerald",
-        // "teal",
-        "violet",
-    ],
-    steps: [
-        // 50,
-        // 100,
-        200,
-        // 300,
-        400,
-        // 500,
-        // 600,
-        // 700,
-        800,
-        // 900,
-        950,
-    ],
-};
-
-export function generateAllPossibleGradients() {
-    const combinations = new Set<string>();
-    gradientOptions.directions.forEach((dir) => {
-        // colour one
-        gradientOptions.colours.forEach((colourOption) => {
-            gradientOptions.steps.forEach((stepOptionOne) => {
-                // pick second colour
-                gradientOptions.colours
-                    .filter((x) => x != colourOption)
-                    .forEach((colourOptionTwo) => {
-                        gradientOptions.steps.forEach((stepOptionTwo) => {
-                            combinations.add(
-                                `bg-gradient-to-${dir} from-${colourOption}-${stepOptionOne} to-${colourOptionTwo}-${stepOptionTwo}`
-                            );
-                        });
-                    });
-            });
-        });
-    });
-
-    console.log(combinations.size);
-
-    return Array.from(combinations.values()).reduce(
-        (prev, curr) => prev + " " + curr
-    );
-}
-
-export function generateGradient() {
-    const dir =
-        gradientOptions.directions[
-            Math.floor(Math.random() * gradientOptions.directions.length)
-        ];
-    const colourOne =
-        gradientOptions.colours[
-            Math.floor(Math.random() * gradientOptions.colours.length)
-        ];
-    const colourTwo = gradientOptions.colours.filter(
-        (colour) => colour != colourOne
-    )[Math.floor(Math.random() * (gradientOptions.colours.length - 1))];
-    const colourOneStep =
-        gradientOptions.steps[
-            Math.floor(Math.random() * gradientOptions.steps.length)
-        ];
-    const colourTwoStep =
-        gradientOptions.steps[
-            Math.floor(Math.random() * gradientOptions.steps.length)
-        ];
-
-    const res = `bg-gradient-to-${dir} from-${colourOne}-${colourOneStep} to-${colourTwo}-${colourTwoStep}`;
-
-    return res;
 }
 
 export const seeSizeOfStringInLocalStorage = (some: string) => {
