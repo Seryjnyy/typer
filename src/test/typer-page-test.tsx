@@ -9,26 +9,25 @@ import React, {
     useReducer,
     useRef,
     useState,
-} from 'react'
-import { useCurrentSong, useProcessedSongContent } from '@/test/useTest.tsx'
-import { useCalculateStuff } from '@/test/useTest.tsx'
-import { ScrollArea } from '@/components/ui/scroll-area.tsx'
-import { cn } from '@/lib/utils.ts'
-import Ch, { chVariant } from '@/components/ch.tsx'
-import { useTextModificationsStore } from '@/lib/store/text-modifications-store.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
+} from "react"
+import { useCurrentSong } from "@/test/useTest.tsx"
+import { ScrollArea } from "@/components/ui/scroll-area.tsx"
+import { cn } from "@/lib/utils.ts"
+import Ch, { chVariant } from "@/components/ch.tsx"
+import { useTextModificationsStore } from "@/lib/store/text-modifications-store.tsx"
+import { Textarea } from "@/components/ui/textarea.tsx"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from '@/components/ui/tooltip.tsx'
-import KeyboardButton from '@/components/keyboard-button.tsx'
-import TextModificationDialog from '@/routes/typer/cylinder/text-modification-dialog.tsx'
-import NoSongSelected from '@/routes/typer/no-song-selected.tsx'
-import { useStopwatch } from 'react-timer-hook'
-import { Song } from '@/lib/types.ts'
-import { Button } from '@/components/ui/button.tsx'
+} from "@/components/ui/tooltip.tsx"
+import KeyboardButton from "@/components/keyboard-button.tsx"
+import TextModificationDialog from "@/routes/typer/cylinder/text-modification-dialog.tsx"
+import NoSongSelected from "@/routes/typer/no-song-selected.tsx"
+import { useStopwatch } from "react-timer-hook"
+import { Song } from "@/lib/types.ts"
+import { Button } from "@/components/ui/button.tsx"
 
 // idle -> started -> (paused, out of focus)
 // paused -> started
@@ -38,14 +37,14 @@ import { Button } from '@/components/ui/button.tsx'
 // started -> completed
 // completed -> results
 
-type State = 'idle' | 'started' | 'paused' | 'out-of-focus' | 'completed'
+type State = "idle" | "started" | "paused" | "out-of-focus" | "completed"
 
 enum StateActionKind {
-    START = 'START',
-    PAUSE = 'PAUSE',
-    RESTART = 'RESTART',
-    RECEIVED_FOCUS = 'RECEIVED_FOCUS',
-    LOST_FOCUS = 'LOST_FOCUS',
+    START = "START",
+    PAUSE = "PAUSE",
+    RESTART = "RESTART",
+    RECEIVED_FOCUS = "RECEIVED_FOCUS",
+    LOST_FOCUS = "LOST_FOCUS",
 }
 
 interface StateAction {
@@ -56,13 +55,13 @@ function reducer(state: State, action: StateAction): State {
     const { type } = action
     switch (type) {
         case StateActionKind.LOST_FOCUS:
-            if (state === 'started') {
-                return 'out-of-focus'
+            if (state === "started") {
+                return "out-of-focus"
             }
             return state
         case StateActionKind.RECEIVED_FOCUS:
-            if (state === 'out-of-focus' || state === 'paused') {
-                return 'started'
+            if (state === "out-of-focus" || state === "paused") {
+                return "started"
             }
             return state
         default:
@@ -89,7 +88,7 @@ const SongProvider = () => {
 }
 
 const GameEngine = ({ song }: { song: Song }) => {
-    const [state, dispatch] = useReducer(reducer, 'idle')
+    const [state, dispatch] = useReducer(reducer, "idle")
     const {
         totalSeconds,
         start: startStopwatch,
@@ -132,7 +131,7 @@ function TyperPageTest({ gameState }: PassItOn) {
                         <div className="flex justify-center w-full py-24 relative">
                             <div className="text-2xl font-semibold flex flex-col text-center px-1 sm:px-2  ">
                                 <RenderTest
-                                    content={currentSong?.content ?? ''}
+                                    content={currentSong?.content ?? ""}
                                 />
                             </div>
                         </div>
@@ -161,7 +160,7 @@ const RenderTest = ({ gameState, content }: PassItOn & { content: string }) => {
         .reduce((prev, curr) => prev + curr)
 
     const [inputHistory, setInputHistory] = useState<string[]>([])
-    const [currentInput, setCurrentInput] = useState('')
+    const [currentInput, setCurrentInput] = useState("")
     const [statTracker, setStatTracker] = useState({
         correct: 0,
         incorrect: 0,
@@ -223,7 +222,7 @@ const RenderTest = ({ gameState, content }: PassItOn & { content: string }) => {
         // Stat tracking
         let correct = 0
         let incorrect = 0
-        const l = lines.map((line) => line.target).join('')
+        const l = lines.map((line) => line.target).join("")
         const errorMap = new Set<number>(statTracker.errorMap)
         Array.from(newVal).forEach((ch, index) => {
             if (ch == l[index]) {
@@ -281,7 +280,7 @@ const RenderTest = ({ gameState, content }: PassItOn & { content: string }) => {
                 // onBlur={() => setFocusedOnInput(false)}
                 // onKeyDown={(e) => handleKeyDown(e)}
             />
-            <div className={'flex flex-col gap-2 font-mono'}>
+            <div className={"flex flex-col gap-2 font-mono"}>
                 <Display
                     verses={verses}
                     inputHistory={inputHistory}
@@ -289,7 +288,7 @@ const RenderTest = ({ gameState, content }: PassItOn & { content: string }) => {
                     tryVerseOption={true}
                 />
             </div>
-            <div>{currentLine >= lines.length && 'completed'} </div>
+            <div>{currentLine >= lines.length && "completed"} </div>
             <div>{`${currentLine} - ${lines.length}`} </div>
             <TextModificationDialog />
             <div>
@@ -298,7 +297,7 @@ const RenderTest = ({ gameState, content }: PassItOn & { content: string }) => {
             <Button
                 onClick={() => {
                     setInputHistory([])
-                    setCurrentInput('')
+                    setCurrentInput("")
                     setStatTracker({
                         correct: 0,
                         incorrect: 0,
@@ -337,16 +336,16 @@ const Display = ({
     const getEquivalentInput = (index: number) => {
         // this will take the current line index and try to get a value from inputHistory for that line
         // nothing if not yet covered
-        if (index > inputHistory.length - 1) return ''
-        if (index < 0) return ''
+        if (index > inputHistory.length - 1) return ""
+        if (index < 0) return ""
 
         return inputHistory[index]
     }
 
     useEffect(() => {
         refs.current.get(currentLine)?.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
+            behavior: "smooth",
+            block: "center",
         })
     }, [currentLine, verses])
 
@@ -357,9 +356,9 @@ const Display = ({
                 <li key={vIndex}>
                     <ol
                         className={cn(
-                            ' mb-4 p-2 rounded-md relative group/verse sm:leading-8 leading-10',
+                            " mb-4 p-2 rounded-md relative group/verse sm:leading-8 leading-10",
                             {
-                                'hover:outline': tryVerseOption,
+                                "hover:outline": tryVerseOption,
                             }
                         )}
                     >
@@ -381,7 +380,7 @@ const Display = ({
                                     <TooltipTrigger asChild>
                                         <KeyboardButton
                                             // onClick={() => onClickVerse?.(verse)}
-                                            variant={'verse'}
+                                            variant={"verse"}
                                         />
                                     </TooltipTrigger>
                                     <TooltipContent className="group-hover/verse:block hidden">
@@ -393,7 +392,7 @@ const Display = ({
                     </ol>
                     {vIndex < verses.length - 1 && (
                         <span className="py-4 mx-auto opacity-50 text-md font-normal">
-                            {'𝆕'}
+                            {"𝆕"}
                         </span>
                     )}
                 </li>
@@ -415,63 +414,63 @@ const LineTestBase = forwardRef<HTMLDivElement, LineTestProps>(
             useTextModificationsStore.use.harderOptions()
 
         if (isCurrentLine) {
-            console.log('current', line)
+            console.log("current", line)
         }
         return (
-            <div className={'tracking-wide'} ref={ref}>
-                {line.split('').map((ch, index) => {
+            <div className={"tracking-wide"} ref={ref}>
+                {line.split("").map((ch, index) => {
                     const char = input.at(index)
 
                     let variant: chVariant
 
                     if (char === ch) {
-                        variant = 'correct'
+                        variant = "correct"
                     } else if (index >= input.length) {
                         if (isCurrentLine) {
                             variant =
                                 index === input.length
-                                    ? 'current'
-                                    : 'not-covered'
+                                    ? "current"
+                                    : "not-covered"
                         } else {
-                            variant = 'not-covered'
+                            variant = "not-covered"
                         }
                     } else {
-                        if (ch == ' ' || ch == '\n') {
-                            variant = 'incorrect'
-                            ch = '_'
+                        if (ch == " " || ch == "\n") {
+                            variant = "incorrect"
+                            ch = "_"
                         } else {
-                            variant = 'incorrect'
+                            variant = "incorrect"
                         }
                     }
 
-                    if (variant != 'correct' && variant != 'incorrect') {
+                    if (variant != "correct" && variant != "incorrect") {
                         // current, not covered
 
                         if (isCurrentLine) {
                             if (difficultyModifiers.cantSeeAhead) {
-                                if (ch != ' ' && input.length !== index) {
-                                    ch = '_'
+                                if (ch != " " && input.length !== index) {
+                                    ch = "_"
                                 }
 
                                 if (difficultyModifiers.cantSeeCurrent) {
-                                    ch = '_'
+                                    ch = "_"
                                 }
 
                                 if (
                                     difficultyModifiers.cantSeeUnderlines &&
                                     input.length !== index
                                 ) {
-                                    variant = 'normalInvisible'
+                                    variant = "normalInvisible"
                                 }
                             }
                         } else {
                             if (difficultyModifiers.cantSeeAhead) {
-                                if (ch != ' ') {
-                                    ch = '_'
+                                if (ch != " ") {
+                                    ch = "_"
                                 }
 
                                 if (difficultyModifiers.cantSeeUnderlines) {
-                                    variant = 'normalInvisible'
+                                    variant = "normalInvisible"
                                 }
                             }
                         }
