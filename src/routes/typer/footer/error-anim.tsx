@@ -27,7 +27,7 @@ export default function ErrorAnim({ index }: { index: number | null }) {
                 "animate-explosion w-[10vw] h-[10vw] duration-300": animationKey !== 0,
             })}
         >
-            <X className={"size-[10vw] absolute bottom-0 left-0 text-red-500"} />
+            <X className={"animate-explosion size-[10vw] absolute bottom-0 left-0 text-red-500"} />
         </div>
     )
 }
