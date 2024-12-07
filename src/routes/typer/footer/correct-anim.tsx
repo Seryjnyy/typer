@@ -19,14 +19,14 @@ export default function CorrectAnim({ index, song }: { index: number | null; son
         setAnimationKey((prevKey) => prevKey + 1)
     }
 
-    if (!isCorrectAnim) return null
+    if (!isCorrectAnim || animationKey === 0) return null
 
     return (
         <div
             key={animationKey}
             style={{ ...coverAsBgGradientStyle, padding: Math.random() * 100 + "px" }}
             className={cn(`absolute  rounded-full  sm:-bottom-5 bottom-10 right-0 sm:-right-5 brightness-50   `, {
-                "animate-explosion w-[6vw] h-[6vw] duration-300": animationKey > 0,
+                "animate-explosion w-[6vw] h-[6vw]   duration-300": animationKey > 0,
             })}
         ></div>
     )

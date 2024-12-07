@@ -18,7 +18,7 @@ export default function ErrorAnim({ index }: { index: number | null }) {
         setAnimationKey((prevKey) => prevKey + 1)
     }
 
-    if (!isErrorAnim) return null
+    if (!isErrorAnim || animationKey === 0) return null
 
     return (
         <div
