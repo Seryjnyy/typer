@@ -1,33 +1,33 @@
-import { usePreferenceStore } from "@/lib/store/preferences-store";
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { usePreferenceStore } from "@/lib/store/preferences-store"
+import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react"
+import { Song } from "@/lib/types.ts"
+import { useSongCover } from "@/lib/hooks/use-song-cover.ts"
 
-export default function CorrectAnim({ index }: { index: number | null }) {
-    const [animationKey, setAnimationKey] = useState(0);
-    const isErrorAnim = usePreferenceStore.use.isErrorAnim();
+export default function CorrectAnim({ index, song }: { index: number | null; song: Song }) {
+    const [animationKey, setAnimationKey] = useState(0)
+    const isCorrectAnim = usePreferenceStore.use.isCorrectAnim()
+    const { coverAsBgGradientStyle } = useSongCover(song)
 
     useEffect(() => {
-        if (index != undefined) {
-            triggerAnimation();
+        if (index != 0) {
+            triggerAnimation()
         }
-    }, [index]);
+    }, [index])
 
     const triggerAnimation = () => {
-        setAnimationKey((prevKey) => prevKey + 1);
-    };
+        setAnimationKey((prevKey) => prevKey + 1)
+    }
 
-    if (!isErrorAnim) return null;
+    if (!isCorrectAnim) return null
 
     return (
         <div
             key={animationKey}
-            className={cn(
-                `absolute  bg-gradient-to-tl from-green-500 rounded-full  sm:-bottom-5 bottom-10 right-0 sm:-right-5 brightness-50   `,
-                {
-                    "animate-explosion w-[10vw] h-[10vw] duration-300":
-                        animationKey != 0,
-                }
-            )}
+            style={{ ...coverAsBgGradientStyle, padding: Math.random() * 100 + "px" }}
+            className={cn(`absolute  rounded-full  sm:-bottom-5 bottom-10 right-0 sm:-right-5 brightness-50   `, {
+                "animate-explosion w-[6vw] h-[6vw] duration-300": animationKey > 0,
+            })}
         ></div>
-    );
+    )
 }
