@@ -15,7 +15,7 @@ const CurrentView = () => {
     const harderOptions = useTextModificationsStore.use.harderOptions()
     const txtMod = useTextModificationsStore.use.textModifications()
 
-    let before = textModification("Som", txtMod)
+    const before = textModification("Som", txtMod)
     let current = textModification("e", txtMod)
     let after = textModification("good song lyrics yeah!1", txtMod)
     let currentChVariant: chVariant = "current"
@@ -99,7 +99,7 @@ export default function TextModificationDialog() {
 
     const onResetAll = () => {
         resetHarderOptions()
-        resetTextModifications
+        resetTextModifications()
     }
 
     const isHarderOptionsChanged = harderOptions.cantSeeAhead || harderOptions.cantSeeCurrent || harderOptions.cantSeeUnderlines
@@ -209,6 +209,17 @@ export default function TextModificationDialog() {
                                     </ToggleGroupItem>
                                 </ToggleGroup>
                             </div>
+                            <div className="pt-2">
+                                <Button
+                                    className=" space-x-2 text-muted-foreground "
+                                    size={"sm"}
+                                    variant={"ghost"}
+                                    onClick={resetTextModifications}
+                                >
+                                    <ReloadIcon className="w-3 h-3" />
+                                    <span>reset options</span>
+                                </Button>
+                            </div>
                             {isTxtModificationChanged && (
                                 <p className="text-orange-500 text-xs pt-4">
                                     Warning: These settings can make the gameplay easier so as a result any high score you get will not be
@@ -294,7 +305,7 @@ export default function TextModificationDialog() {
                                         onClick={resetHarderOptions}
                                     >
                                         <ReloadIcon className="w-3 h-3" />
-                                        <span>reset harder options</span>
+                                        <span>reset options</span>
                                     </Button>
                                 </div>
                             </div>
