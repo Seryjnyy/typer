@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useReducer, useRef, useState } from "react"
-import { cn, wpm as calcWpm } from "@/lib/utils.ts"
+import { cn, textModification, wpm as calcWpm } from "@/lib/utils.ts"
 import { TextModificationOptions, useTextModificationsStore } from "@/lib/store/text-modifications-store.tsx"
 import { Textarea } from "@/components/ui/textarea.tsx"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx"
@@ -95,11 +95,13 @@ export const SongProviderForTyper = ({
     onCompletion,
 }: SongProviderForTyperProps) => {
     const song = useSong(sourceID)
+    const txtMods = useTextModificationsStore.use.textModifications()
 
     const contentRes = useMemo(() => {
         if (!song) return content ?? ""
-        return content ? content : ""
-    }, [song, content])
+        const res = content ? content : ""
+        return textModification(res, txtMods)
+    }, [song, content, txtMods])
 
     if (!song) return <div>something went wrong...</div>
 

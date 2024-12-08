@@ -68,7 +68,7 @@ export const splitSongIntoVerses = (song: string) => {
 
 // I think leave as strings for now so its extendable, like punctuation = ".,/"
 
-// TODO : why isn't textmodificationoptions values optional????
+// TODO : why arent' textmodificationoptions values optional????
 export const textModification = (s: string, options: TextModificationOptions) => {
     let res = s
 
