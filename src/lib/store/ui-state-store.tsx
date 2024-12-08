@@ -1,21 +1,20 @@
-import { create } from "zustand";
+import { create } from "zustand"
 
-import { createJSONStorage, persist } from "zustand/middleware";
-import { createSelectors } from "./create-selectors";
+import { createJSONStorage, persist } from "zustand/middleware"
+import { createSelectors } from "./create-selectors"
 
 type Store = {
-    focus: boolean;
-    setFocus: (focus: boolean) => void;
-    queueWindowOpen: boolean;
-    setQueueWindowOpen: (open: boolean) => void;
-};
+    focus: boolean
+    setFocus: (focus: boolean) => void
+    queueWindowOpen: boolean
+    setQueueWindowOpen: (open: boolean) => void
+}
 
 const useUiStateStoreBase = create<Store>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             queueWindowOpen: true,
-            setQueueWindowOpen: (open) =>
-                set(() => ({ queueWindowOpen: open })),
+            setQueueWindowOpen: (open) => set(() => ({ queueWindowOpen: open })),
             currentWindow: "typer",
             focus: false,
             setFocus: (focus) => set(() => ({ focus: focus })),
@@ -25,8 +24,8 @@ const useUiStateStoreBase = create<Store>()(
             storage: createJSONStorage(() => sessionStorage),
         }
     )
-);
+)
 
-const useUiStateStore = createSelectors(useUiStateStoreBase);
+const useUiStateStore = createSelectors(useUiStateStoreBase)
 
-export { useUiStateStore };
+export { useUiStateStore }

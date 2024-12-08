@@ -8,92 +8,68 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 
-import {
-    DotsHorizontalIcon,
-    DownloadIcon,
-    EyeOpenIcon,
-    Pencil1Icon,
-    PlayIcon,
-    PlusIcon,
-    TrashIcon,
-} from "@radix-ui/react-icons";
+import { DotsHorizontalIcon, DownloadIcon, EyeOpenIcon, Pencil1Icon, PlayIcon, PlusIcon, TrashIcon } from "@radix-ui/react-icons"
 
-import { Icons } from "@/components/icons";
-import MusicPlaying from "@/components/music-playing";
-import { usePlaySongThroughSpotify } from "@/components/spotify/use-play-song-through-spotify";
-import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import useExportSongs from "@/lib/hooks/use-export-song";
-import usePlaySong from "@/lib/hooks/use-play-song";
-import usePlaylists from "@/lib/hooks/use-playlists";
-import { usePlaylistStore } from "@/lib/store/playlist-store";
-import { Song } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { ReactNode, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQueueStore } from "../../lib/store/queue-store";
-import { useSongStore } from "../../lib/store/song-store";
-import CreatePlaylistForm from "./create-playlist-form";
-import { PlaylistBanner } from "./playlist-header";
+import { Icons } from "@/components/icons"
+import MusicPlaying from "@/components/music-playing"
+import { usePlaySongThroughSpotify } from "@/components/spotify/use-play-song-through-spotify"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import useExportSongs from "@/lib/hooks/use-export-song"
+import usePlaySong from "@/lib/hooks/use-play-song"
+import usePlaylists from "@/lib/hooks/use-playlists"
+import { usePlaylistStore } from "@/lib/store/playlist-store"
+import { Song } from "@/lib/types"
+import { ReactNode, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useQueueStore } from "../../lib/store/queue-store"
+import { useSongStore } from "../../lib/store/song-store"
+import CreatePlaylistForm from "./create-playlist-form"
+import { PlaylistBanner } from "./playlist-header"
 
 const AddToPlaylistDialog = ({ song }: { song: Song }) => {
-    const [newPlaylistOpen, setNewPlaylistOpen] = useState(false);
-    const playlists = usePlaylistStore.use.playlists();
-    const { addToPlaylist, getPlaylistSongs } = usePlaylists();
-    const [open, setOpen] = useState(false);
+    const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
+    const playlists = usePlaylistStore.use.playlists()
+    const { addToPlaylist, getPlaylistSongs } = usePlaylists()
+    const [open, setOpen] = useState(false)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger
                 onClick={(e) => {
-                    e.stopPropagation();
+                    e.stopPropagation()
                 }}
                 className="flex gap-1 items-center"
             >
                 <PlusIcon />
                 <span>Add to playlist</span>
             </DialogTrigger>
-            <DialogContent
-                onClick={(e) => e.stopPropagation()}
-                className="w-[20rem] h-[30rem] flex flex-col justify-start"
-            >
+            <DialogContent onClick={(e) => e.stopPropagation()} className="w-[20rem] h-[30rem] flex flex-col justify-start">
                 <DialogHeader className="border-b pb-1">
-                    <DialogTitle className="text-muted-foreground">
-                        Add song to...
-                    </DialogTitle>
+                    <DialogTitle className="text-muted-foreground">Add song to...</DialogTitle>
                     <DialogDescription className="sr-only">
-                        Chose a playlist to add the song to, or create a new
-                        playlist.
+                        Chose a playlist to add the song to, or create a new playlist.
                     </DialogDescription>
                 </DialogHeader>
                 {newPlaylistOpen && (
                     <div className="w-full  flex-col h-full pt-10 ">
-                        <span className="border-b font-bold text-xl">
-                            New playlist
-                        </span>
+                        <span className="border-b font-bold text-xl">New playlist</span>
                         <CreatePlaylistForm
                             songs={[song.id]}
                             onCancel={() => setNewPlaylistOpen(false)}
                             onSave={() => {
-                                setNewPlaylistOpen(false);
-                                setOpen(false);
+                                setNewPlaylistOpen(false)
+                                setOpen(false)
                             }}
                         />
                     </div>
@@ -102,77 +78,62 @@ const AddToPlaylistDialog = ({ song }: { song: Song }) => {
                     <ScrollArea className="h-[26.3rem]     pr-3 pl-1 py-1 ">
                         <div className="flex flex-col gap-3">
                             <div className="pb-1 border-b">
-                                <Button
-                                    className="w-full rounded-none"
-                                    variant={"ghost"}
-                                    onClick={() => setNewPlaylistOpen(true)}
-                                >
+                                <Button className="w-full rounded-none" variant={"ghost"} onClick={() => setNewPlaylistOpen(true)}>
                                     <PlusIcon /> New playlist
                                 </Button>
                             </div>
                             {playlists.map((playlist) => {
-                                const playlistSongs = getPlaylistSongs(
-                                    playlist.id
-                                );
+                                const playlistSongs = getPlaylistSongs(playlist.id)
                                 return (
                                     <Button
                                         className="w-full rounded-none"
                                         variant={"ghost"}
                                         key={playlist.id}
                                         onClick={() => {
-                                            addToPlaylist(playlist.id, song.id);
-                                            setOpen(false);
+                                            addToPlaylist(playlist.id, song.id)
+                                            setOpen(false)
                                         }}
                                     >
                                         <div>
-                                            <PlaylistBanner
-                                                size={"sm"}
-                                                playlist={playlist}
-                                            />
+                                            <PlaylistBanner size={"sm"} playlist={playlist} />
                                         </div>
                                         <span className="w-full ">
-                                            {playlist.title} -{" "}
-                                            {playlistSongs.length}
+                                            {playlist.title} - {playlistSongs.length}
                                         </span>
                                     </Button>
-                                );
+                                )
                             })}
                         </div>
                     </ScrollArea>
                 )}
             </DialogContent>
         </Dialog>
-    );
-};
-
-interface SongPopoverProps {
-    song: Song;
-    exclude?: { viewMore?: boolean };
-    destructiveMenuItems?: ReactNode;
+    )
 }
 
-export default function SongPopover({
-    song,
-    exclude,
-    destructiveMenuItems,
-}: SongPopoverProps) {
-    const queueNext = useQueueStore.use.queueNext();
-    const removeSong = useSongStore.use.removeSong();
-    const enqueue = useQueueStore.use.enqueue();
-    const playSong = usePlaySong();
-    const { exportSongs } = useExportSongs();
+interface SongPopoverProps {
+    song: Song
+    exclude?: { viewMore?: boolean }
+    destructiveMenuItems?: ReactNode
+}
 
-    const { setPlayableSong, currentPlayableSong } =
-        usePlaySongThroughSpotify();
+export default function SongPopover({ song, exclude, destructiveMenuItems }: SongPopoverProps) {
+    const queueNext = useQueueStore.use.queueNext()
+    const removeSong = useSongStore.use.removeSong()
+    const enqueue = useQueueStore.use.enqueue()
+    const playSong = usePlaySong()
+    const { exportSongs } = useExportSongs()
+
+    const { setPlayableSong, currentPlayableSong } = usePlaySongThroughSpotify()
 
     const onAddToQueue = (songId: string) => {
-        enqueue(songId);
-    };
-    const navigate = useNavigate();
+        enqueue(songId)
+    }
+    const navigate = useNavigate()
 
     const handleExportSong = () => {
-        exportSongs([song]);
-    };
+        exportSongs([song])
+    }
 
     return (
         <DropdownMenu>
@@ -183,8 +144,8 @@ export default function SongPopover({
                 <DropdownMenuItem
                     className="space-x-1"
                     onClick={(e) => {
-                        e.stopPropagation();
-                        playSong(song.id);
+                        e.stopPropagation()
+                        playSong(song.id)
                     }}
                 >
                     <PlayIcon />
@@ -194,8 +155,8 @@ export default function SongPopover({
                 <DropdownMenuItem
                     className="space-x-1"
                     onClick={(e) => {
-                        e.stopPropagation();
-                        onAddToQueue(song.id);
+                        e.stopPropagation()
+                        onAddToQueue(song.id)
                     }}
                 >
                     <PlusIcon />
@@ -205,26 +166,20 @@ export default function SongPopover({
                     <DropdownMenuItem
                         className="flex gap-1 items-center"
                         onClick={(e) => {
-                            e.stopPropagation();
-                            setPlayableSong(song);
+                            e.stopPropagation()
+                            setPlayableSong(song)
                         }}
                     >
-                        <Icons.spotify className="size-4 fill-primary-foreground " />{" "}
-                        Play
-                        {song.id === currentPlayableSong?.id && (
-                            <MusicPlaying
-                                variant={"primary"}
-                                className="ml-1"
-                            />
-                        )}
+                        <Icons.spotify className="size-4 fill-primary-foreground " /> Play
+                        {song.id === currentPlayableSong?.id && <MusicPlaying variant={"primary"} className="ml-1" />}
                     </DropdownMenuItem>
                 )}
 
                 <DropdownMenuItem
                     className="space-x-1"
                     onClick={(e) => {
-                        e.stopPropagation();
-                        queueNext(song.id);
+                        e.stopPropagation()
+                        queueNext(song.id)
                     }}
                 >
                     <PlusIcon />
@@ -236,8 +191,8 @@ export default function SongPopover({
                         <DropdownMenuItem
                             className="space-x-1"
                             onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/songs/${song.id}`);
+                                e.stopPropagation()
+                                navigate(`/songs/${song.id}`)
                             }}
                         >
                             <EyeOpenIcon />
@@ -249,8 +204,8 @@ export default function SongPopover({
                 <DropdownMenuItem
                     className="space-x-1"
                     onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/songs/${song.id}/edit`);
+                        e.stopPropagation()
+                        navigate(`/songs/${song.id}/edit`)
                     }}
                 >
                     <Pencil1Icon />
@@ -264,8 +219,8 @@ export default function SongPopover({
                 <DropdownMenuItem
                     className="space-x-1"
                     onClick={(e) => {
-                        e.stopPropagation();
-                        handleExportSong();
+                        e.stopPropagation()
+                        handleExportSong()
                     }}
                 >
                     <DownloadIcon />
@@ -280,7 +235,7 @@ export default function SongPopover({
                         <AlertDialogTrigger
                             asChild
                             onClick={(e) => {
-                                e.stopPropagation();
+                                e.stopPropagation()
                             }}
                         >
                             <div className="gap-1 relative flex  cursor-default select-none items-center rounded-sm   text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground ">
@@ -288,25 +243,20 @@ export default function SongPopover({
                                 Delete
                             </div>
                         </AlertDialogTrigger>
-                        <AlertDialogContent
-                            onClick={(e) => e.stopPropagation()}
-                        >
+                        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                </AlertDialogTitle>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This action cannot be undone. This will
-                                    permanently delete the song.
+                                    This action cannot be undone. This will permanently delete the song.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeSong(song.id);
-                                        navigate("/songs");
+                                        e.stopPropagation()
+                                        removeSong(song.id)
+                                        navigate("/songs")
                                     }}
                                 >
                                     Continue
@@ -317,5 +267,5 @@ export default function SongPopover({
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
-    );
+    )
 }

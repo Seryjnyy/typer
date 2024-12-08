@@ -1,36 +1,34 @@
-import { create } from "zustand";
-
-import { Windows } from "../types";
-import { createSelectors } from "./create-selectors";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { create } from "zustand"
+import { createSelectors } from "./create-selectors"
+import { createJSONStorage, persist } from "zustand/middleware"
 
 // TODO : I don't know if this should be a global store
 // TODO : Idk if storing the settings that make it harder here makes sense :/
-const TextModificationStoreName = "typer-text-modifications-storage";
+const TextModificationStoreName = "typer-text-modifications-storage"
 
 export type TextModificationOptions = {
-    letterCase: "normal" | "upper" | "lower";
-    punctuation: "normal" | "removed";
-    numbers: "normal" | "removed";
-};
+    letterCase: "normal" | "upper" | "lower"
+    punctuation: "normal" | "removed"
+    numbers: "normal" | "removed"
+}
 
 export type HarderOptions = {
-    cantSeeAhead: boolean;
-    cantSeeCurrent: boolean;
-    cantSeeUnderlines: boolean;
-};
+    cantSeeAhead: boolean
+    cantSeeCurrent: boolean
+    cantSeeUnderlines: boolean
+}
 
 type State = {
-    textModifications: TextModificationOptions;
-    harderOptions: HarderOptions;
-};
+    textModifications: TextModificationOptions
+    harderOptions: HarderOptions
+}
 
 type Actions = {
-    setTextModifications: (val: TextModificationOptions) => void;
-    setHarderOptions: (val: HarderOptions) => void;
-    resetTextModifications: () => void;
-    resetHarderOptions: () => void;
-};
+    setTextModifications: (val: TextModificationOptions) => void
+    setHarderOptions: (val: HarderOptions) => void
+    resetTextModifications: () => void
+    resetHarderOptions: () => void
+}
 
 const defaults: State = {
     textModifications: {
@@ -43,27 +41,27 @@ const defaults: State = {
         cantSeeCurrent: false,
         cantSeeUnderlines: false,
     },
-};
+}
 
 const useTextModificationsStoreBase = create<State & Actions>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             ...defaults,
             setTextModifications: (val: TextModificationOptions) =>
                 set(() => {
-                    return { textModifications: val };
+                    return { textModifications: val }
                 }),
             setHarderOptions: (val: HarderOptions) =>
                 set(() => {
-                    return { harderOptions: val };
+                    return { harderOptions: val }
                 }),
             resetHarderOptions: () =>
                 set(() => {
-                    return { harderOptions: defaults.harderOptions };
+                    return { harderOptions: defaults.harderOptions }
                 }),
             resetTextModifications: () =>
                 set(() => {
-                    return { textModifications: defaults.textModifications };
+                    return { textModifications: defaults.textModifications }
                 }),
         }),
         {
@@ -71,10 +69,8 @@ const useTextModificationsStoreBase = create<State & Actions>()(
             storage: createJSONStorage(() => localStorage),
         }
     )
-);
+)
 
-const useTextModificationsStore = createSelectors(
-    useTextModificationsStoreBase
-);
+const useTextModificationsStore = createSelectors(useTextModificationsStoreBase)
 
-export { useTextModificationsStore };
+export { useTextModificationsStore }

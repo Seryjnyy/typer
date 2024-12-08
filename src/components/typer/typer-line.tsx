@@ -45,7 +45,8 @@ const LineBase = forwardRef<HTMLDivElement, LineBaseProps>(({ line, input, isCur
                                 ch = "_"
                             }
 
-                            if (difficultyModifiers.cantSeeCurrent) {
+                            // Don't replace char if it's a space
+                            if (difficultyModifiers.cantSeeCurrent && !(ch == " " || ch == "\n")) {
                                 ch = "_"
                             }
 

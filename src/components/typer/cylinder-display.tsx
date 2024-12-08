@@ -29,6 +29,7 @@ const calcLineStyle = (offsetFromCenter: number, maxOffsetFromCenter: number) =>
     return { transform, fontSize, fontWeight, opacity }
 }
 
+// TODO : set currentlyViewingLine to current line when user is typing, It might have to be a useImperativeHandle
 const CylinderDisplay = ({
     verses,
     tryVerse,

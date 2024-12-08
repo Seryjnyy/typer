@@ -6,7 +6,7 @@ const chVariants = cva("", {
     variants: {
         variant: {
             current:
-                "rounded-md relative before:content-['|'] before:bg-yellow-800 before:text-transparent before:px-[0.09rem] before:w-1" +
+                "rounded-md relative before:content-['|'] before:bg-yellow-500 before:text-transparent before:px-[0.09rem] before:w-1" +
                 " before:absolute before:animate-pulse before:duration-1500 ",
             currentInvisible:
                 "invisible before:visible rounded-md relative before:content-[''] before:bg-yellow-400  before:px-[0.07rem]" +

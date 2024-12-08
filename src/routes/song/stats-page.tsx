@@ -1,59 +1,45 @@
-import { Button } from "@/components/ui/button";
-import {
-    SongBanner,
-    SongDetail,
-    SongHeader,
-} from "@/components/ui/song-header";
-import { useSongStore } from "@/lib/store/song-store";
-import { GearIcon, InfoCircledIcon } from "@radix-ui/react-icons";
-import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import { SongBanner, SongDetail, SongHeader } from "@/components/ui/song-header"
+import { useSongStore } from "@/lib/store/song-store"
+import { InfoCircledIcon } from "@radix-ui/react-icons"
+import { useMemo } from "react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+
 export default function StatsPage() {
-    const songs = useSongStore.use.songs();
+    const songs = useSongStore.use.songs()
 
     const completion = useMemo(() => {
-        const sorted = songs.sort((a, b) => b.completion - a.completion);
-        const most = sorted[0];
-        const least = sorted[sorted.length - 1];
+        const sorted = songs.sort((a, b) => b.completion - a.completion)
+        const most = sorted[0]
+        const least = sorted[sorted.length - 1]
 
         return [
             { song: most, amount: most.completion, label: "Most completed" },
             { song: least, amount: least.completion, label: "Least completed" },
-        ];
-    }, [songs]);
+        ]
+    }, [songs])
 
     const totalCompletion = useMemo(() => {
-        let count = 0;
+        let count = 0
         for (const song of songs) {
-            count += song.completion;
+            count += song.completion
         }
-        return count;
-    }, [songs]);
+        return count
+    }, [songs])
 
     const typedChar = useMemo(() => {
-        let count = 0;
+        let count = 0
         for (const song of songs) {
-            count += song.completion * song.content.length;
+            count += song.completion * song.content.length
         }
-        return count;
-    }, [songs]);
+        return count
+    }, [songs])
 
     const longestTypedSong = useMemo(() => {
-        const res = songs
-            .filter((song) => song.completion > 0)
-            .sort((a, b) => a.content.length - b.content.length);
+        const res = songs.filter((song) => song.completion > 0).sort((a, b) => a.content.length - b.content.length)
 
-        return res.length > 0 ? res[0] : null;
-    }, [songs]);
+        return res.length > 0 ? res[0] : null
+    }, [songs])
 
     return (
         <ScrollArea className="h-[calc(100vh-11rem)] w-full px-2 sm:px-6 md:px-12 rounded-b-md">
@@ -69,13 +55,10 @@ export default function StatsPage() {
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>
-                                        Are you absolutely sure?
-                                    </DialogTitle>
+                                    <DialogTitle>Are you absolutely sure?</DialogTitle>
                                     <DialogDescription>
-                                        This action cannot be undone. This will
-                                        permanently delete your account and
-                                        remove your data from our servers.
+                                        This action cannot be undone. This will permanently delete your account and remove your data from
+                                        our servers.
                                     </DialogDescription>
                                 </DialogHeader>
                             </DialogContent>
@@ -84,21 +67,15 @@ export default function StatsPage() {
                     <div className="p-2 border rounded-sm space-y-8 px-4 py-4">
                         {completion.map((entry) => (
                             <div className="space-y-2">
-                                <span className="font-semibold">
-                                    {entry.label}
-                                </span>
+                                <span className="font-semibold">{entry.label}</span>
                                 <div className="pl-4 flex items-center w-full justify-between">
                                     <SongHeader>
                                         <SongBanner song={entry.song} />
                                         <SongDetail song={entry.song} />
                                     </SongHeader>
                                     <span className="text-nowrap">
-                                        <span className="font-bold">
-                                            {entry.amount}
-                                        </span>{" "}
-                                        <span className="text-muted-foreground">
-                                            completions
-                                        </span>
+                                        <span className="font-bold">{entry.amount}</span>{" "}
+                                        <span className="text-muted-foreground">completions</span>
                                     </span>
                                 </div>
                             </div>
@@ -109,15 +86,11 @@ export default function StatsPage() {
                             <div>{totalCompletion}</div>
                         </div>
                         <div>
-                            <span className="font-semibold">
-                                TotalTypedChar
-                            </span>
+                            <span className="font-semibold">TotalTypedChar</span>
                             <div>{typedChar}</div>
                         </div>
                         <div className="space-y-2">
-                            <span className="font-semibold">
-                                Longest typed song
-                            </span>
+                            <span className="font-semibold">Longest typed song</span>
                             {longestTypedSong ? (
                                 <div className="pl-4 flex items-center w-full justify-between">
                                     <SongHeader>
@@ -125,12 +98,8 @@ export default function StatsPage() {
                                         <SongDetail song={longestTypedSong} />
                                     </SongHeader>
                                     <span className="text-nowrap">
-                                        <span className="font-bold">
-                                            {longestTypedSong.content.length}
-                                        </span>{" "}
-                                        <span className="text-muted-foreground">
-                                            ch
-                                        </span>
+                                        <span className="font-bold">{longestTypedSong.content.length}</span>{" "}
+                                        <span className="text-muted-foreground">ch</span>
                                     </span>
                                 </div>
                             ) : (
@@ -154,5 +123,5 @@ export default function StatsPage() {
                 </Link>
             </div> */}
         </ScrollArea>
-    );
+    )
 }

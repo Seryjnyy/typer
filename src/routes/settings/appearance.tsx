@@ -1,32 +1,16 @@
-import { useTheme } from "@/components/theme-provider";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-    TyperTextDisplay,
-    usePreferenceStore,
-} from "@/lib/store/preferences-store";
-import { themeList } from "@/lib/themes";
-import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { useTheme } from "@/components/theme-provider"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { TyperTextDisplay, usePreferenceStore } from "@/lib/store/preferences-store"
+import { themeList } from "@/lib/themes"
+import { cn } from "@/lib/utils"
+import { ReactNode } from "react"
 
-const TyperTextDisplayOption = ({
-    value,
-    onChange,
-}: {
-    value: TyperTextDisplay;
-    onChange: (val: TyperTextDisplay) => void;
-}) => {
+const TyperTextDisplayOption = ({ value, onChange }: { value: TyperTextDisplay; onChange: (val: TyperTextDisplay) => void }) => {
     const options: {
-        title: string;
-        value: TyperTextDisplay;
-        element: ReactNode;
+        title: string
+        value: TyperTextDisplay
+        element: ReactNode
     }[] = [
         {
             title: "Cylinder",
@@ -62,7 +46,7 @@ const TyperTextDisplayOption = ({
                 </div>
             ),
         },
-    ];
+    ]
 
     return (
         <>
@@ -70,54 +54,46 @@ const TyperTextDisplayOption = ({
                 <div className="w-fit" key={option.title}>
                     {option.element}
                     <div className="flex justify-between px-2 pt-1">
-                        <span className="text-sm font-semibold ">
-                            {option.title}
-                        </span>
+                        <span className="text-sm font-semibold ">{option.title}</span>
                         <Checkbox
                             checked={option.value == value}
-                            onCheckedChange={(val) => {
-                                onChange(option.value);
+                            onCheckedChange={() => {
+                                onChange(option.value)
                             }}
                         />
                     </div>
                 </div>
             ))}
         </>
-    );
-};
+    )
+}
 
 export default function Appearance() {
-    const { setTheme, theme } = useTheme();
+    const { setTheme, theme } = useTheme()
 
-    const typerTextDisplay = usePreferenceStore.use.typerTextDisplay();
-    const setTyperTextDisplay = usePreferenceStore.use.setTyperTextDisplay();
+    const typerTextDisplay = usePreferenceStore.use.typerTextDisplay()
+    const setTyperTextDisplay = usePreferenceStore.use.setTyperTextDisplay()
 
-    const verseTyperTextDisplay =
-        usePreferenceStore.use.verseTyperTextDisplay();
-    const setVerseTyperTextDisplay =
-        usePreferenceStore.use.setVerseTyperTextDisplay();
+    const verseTyperTextDisplay = usePreferenceStore.use.verseTyperTextDisplay()
+    const setVerseTyperTextDisplay = usePreferenceStore.use.setVerseTyperTextDisplay()
 
-    const isCompletionAnimOn = usePreferenceStore.use.isCompletionAnim();
-    const setCompletionAnim = usePreferenceStore.use.setCompletionAnim();
+    const isCompletionAnimOn = usePreferenceStore.use.isCompletionAnim()
+    const setCompletionAnim = usePreferenceStore.use.setCompletionAnim()
 
-    const isQueueColour = usePreferenceStore.use.isQueueColour();
-    const setQueueColour = usePreferenceStore.use.setQueueColour();
+    const isQueueColour = usePreferenceStore.use.isQueueColour()
+    const setQueueColour = usePreferenceStore.use.setQueueColour()
 
-    const isErrorAnim = usePreferenceStore.use.isErrorAnim();
-    const setErrorAnim = usePreferenceStore.use.setErrorAnim();
+    const isErrorAnim = usePreferenceStore.use.isErrorAnim()
+    const setErrorAnim = usePreferenceStore.use.setErrorAnim()
 
-    const setCorrectAnim = usePreferenceStore.use.setCorrectAnim();
-    const isCorrectAnim = usePreferenceStore.use.isCorrectAnim();
+    const setCorrectAnim = usePreferenceStore.use.setCorrectAnim()
+    const isCorrectAnim = usePreferenceStore.use.isCorrectAnim()
 
-    const setOpenEndScreenInitially =
-        usePreferenceStore.use.setOpenEndScreenInitially();
-    const isOpenEndScreenInitially =
-        usePreferenceStore.use.isOpenEndScreenInitially();
+    const setOpenEndScreenInitially = usePreferenceStore.use.setOpenEndScreenInitially()
+    const isOpenEndScreenInitially = usePreferenceStore.use.isOpenEndScreenInitially()
 
-    const setOpenEndScreenInitiallyVersePage =
-        usePreferenceStore.use.setOpenEndScreenInitiallyVersePage();
-    const isOpenEndScreenInitiallyVersePage =
-        usePreferenceStore.use.isOpenEndScreenInitiallyVersePage();
+    const setOpenEndScreenInitiallyVersePage = usePreferenceStore.use.setOpenEndScreenInitiallyVersePage()
+    const isOpenEndScreenInitiallyVersePage = usePreferenceStore.use.isOpenEndScreenInitiallyVersePage()
 
     const options = [
         {
@@ -163,7 +139,7 @@ export default function Appearance() {
             desc: "Chose if you want the end screen to open when you complete the verse. ",
             onCheckedChange: setOpenEndScreenInitiallyVersePage,
         },
-    ];
+    ]
 
     return (
         <div className="space-y-12">
@@ -172,26 +148,16 @@ export default function Appearance() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Theme</CardTitle>
-                        <CardDescription>
-                            Select the theme you want.
-                        </CardDescription>
+                        <CardDescription>Select the theme you want.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex w-full flex-wrap gap-2 px-6">
                             {themeList
-                                .sort((x) =>
-                                    x.split("-")[0] == "light" ? -1 : 1
-                                )
-                                .map((themeName, i) => {
-                                    if (themeName == "root") return null;
+                                .sort((x) => (x.split("-")[0] == "light" ? -1 : 1))
+                                .map((themeName) => {
+                                    if (themeName == "root") return null
                                     return (
-                                        <div
-                                            key={themeName}
-                                            className={cn(
-                                                "p-4  w-fit rounded-sm",
-                                                themeName
-                                            )}
-                                        >
+                                        <div key={themeName} className={cn("p-4  w-fit rounded-sm", themeName)}>
                                             <div className="w-[12rem] h-[8rem] bg-background border rounded-md flex flex-col justify-between">
                                                 <div className="flex justify-between h-full">
                                                     <div className="w-full pl-6 pt-4 space-y-3">
@@ -226,25 +192,18 @@ export default function Appearance() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center justify-between pt-1 px-2">
-                                                <span className="text-muted-foreground">
-                                                    {themeName}
-                                                </span>
+                                                <span className="text-muted-foreground">{themeName}</span>
                                                 <Checkbox
                                                     checked={themeName == theme}
                                                     onCheckedChange={(val) => {
-                                                        if (
-                                                            val ==
-                                                            "indeterminate"
-                                                        )
-                                                            return;
+                                                        if (val == "indeterminate") return
 
-                                                        if (val)
-                                                            setTheme(themeName);
+                                                        if (val) setTheme(themeName)
                                                     }}
                                                 />
                                             </div>
                                         </div>
-                                    );
+                                    )
                                 })}
                         </div>
                     </CardContent>
@@ -257,16 +216,11 @@ export default function Appearance() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Typer text</CardTitle>
-                            <CardDescription>
-                                Change the way text in typer is displayed.
-                            </CardDescription>
+                            <CardDescription>Change the way text in typer is displayed.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="flex gap-3 flex-wrap">
-                                <TyperTextDisplayOption
-                                    value={typerTextDisplay}
-                                    onChange={setTyperTextDisplay}
-                                />
+                                <TyperTextDisplayOption value={typerTextDisplay} onChange={setTyperTextDisplay} />
                             </div>
                         </CardContent>
 
@@ -275,16 +229,11 @@ export default function Appearance() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Verse typer text</CardTitle>
-                            <CardDescription>
-                                Change the way text in verse typer is displayed.
-                            </CardDescription>
+                            <CardDescription>Change the way text in verse typer is displayed.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="flex gap-3 flex-wrap">
-                                <TyperTextDisplayOption
-                                    value={verseTyperTextDisplay}
-                                    onChange={setVerseTyperTextDisplay}
-                                />
+                                <TyperTextDisplayOption value={verseTyperTextDisplay} onChange={setVerseTyperTextDisplay} />
                             </div>
                         </CardContent>
 
@@ -297,30 +246,21 @@ export default function Appearance() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Other</CardTitle>
-                        <CardDescription>
-                            Change the various other options.
-                        </CardDescription>
+                        <CardDescription>Change the various other options.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {options.map((option) => (
-                            <div
-                                className="border rounded-md p-2 flex justify-between"
-                                key={option.id}
-                            >
+                            <div className="border rounded-md p-2 flex justify-between" key={option.id}>
                                 <div className="flex flex-col" key={option.id}>
-                                    <span className="text-lg font-semibold">
-                                        {option.title}
-                                    </span>
-                                    <p className="text-muted-foreground text-sm md:pr-12 pl-2">
-                                        {option.desc}
-                                    </p>
+                                    <span className="text-lg font-semibold">{option.title}</span>
+                                    <p className="text-muted-foreground text-sm md:pr-12 pl-2">{option.desc}</p>
                                 </div>
                                 <div className="flex justify-center items-center px-4 border-l ">
                                     <Checkbox
                                         checked={option.value}
                                         onCheckedChange={(val) => {
-                                            if (val == "indeterminate") return;
-                                            option.onCheckedChange(val);
+                                            if (val == "indeterminate") return
+                                            option.onCheckedChange(val)
                                         }}
                                     />
                                 </div>
@@ -332,5 +272,5 @@ export default function Appearance() {
                 </Card>
             </div>
         </div>
-    );
+    )
 }

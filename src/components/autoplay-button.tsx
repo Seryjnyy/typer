@@ -1,21 +1,16 @@
-import React from "react";
-import { Button } from "./ui/button";
-import { PauseIcon, PlayIcon } from "@radix-ui/react-icons";
-import { useQueueStore } from "@/lib/store/queue-store";
-import { cn } from "@/lib/utils";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Button } from "./ui/button"
+import { PauseIcon, PlayIcon } from "@radix-ui/react-icons"
+import { useQueueStore } from "@/lib/store/queue-store"
+import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function AutoplayButton() {
-    const autoplay = useQueueStore.use.autoplay();
-    const setAutoplay = useQueueStore.use.setAutoplay();
+    const autoplay = useQueueStore.use.autoplay()
+    const setAutoplay = useQueueStore.use.setAutoplay()
 
     const onSwitchAutoplay = () => {
-        setAutoplay(!autoplay);
-    };
+        setAutoplay(!autoplay)
+    }
 
     return (
         <Button variant={"ghost"} onClick={onSwitchAutoplay} size={"sm"}>
@@ -46,5 +41,5 @@ export default function AutoplayButton() {
                 </TooltipContent>
             </Tooltip>
         </Button>
-    );
+    )
 }

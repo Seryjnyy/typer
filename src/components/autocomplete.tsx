@@ -1,35 +1,25 @@
-import { cn } from "@/lib/utils";
-import { Command as CommandPrimitive } from "cmdk";
-import { Check, PlusIcon } from "lucide-react";
-import { ReactNode, useMemo, useState } from "react";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
-import {
-    Popover,
-    PopoverAnchor,
-    PopoverContent,
-} from "@/components/ui/popover";
-import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils"
+import { Command as CommandPrimitive } from "cmdk"
+import { PlusIcon } from "lucide-react"
+import { ReactNode, useMemo, useState } from "react"
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type Props<T extends string> = {
-    selectedValue: T;
-    onSelectedValueChange: (value: T) => void;
-    searchValue: string;
-    onSearchValueChange: (value: string) => void;
-    items: { value: T; label: string }[];
-    isLoading?: boolean;
-    emptyMessage?: string;
-    placeholder?: string;
-    saveInputAsSelected?: boolean;
-    maxItemRender?: number;
-    listTitle?: ReactNode;
-};
+    selectedValue: T
+    onSelectedValueChange: (value: T) => void
+    searchValue: string
+    onSearchValueChange: (value: string) => void
+    items: { value: T; label: string }[]
+    isLoading?: boolean
+    emptyMessage?: string
+    placeholder?: string
+    saveInputAsSelected?: boolean
+    maxItemRender?: number
+    listTitle?: ReactNode
+}
 
 // Component from here v, slightly modified
 // to take input as value, fixed covered focus outline on input, added max item render, added prepend component as title, fixed onblur not closing popover if two or more popovers in a row, and some other stuff
@@ -49,90 +39,79 @@ export function AutoComplete<T extends string>({
     placeholder = "",
     maxItemRender = 7,
 }: Props<T>) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     const labels = useMemo(
         () =>
-            items.reduce((acc, item) => {
-                acc[item.value] = item.label;
-                return acc;
-            }, {} as Record<string, string>),
+            items.reduce(
+                (acc, item) => {
+                    acc[item.value] = item.label
+                    return acc
+                },
+                {} as Record<string, string>
+            ),
         [items]
-    );
+    )
 
     const reset = () => {
         // Reset state if we are not taking the input as a value
         if (!saveInputAsSelected) {
-            onSelectedValueChange("" as T);
-            onSearchValueChange("");
+            onSelectedValueChange("" as T)
+            onSearchValueChange("")
         }
-    };
+    }
 
     const onInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        if (
-            !e.relatedTarget?.hasAttribute("cmdk-list") &&
-            labels[selectedValue] !== searchValue
-        ) {
-            reset();
+        if (!e.relatedTarget?.hasAttribute("cmdk-list") && labels[selectedValue] !== searchValue) {
+            reset()
         }
 
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
     const onSelectItem = (inputValue: string) => {
         if (inputValue === selectedValue) {
-            reset();
+            reset()
         } else {
-            onSelectedValueChange(inputValue as T);
-            onSearchValueChange(labels[inputValue] ?? "");
+            onSelectedValueChange(inputValue as T)
+            onSearchValueChange(labels[inputValue] ?? "")
         }
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
-    let filteredItems = items.filter(
-        (item) =>
-            !searchValue ||
-            item.label.toLocaleLowerCase().includes(searchValue.toLowerCase())
-    );
+    let filteredItems = items.filter((item) => !searchValue || item.label.toLocaleLowerCase().includes(searchValue.toLowerCase()))
 
-    let create = false;
+    let create = false
 
     if (
         saveInputAsSelected &&
         searchValue != "" &&
-        filteredItems.find(
-            (x) => x.label.toLowerCase() === searchValue.toLowerCase()
-        ) == undefined
+        filteredItems.find((x) => x.label.toLowerCase() === searchValue.toLowerCase()) == undefined
         // && filteredItems.length == 0
     ) {
-        filteredItems.unshift({ label: searchValue, value: searchValue as T });
+        filteredItems.unshift({ label: searchValue, value: searchValue as T })
         // TODO : Sometimes input can equal value, so it gets a tick, but that value can be anywhere, feel like it should be at the top
 
-        create = true;
+        create = true
     }
 
     return (
         <div className="flex items-center ">
             <Popover open={open} onOpenChange={setOpen}>
-                <Command
-                    shouldFilter={false}
-                    className="p-[1px] bg-transparent -translate-y-[1px]"
-                >
+                <Command shouldFilter={false} className="p-[1px] bg-transparent -translate-y-[1px]">
                     <PopoverAnchor asChild>
                         <CommandPrimitive.Input
                             asChild
                             value={searchValue}
                             onValueChange={(val) => {
                                 if (saveInputAsSelected) {
-                                    onSelectedValueChange(val as T);
+                                    onSelectedValueChange(val as T)
                                 }
 
-                                onSearchValueChange(val);
+                                onSearchValueChange(val)
                             }}
                             onKeyDown={(e) => setOpen(e.key !== "Escape")}
-                            onMouseDown={() =>
-                                setOpen((open) => !!searchValue || !open)
-                            }
+                            onMouseDown={() => setOpen((open) => !!searchValue || !open)}
                             onFocus={() => setOpen(true)}
                             onBlur={onInputBlur}
                             className="bg-background "
@@ -140,18 +119,13 @@ export function AutoComplete<T extends string>({
                             <Input placeholder={placeholder} />
                         </CommandPrimitive.Input>
                     </PopoverAnchor>
-                    {!open && (
-                        <CommandList aria-hidden="true" className="hidden" />
-                    )}
+                    {!open && <CommandList aria-hidden="true" className="hidden" />}
                     <PopoverContent
                         asChild
                         onOpenAutoFocus={(e) => e.preventDefault()}
                         onInteractOutside={(e) => {
-                            if (
-                                e.target instanceof Element &&
-                                e.target.hasAttribute("cmdk-input")
-                            ) {
-                                e.preventDefault();
+                            if (e.target instanceof Element && e.target.hasAttribute("cmdk-input")) {
+                                e.preventDefault()
                             }
                         }}
                         className={cn("w-[--radix-popover-trigger-width] p-0", {
@@ -169,26 +143,17 @@ export function AutoComplete<T extends string>({
                             )}
                             {filteredItems.length > 0 && !isLoading ? (
                                 <CommandGroup>
-                                    {filteredItems
-                                        .slice(0, maxItemRender)
-                                        .map((option) => (
-                                            <CommandItem
-                                                key={option.value}
-                                                value={option.value}
-                                                onMouseDown={(e) =>
-                                                    e.preventDefault()
-                                                }
-                                                onSelect={onSelectItem}
-                                                className={cn(
-                                                    "overflow-hidden  text-wrap text-center ",
-                                                    {
-                                                        "pl-6":
-                                                            saveInputAsSelected &&
-                                                            !create,
-                                                    }
-                                                )}
-                                            >
-                                                {/* {!create && (
+                                    {filteredItems.slice(0, maxItemRender).map((option) => (
+                                        <CommandItem
+                                            key={option.value}
+                                            value={option.value}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onSelect={onSelectItem}
+                                            className={cn("overflow-hidden  text-wrap text-center ", {
+                                                "pl-6": saveInputAsSelected && !create,
+                                            })}
+                                        >
+                                            {/* {!create && (
                                                     <Check
                                                         className={cn(
                                                             "mr-2 h-4 w-4",
@@ -199,39 +164,27 @@ export function AutoComplete<T extends string>({
                                                         )}
                                                     />
                                                 )} */}
-                                                {saveInputAsSelected &&
-                                                    create && (
-                                                        <PlusIcon
-                                                            className={cn(
-                                                                "mr-2 h-4 w-4",
-                                                                selectedValue ===
-                                                                    option.value
-                                                                    ? "opacity-100"
-                                                                    : "opacity-0"
-                                                            )}
-                                                        />
+                                            {saveInputAsSelected && create && (
+                                                <PlusIcon
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedValue === option.value ? "opacity-100" : "opacity-0"
                                                     )}
-                                                <span className="w-full">
-                                                    {option.label}
-                                                </span>
-                                            </CommandItem>
-                                        ))}
+                                                />
+                                            )}
+                                            <span className="w-full">{option.label}</span>
+                                        </CommandItem>
+                                    ))}
                                     {filteredItems.length > maxItemRender && (
-                                        <span className="w-full flex justify-center pl-6 text-muted-foreground">
-                                            ...
-                                        </span>
+                                        <span className="w-full flex justify-center pl-6 text-muted-foreground">...</span>
                                     )}
                                 </CommandGroup>
                             ) : null}
-                            {!isLoading ? (
-                                <CommandEmpty className="sr-only">
-                                    {emptyMessage ?? "No items."}
-                                </CommandEmpty>
-                            ) : null}
+                            {!isLoading ? <CommandEmpty className="sr-only">{emptyMessage ?? "No items."}</CommandEmpty> : null}
                         </CommandList>
                     </PopoverContent>
                 </Command>
             </Popover>
         </div>
-    );
+    )
 }

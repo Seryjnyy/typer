@@ -1,24 +1,24 @@
-import BackButton from "@/components/ui/back-button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useMemo } from "react";
-import { useParams } from "react-router-dom";
-import PlaylistEditForm from "./playlist-edit-form";
-import usePlaylists from "@/lib/hooks/use-playlists";
+import BackButton from "@/components/ui/back-button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useMemo } from "react"
+import { useParams } from "react-router-dom"
+import PlaylistEditForm from "./playlist-edit-form"
+import usePlaylists from "@/lib/hooks/use-playlists"
 
 export default function PlaylistEdit() {
-    const { playlistID } = useParams();
-    const { getPlaylist } = usePlaylists();
+    const { playlistID } = useParams()
+    const { getPlaylist } = usePlaylists()
 
     if (!playlistID) {
-        throw Error("No playlist ID provided.");
+        throw Error("No playlist ID provided.")
     }
 
     const playlist = useMemo(() => {
-        return getPlaylist(playlistID);
-    }, [playlistID]);
+        return getPlaylist(playlistID)
+    }, [playlistID])
 
     if (!playlist) {
-        throw Error("No such playlist found.");
+        throw Error("No such playlist found.")
     }
 
     return (
@@ -33,5 +33,5 @@ export default function PlaylistEdit() {
                 </div>
             </ScrollArea>
         </div>
-    );
+    )
 }

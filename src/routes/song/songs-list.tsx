@@ -1,22 +1,6 @@
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-    Drawer,
-    DrawerContent,
-    DrawerDescription,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer";
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 import {
     AlertDialog,
@@ -28,9 +12,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/components/ui/alert-dialog"
 import {
     Cross1Icon,
     ListBulletIcon,
@@ -39,106 +21,88 @@ import {
     PlusIcon,
     TextAlignCenterIcon,
     TrashIcon,
-} from "@radix-ui/react-icons";
-import { Button } from "../../components/ui/button";
-import {
-    SongBanner,
-    SongDetail,
-    SongHeader,
-} from "../../components/ui/song-header";
+} from "@radix-ui/react-icons"
+import { Button } from "../../components/ui/button"
+import { SongBanner, SongDetail, SongHeader } from "../../components/ui/song-header"
 
-import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ReactNode, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ScrollArea } from "../../components/ui/scroll-area";
-import { useQueueStore } from "../../lib/store/queue-store";
-import { useSongStore } from "../../lib/store/song-store";
-import CreateSongForm from "./create-song-form";
+import { Input } from "@/components/ui/input"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { ReactNode, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { ScrollArea } from "../../components/ui/scroll-area"
+import { useQueueStore } from "../../lib/store/queue-store"
+import { useSongStore } from "../../lib/store/song-store"
 
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { ListStyle, Order, Song, SortBy } from "@/lib/types";
-import SongPopover from "./song-popover";
-import StatsPage from "./stats-page";
-import { usePreferenceStore } from "@/lib/store/preferences-store";
-import { useUiStateStore } from "@/lib/store/ui-state-store";
-import useScreenSize from "@/lib/hooks/use-screen-size";
-import Playlists from "./playlists";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ListStyle, Order, Song, SortBy } from "@/lib/types"
+import SongPopover from "./song-popover"
+import { usePreferenceStore } from "@/lib/store/preferences-store"
+import { useUiStateStore } from "@/lib/store/ui-state-store"
+import useScreenSize from "@/lib/hooks/use-screen-size"
 
 const sortSongs = (songs: Song[], order: Order, sort: SortBy) => {
     switch (sort) {
         case "title":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.title.localeCompare(b.title);
+                    return a.title.localeCompare(b.title)
                 } else {
-                    return b.title.localeCompare(a.title);
+                    return b.title.localeCompare(a.title)
                 }
-            });
+            })
         case "source":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.source.localeCompare(b.title);
+                    return a.source.localeCompare(b.title)
                 } else {
-                    return b.source.localeCompare(a.title);
+                    return b.source.localeCompare(a.title)
                 }
-            });
+            })
         case "completions":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.completion - b.completion;
+                    return a.completion - b.completion
                 } else {
-                    return b.completion - a.completion;
+                    return b.completion - a.completion
                 }
-            });
+            })
         case "length":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.content.length - b.content.length;
+                    return a.content.length - b.content.length
                 } else {
-                    return b.content.length - a.content.length;
+                    return b.content.length - a.content.length
                 }
-            });
+            })
         case "created":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.createdAt - b.createdAt;
+                    return a.createdAt - b.createdAt
                 } else {
-                    return b.createdAt - a.createdAt;
+                    return b.createdAt - a.createdAt
                 }
-            });
+            })
         case "modified":
             return songs.sort((a, b) => {
                 if (order === "asc") {
-                    return a.lastModifiedAt - b.lastModifiedAt;
+                    return a.lastModifiedAt - b.lastModifiedAt
                 } else {
-                    return b.lastModifiedAt - a.lastModifiedAt;
+                    return b.lastModifiedAt - a.lastModifiedAt
                 }
-            });
+            })
 
         default:
-            return songs;
+            return songs
     }
-};
+}
 
 const SongLyricHoverCard = ({ song }: { song: Song }) => {
     return (
         <HoverCard openDelay={500} closeDelay={0}>
-            <HoverCardTrigger
-                className="hidden md:block p-2"
-                onClick={(e) => e.stopPropagation()}
-            >
+            <HoverCardTrigger className="hidden md:block p-2" onClick={(e) => e.stopPropagation()}>
                 <TextAlignCenterIcon />
             </HoverCardTrigger>
-            <HoverCardContent
-                className="w-fit text-xs max-h-[20rem] overflow-hidden"
-                side="bottom"
-                align={"end"}
-            >
+            <HoverCardContent className="w-fit text-xs max-h-[20rem] overflow-hidden" side="bottom" align={"end"}>
                 <span className="text-muted-foreground font-bold">Lyrics</span>
                 <pre>
                     {song.content.slice(0, 256)}
@@ -146,43 +110,30 @@ const SongLyricHoverCard = ({ song }: { song: Song }) => {
                 </pre>
             </HoverCardContent>
         </HoverCard>
-    );
-};
+    )
+}
 
 const SongStats = ({ song }: { song: Song }) => {
-    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen();
-    const songListStylePref = usePreferenceStore.use.songList();
-    const { isLg } = useScreenSize();
+    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen()
+    const songListStylePref = usePreferenceStore.use.songList()
+    const { isLg } = useScreenSize()
 
-    if (isQueueWindowOpen && !isLg) return null;
+    if (isQueueWindowOpen && !isLg) return null
 
     return (
         <div
-            className={
-                " gap-4   p-2 rounded-lg hidden sm:flex" +
-                (songListStylePref.listStyle == "list"
-                    ? "border border-dashed"
-                    : "")
-            }
+            className={" gap-4   p-2 rounded-lg hidden sm:flex" + (songListStylePref.listStyle == "list" ? "border border-dashed" : "")}
             onClick={(e) => e.stopPropagation()}
         >
-            <span className="text-xs text-muted-foreground border-r pr-3">
-                {song.content.length} ch
-            </span>
-            <span className="text-xs text-muted-foreground">
-                {song.record.accuracy}%
-            </span>
-            <span className="text-xs text-muted-foreground">
-                {song.record.wpm} wpm
-            </span>
-            <span className="text-xs text-muted-foreground">
-                {song.completion} completions
-            </span>
+            <span className="text-xs text-muted-foreground border-r pr-3">{song.content.length} ch</span>
+            <span className="text-xs text-muted-foreground">{song.record.accuracy}%</span>
+            <span className="text-xs text-muted-foreground">{song.record.wpm} wpm</span>
+            <span className="text-xs text-muted-foreground">{song.completion} completions</span>
         </div>
-    );
-};
+    )
+}
 
-type SongItemExclude = { deleteButton: boolean };
+type SongItemExclude = { deleteButton: boolean }
 
 const SongItem = ({
     song,
@@ -192,24 +143,24 @@ const SongItem = ({
     buttonRender,
     popoverDestructiveRender,
 }: {
-    song: Song;
-    index: number;
-    listStyle: ListStyle;
-    exclude?: SongItemExclude;
-    buttonRender?: (song: Song) => ReactNode;
-    popoverDestructiveRender?: (song: Song) => ReactNode;
+    song: Song
+    index: number
+    listStyle: ListStyle
+    exclude?: SongItemExclude
+    buttonRender?: (song: Song) => ReactNode
+    popoverDestructiveRender?: (song: Song) => ReactNode
 }) => {
-    const removeSong = useSongStore.use.removeSong();
+    const removeSong = useSongStore.use.removeSong()
 
-    const currentSong = useQueueStore.use.current();
-    const enqueue = useQueueStore.use.enqueue();
-    const queueNext = useQueueStore.use.queueNext();
+    const currentSong = useQueueStore.use.current()
+    const enqueue = useQueueStore.use.enqueue()
+    // const queueNext = useQueueStore.use.queueNext()
 
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     const onAddToQueue = (songId: string) => {
-        enqueue(songId);
-    };
+        enqueue(songId)
+    }
 
     if (listStyle == "compact") {
         return (
@@ -218,25 +169,13 @@ const SongItem = ({
                 onClick={() => navigate(`/songs/${song.id}`)}
             >
                 <div className="flex gap-4 items-center">
-                    <div
-                        className="text-muted group-hover:text-foreground text-xs sm:text-md"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                    <div className="text-muted group-hover:text-foreground text-xs sm:text-md" onClick={(e) => e.stopPropagation()}>
                         {index + 1}
                     </div>
-                    <div
-                        className=" gap-3 flex justify-between text-xs sm:text-sm items-center"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <span className="font-semibold  text-ellipsis overflow-hidden whitespace-nowrap">
-                            {song.title}
-                        </span>
-                        <span className="text-muted-foreground hidden sm:block">
-                            -
-                        </span>
-                        <span className="text-muted-foreground">
-                            {song.source}
-                        </span>
+                    <div className=" gap-3 flex justify-between text-xs sm:text-sm items-center" onClick={(e) => e.stopPropagation()}>
+                        <span className="font-semibold  text-ellipsis overflow-hidden whitespace-nowrap">{song.title}</span>
+                        <span className="text-muted-foreground hidden sm:block">-</span>
+                        <span className="text-muted-foreground">{song.source}</span>
                     </div>
                 </div>
 
@@ -246,7 +185,7 @@ const SongItem = ({
                     <SongPopover song={song} />
                 </div>
             </div>
-        );
+        )
     }
 
     return (
@@ -256,18 +195,11 @@ const SongItem = ({
             onClick={() => navigate(`/songs/${song.id}`)}
         >
             <div className="flex gap-4 items-center ">
-                <div
-                    className="text-muted group-hover:text-foreground "
-                    onClick={(e) => e.stopPropagation()}
-                >
+                <div className="text-muted group-hover:text-foreground " onClick={(e) => e.stopPropagation()}>
                     {index + 1}
                 </div>
                 <SongHeader>
-                    <SongBanner
-                        song={song}
-                        onClick={(e) => e.stopPropagation()}
-                        playButton
-                    />
+                    <SongBanner song={song} onClick={(e) => e.stopPropagation()} playButton />
                     <SongDetail
                         length={"extra-long"}
                         className="pl-3"
@@ -288,8 +220,8 @@ const SongItem = ({
                         className="gap-1"
                         size={"sm"}
                         onClick={(e) => {
-                            e.stopPropagation();
-                            onAddToQueue(song.id);
+                            e.stopPropagation()
+                            onAddToQueue(song.id)
                         }}
                         variant={"outline"}
                     >
@@ -302,34 +234,27 @@ const SongItem = ({
                             <AlertDialogTrigger
                                 asChild
                                 onClick={(e) => {
-                                    e.stopPropagation();
+                                    e.stopPropagation()
                                 }}
                             >
                                 <Button variant={"destructive"} size={"sm"}>
                                     <TrashIcon />
                                 </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent
-                                onClick={(e) => e.stopPropagation()}
-                            >
+                            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        This action cannot be undone. This will
-                                        permanently delete the song.
+                                        This action cannot be undone. This will permanently delete the song.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                        Cancel
-                                    </AlertDialogCancel>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            removeSong(song.id);
-                                            navigate("/songs");
+                                            e.stopPropagation()
+                                            removeSong(song.id)
+                                            navigate("/songs")
                                         }}
                                     >
                                         Continue
@@ -339,22 +264,13 @@ const SongItem = ({
                         </AlertDialog>
                     ) : null}
                 </div>
-                <SongPopover
-                    song={song}
-                    destructiveMenuItems={popoverDestructiveRender?.(song)}
-                />
+                <SongPopover song={song} destructiveMenuItems={popoverDestructiveRender?.(song)} />
             </div>
         </div>
-    );
-};
+    )
+}
 
-const ResponsiveCount = ({
-    currentCount,
-    totalCount,
-}: {
-    currentCount: number;
-    totalCount: number;
-}) => {
+const ResponsiveCount = ({ currentCount, totalCount }: { currentCount: number; totalCount: number }) => {
     return (
         <div>
             <TooltipProvider>
@@ -370,92 +286,63 @@ const ResponsiveCount = ({
                 </Tooltip>
             </TooltipProvider>
         </div>
-    );
-};
-
-interface SongsListProps {
-    songsList: Song[];
-    exclude?: SongItemExclude;
-    listItemButtonRender?: (song: Song) => ReactNode;
-    listItemPopoverDestructiveRender?: (song: Song) => ReactNode;
+    )
 }
 
-const SongsList = ({
-    songsList,
-    exclude,
-    listItemPopoverDestructiveRender,
-    listItemButtonRender,
-}: SongsListProps) => {
+interface SongsListProps {
+    songsList: Song[]
+    exclude?: SongItemExclude
+    listItemButtonRender?: (song: Song) => ReactNode
+    listItemPopoverDestructiveRender?: (song: Song) => ReactNode
+}
+
+const SongsList = ({ songsList, exclude, listItemPopoverDestructiveRender, listItemButtonRender }: SongsListProps) => {
     // TODO : Include song content in the search
     // TODO : Highlight the section that was searched for and found, this includes some element to show it was found in lyrics
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState("")
 
-    const songListPreferences = usePreferenceStore.use.songList();
-    const setSongListPreferences = usePreferenceStore.use.setSongListPref();
+    const songListPreferences = usePreferenceStore.use.songList()
+    const setSongListPreferences = usePreferenceStore.use.setSongListPref()
 
-    const lowerCaseSearchTerm = searchTerm.toLocaleLowerCase();
+    const lowerCaseSearchTerm = searchTerm.toLocaleLowerCase()
 
     const filteredAndSortedSongs = useMemo(() => {
-        return sortSongs(
-            songsList,
-            songListPreferences.order,
-            songListPreferences.sortBy
-        ).filter(
+        return sortSongs(songsList, songListPreferences.order, songListPreferences.sortBy).filter(
             (song) =>
                 song.title.toLocaleLowerCase().includes(lowerCaseSearchTerm) ||
                 song.source.toLocaleLowerCase().includes(lowerCaseSearchTerm)
-        );
-    }, [songsList, songListPreferences, lowerCaseSearchTerm]);
+        )
+    }, [songsList, songListPreferences, lowerCaseSearchTerm])
 
-    const listStyleOptions = ["list", "compact"];
-    const sortOrderOptions = ["asc", "desc"];
-    const sortByOptions = [
-        "title",
-        "source",
-        "length",
-        "completions",
-        "created",
-        "modified",
-    ];
+    const listStyleOptions = ["list", "compact"]
+    const sortOrderOptions = ["asc", "desc"]
+    const sortByOptions = ["title", "source", "length", "completions", "created", "modified"]
 
     const onChangeSortOrder = (val: string) => {
-        if (val != "asc" && val != "desc") return;
+        if (val != "asc" && val != "desc") return
 
-        setSongListPreferences({ ...songListPreferences, order: val });
-    };
+        setSongListPreferences({ ...songListPreferences, order: val })
+    }
 
     const onChangeSortBy = (val: string) => {
-        if (
-            val != "title" &&
-            val != "source" &&
-            val != "length" &&
-            val != "modified" &&
-            val != "created" &&
-            val != "completions"
-        )
-            return;
+        if (val != "title" && val != "source" && val != "length" && val != "modified" && val != "created" && val != "completions") return
 
-        setSongListPreferences({ ...songListPreferences, sortBy: val });
-    };
+        setSongListPreferences({ ...songListPreferences, sortBy: val })
+    }
 
     const onChangeListStyle = (val: string) => {
-        if (val != "list" && val != "compact") return;
+        if (val != "list" && val != "compact") return
 
-        setSongListPreferences({ ...songListPreferences, listStyle: val });
-    };
+        setSongListPreferences({ ...songListPreferences, listStyle: val })
+    }
 
-    const isSortNotStandard =
-        songListPreferences.sortBy != "created" ||
-        songListPreferences.order != "asc";
+    const isSortNotStandard = songListPreferences.sortBy != "created" || songListPreferences.order != "asc"
 
     return (
         <>
             <div className=" h-full ">
                 <div className=" items-center gap-6 hidden sm:flex justify-between py-3  px-6">
-                    <ResponsiveCount
-                        currentCount={filteredAndSortedSongs.length}
-                        totalCount={songsList.length}
-                    />
+                    <ResponsiveCount currentCount={filteredAndSortedSongs.length} totalCount={songsList.length} />
 
                     <div className="flex items-center gap-8 pl-6">
                         <div>
@@ -465,12 +352,7 @@ const SongsList = ({
                                         <TooltipTrigger asChild>
                                             <PopoverTrigger>
                                                 <ListBulletIcon
-                                                    className={
-                                                        songListPreferences.listStyle ==
-                                                        "compact"
-                                                            ? "text-primary"
-                                                            : ""
-                                                    }
+                                                    className={songListPreferences.listStyle == "compact" ? "text-primary" : ""}
                                                 />
                                             </PopoverTrigger>
                                         </TooltipTrigger>
@@ -483,9 +365,7 @@ const SongsList = ({
                                 <PopoverContent className="space-y-2 w-fit">
                                     <ToggleGroup
                                         value={songListPreferences.listStyle}
-                                        onValueChange={(val) =>
-                                            onChangeListStyle(val)
-                                        }
+                                        onValueChange={(val) => onChangeListStyle(val)}
                                         type="single"
                                         orientation="vertical"
                                         className="flex flex-col"
@@ -497,9 +377,7 @@ const SongsList = ({
                                                 aria-label={`Toggle ${option} style`}
                                                 className="capitalize w-full "
                                             >
-                                                <span className="mr-auto">
-                                                    {option}
-                                                </span>
+                                                <span className="mr-auto">{option}</span>
                                             </ToggleGroupItem>
                                         ))}
                                     </ToggleGroup>
@@ -512,13 +390,7 @@ const SongsList = ({
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <PopoverTrigger>
-                                                <MixerHorizontalIcon
-                                                    className={
-                                                        isSortNotStandard
-                                                            ? "text-primary"
-                                                            : ""
-                                                    }
-                                                />
+                                                <MixerHorizontalIcon className={isSortNotStandard ? "text-primary" : ""} />
                                             </PopoverTrigger>
                                         </TooltipTrigger>
                                         <TooltipContent side="bottom">
@@ -529,9 +401,7 @@ const SongsList = ({
                                 <PopoverContent className="space-y-2 w-fit">
                                     <ToggleGroup
                                         value={songListPreferences.sortBy}
-                                        onValueChange={(val) =>
-                                            onChangeSortBy(val)
-                                        }
+                                        onValueChange={(val) => onChangeSortBy(val)}
                                         type="single"
                                         orientation="vertical"
                                         className="flex flex-col items-start"
@@ -543,18 +413,14 @@ const SongsList = ({
                                                 aria-label={`Toggle sort by ${option}`}
                                                 className="capitalize w-full "
                                             >
-                                                <span className="mr-auto">
-                                                    {option}
-                                                </span>
+                                                <span className="mr-auto">{option}</span>
                                             </ToggleGroupItem>
                                         ))}
                                     </ToggleGroup>
 
                                     <ToggleGroup
                                         value={songListPreferences.order}
-                                        onValueChange={(val) =>
-                                            onChangeSortOrder(val)
-                                        }
+                                        onValueChange={(val) => onChangeSortOrder(val)}
                                         type="single"
                                         orientation="vertical"
                                         className="flex flex-col border-t pt-2"
@@ -566,9 +432,7 @@ const SongsList = ({
                                                 aria-label={`Toggle sort order ${option}`}
                                                 className="capitalize w-full "
                                             >
-                                                <span className="mr-auto">
-                                                    {option}
-                                                </span>
+                                                <span className="mr-auto">{option}</span>
                                             </ToggleGroupItem>
                                         ))}
                                     </ToggleGroup>
@@ -577,19 +441,10 @@ const SongsList = ({
                         </div>
 
                         <div className="flex items-center gap-1 ">
-                            <MagnifyingGlassIcon
-                                className={
-                                    searchTerm.length > 0 ? "text-primary" : ""
-                                }
-                            />
+                            <MagnifyingGlassIcon className={searchTerm.length > 0 ? "text-primary" : ""} />
 
                             <div className="relative">
-                                <Input
-                                    value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
-                                />
+                                <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                                 {searchTerm.length != 0 && (
                                     <Button
                                         size={"icon"}
@@ -606,24 +461,14 @@ const SongsList = ({
                 </div>
 
                 <div className="flex gap-8 sm:hidden justify-between py-3 px-3 border-b">
-                    <ResponsiveCount
-                        currentCount={filteredAndSortedSongs.length}
-                        totalCount={songsList.length}
-                    />
+                    <ResponsiveCount currentCount={filteredAndSortedSongs.length} totalCount={songsList.length} />
                     <div className="flex gap-8">
                         <Popover>
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <PopoverTrigger>
-                                            <ListBulletIcon
-                                                className={
-                                                    songListPreferences.listStyle ==
-                                                    "compact"
-                                                        ? "text-primary"
-                                                        : ""
-                                                }
-                                            />
+                                            <ListBulletIcon className={songListPreferences.listStyle == "compact" ? "text-primary" : ""} />
                                         </PopoverTrigger>
                                     </TooltipTrigger>
                                     <TooltipContent side="bottom">
@@ -635,9 +480,7 @@ const SongsList = ({
                             <PopoverContent className="space-y-2 w-fit">
                                 <ToggleGroup
                                     value={songListPreferences.listStyle}
-                                    onValueChange={(val) =>
-                                        onChangeListStyle(val)
-                                    }
+                                    onValueChange={(val) => onChangeListStyle(val)}
                                     type="single"
                                     orientation="vertical"
                                     className="flex flex-col"
@@ -649,9 +492,7 @@ const SongsList = ({
                                             aria-label={`Toggle ${option} style`}
                                             className="capitalize w-full "
                                         >
-                                            <span className="mr-auto">
-                                                {option}
-                                            </span>
+                                            <span className="mr-auto">{option}</span>
                                         </ToggleGroupItem>
                                     ))}
                                 </ToggleGroup>
@@ -663,12 +504,7 @@ const SongsList = ({
                                     <TooltipTrigger asChild>
                                         <DrawerTrigger>
                                             <MixerHorizontalIcon
-                                                className={
-                                                    searchTerm.length > 0 ||
-                                                    isSortNotStandard
-                                                        ? "text-primary"
-                                                        : ""
-                                                }
+                                                className={searchTerm.length > 0 || isSortNotStandard ? "text-primary" : ""}
                                             />
                                         </DrawerTrigger>
                                     </TooltipTrigger>
@@ -680,44 +516,22 @@ const SongsList = ({
 
                             <DrawerContent className="h-[70vh] px-10">
                                 <DrawerHeader>
-                                    <DrawerTitle className="sr-only">
-                                        Search for songs or change how songs are
-                                        sorted.
-                                    </DrawerTitle>
-                                    <DrawerDescription className="sr-only">
-                                        Sort of search.
-                                    </DrawerDescription>
+                                    <DrawerTitle className="sr-only">Search for songs or change how songs are sorted.</DrawerTitle>
+                                    <DrawerDescription className="sr-only">Sort of search.</DrawerDescription>
                                 </DrawerHeader>
                                 <div className="flex flex-col justify-between h-full px-2 pt-2 pb-6">
                                     <div>
-                                        <h2 className="text-center text-lg font-semibold pb-2">
-                                            Search
-                                        </h2>
+                                        <h2 className="text-center text-lg font-semibold pb-2">Search</h2>
                                         <div className="flex items-center gap-1 ">
-                                            <MagnifyingGlassIcon
-                                                className={
-                                                    searchTerm.length > 0
-                                                        ? "text-primary"
-                                                        : ""
-                                                }
-                                            />
+                                            <MagnifyingGlassIcon className={searchTerm.length > 0 ? "text-primary" : ""} />
 
                                             <div className="relative w-full">
-                                                <Input
-                                                    value={searchTerm}
-                                                    onChange={(e) =>
-                                                        setSearchTerm(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
+                                                <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                                                 {searchTerm.length != 0 && (
                                                     <Button
                                                         size={"icon"}
                                                         variant={"ghost"}
-                                                        onClick={() =>
-                                                            setSearchTerm("")
-                                                        }
+                                                        onClick={() => setSearchTerm("")}
                                                         className="absolute -right-10 top-0"
                                                     >
                                                         <Cross1Icon />
@@ -728,16 +542,10 @@ const SongsList = ({
                                     </div>
                                     <div>
                                         <div>
-                                            <h2 className="text-center text-lg font-semibold pb-2">
-                                                Sort
-                                            </h2>
+                                            <h2 className="text-center text-lg font-semibold pb-2">Sort</h2>
                                             <ToggleGroup
-                                                value={
-                                                    songListPreferences.sortBy
-                                                }
-                                                onValueChange={(val) =>
-                                                    onChangeSortBy(val)
-                                                }
+                                                value={songListPreferences.sortBy}
+                                                onValueChange={(val) => onChangeSortBy(val)}
                                                 type="single"
                                                 orientation="vertical"
                                                 className="flex flex-col items-start"
@@ -749,38 +557,28 @@ const SongsList = ({
                                                         aria-label={`Toggle sort by ${option}`}
                                                         className="capitalize w-full "
                                                     >
-                                                        <span className="mr-auto">
-                                                            {option}
-                                                        </span>
+                                                        <span className="mr-auto">{option}</span>
                                                     </ToggleGroupItem>
                                                 ))}
                                             </ToggleGroup>
 
                                             <ToggleGroup
-                                                value={
-                                                    songListPreferences.order
-                                                }
-                                                onValueChange={(val) =>
-                                                    onChangeSortOrder(val)
-                                                }
+                                                value={songListPreferences.order}
+                                                onValueChange={(val) => onChangeSortOrder(val)}
                                                 type="single"
                                                 orientation="vertical"
                                                 className="flex flex-col border-t pt-2"
                                             >
-                                                {sortOrderOptions.map(
-                                                    (option) => (
-                                                        <ToggleGroupItem
-                                                            key={option}
-                                                            value={option}
-                                                            aria-label={`Toggle sort order ${option}`}
-                                                            className="capitalize w-full "
-                                                        >
-                                                            <span className="mr-auto">
-                                                                {option}
-                                                            </span>
-                                                        </ToggleGroupItem>
-                                                    )
-                                                )}
+                                                {sortOrderOptions.map((option) => (
+                                                    <ToggleGroupItem
+                                                        key={option}
+                                                        value={option}
+                                                        aria-label={`Toggle sort order ${option}`}
+                                                        className="capitalize w-full "
+                                                    >
+                                                        <span className="mr-auto">{option}</span>
+                                                    </ToggleGroupItem>
+                                                ))}
                                             </ToggleGroup>
                                         </div>
                                     </div>
@@ -797,40 +595,27 @@ const SongsList = ({
                             filteredAndSortedSongs.map((song, index) => (
                                 <SongItem
                                     exclude={exclude}
-                                    buttonRender={(song) =>
-                                        listItemButtonRender?.(song)
-                                    }
-                                    popoverDestructiveRender={(song) =>
-                                        listItemPopoverDestructiveRender?.(song)
-                                    }
+                                    buttonRender={(song) => listItemButtonRender?.(song)}
+                                    popoverDestructiveRender={(song) => listItemPopoverDestructiveRender?.(song)}
                                     key={song.id}
                                     song={song}
                                     index={index}
                                     listStyle={songListPreferences.listStyle}
                                 />
                             ))}
-                        {songsList.length > 0 &&
-                            filteredAndSortedSongs.length == 0 && (
-                                <div className="w-full flex items-center justify-center mt-12">
-                                    <div className="flex flex-col text-center">
-                                        <h3 className="font-semibold text-2xl">
-                                            No results found
-                                        </h3>
-                                        <span className="text-muted-foreground ">
-                                            Couldn't find what you searched for.
-                                        </span>
-                                    </div>
+                        {songsList.length > 0 && filteredAndSortedSongs.length == 0 && (
+                            <div className="w-full flex items-center justify-center mt-12">
+                                <div className="flex flex-col text-center">
+                                    <h3 className="font-semibold text-2xl">No results found</h3>
+                                    <span className="text-muted-foreground ">Couldn't find what you searched for.</span>
                                 </div>
-                            )}
+                            </div>
+                        )}
                         {songsList.length == 0 && (
                             <div className="w-full flex items-center justify-center mt-12">
                                 <div className="flex flex-col text-center">
-                                    <h3 className="font-semibold text-2xl">
-                                        You don't have any songs
-                                    </h3>
-                                    <span className="text-muted-foreground ">
-                                        Add some.
-                                    </span>
+                                    <h3 className="font-semibold text-2xl">You don't have any songs</h3>
+                                    <span className="text-muted-foreground ">Add some.</span>
                                 </div>
                             </div>
                         )}
@@ -839,7 +624,7 @@ const SongsList = ({
                 </ScrollArea>
             </div>
         </>
-    );
-};
+    )
+}
 
-export default SongsList;
+export default SongsList
