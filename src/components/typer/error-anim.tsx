@@ -1,5 +1,5 @@
-import { usePreferenceStore } from "@/lib/store/preferences-store"
-import { cn } from "@/lib/utils"
+import { usePreferenceStore } from "@/lib/store/preferences-store.tsx"
+import { cn } from "@/lib/utils.ts"
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 
