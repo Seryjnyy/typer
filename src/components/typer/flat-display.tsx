@@ -3,8 +3,9 @@ import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import { cn } from "@/lib/utils.ts"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx"
 import KeyboardButton from "@/components/keyboard-button.tsx"
+import Line from "@/components/typer/typer-line.tsx"
 
-const Display = ({
+const FlatDisplay = ({
     verses,
     tryVerse,
     inputHistory,
@@ -104,83 +105,4 @@ const Display = ({
     )
 }
 
-import { forwardRef, memo } from "react"
-import { useTextModificationsStore } from "@/lib/store/text-modifications-store.tsx"
-import Ch, { chVariant } from "@/components/ch.tsx"
-
-interface LineBaseProps {
-    line: string
-    input: string
-    isCurrentLine: boolean
-}
-
-const LineBase = forwardRef<HTMLDivElement, LineBaseProps>(({ line, input, isCurrentLine }, ref) => {
-    const difficultyModifiers = useTextModificationsStore.use.harderOptions()
-
-    return (
-        <div className={"tracking-wide"} ref={ref}>
-            {line.split("").map((ch, index) => {
-                const char = input.at(index)
-
-                let variant: chVariant
-
-                if (char === ch) {
-                    variant = "correct"
-                } else if (index >= input.length) {
-                    if (isCurrentLine) {
-                        variant = index === input.length ? "current" : "not-covered"
-                    } else {
-                        variant = "not-covered"
-                    }
-                } else {
-                    if (ch == " " || ch == "\n") {
-                        variant = "incorrect"
-                        ch = "_"
-                    } else {
-                        variant = "incorrect"
-                    }
-                }
-
-                if (variant != "correct" && variant != "incorrect") {
-                    // current, not covered
-
-                    if (isCurrentLine) {
-                        if (difficultyModifiers.cantSeeAhead) {
-                            if (ch != " " && input.length !== index) {
-                                ch = "_"
-                            }
-
-                            if (difficultyModifiers.cantSeeCurrent) {
-                                ch = "_"
-                            }
-
-                            if (difficultyModifiers.cantSeeUnderlines && input.length !== index) {
-                                variant = "normalInvisible"
-                            }
-                        }
-                    } else {
-                        if (difficultyModifiers.cantSeeAhead) {
-                            if (ch != " ") {
-                                ch = "_"
-                            }
-
-                            if (difficultyModifiers.cantSeeUnderlines) {
-                                variant = "normalInvisible"
-                            }
-                        }
-                    }
-                }
-
-                return (
-                    <Ch key={`char-${index}`} variant={variant}>
-                        {ch}
-                    </Ch>
-                )
-            })}
-        </div>
-    )
-})
-
-const Line = memo(LineBase)
-
-export default Display
+export default FlatDisplay
