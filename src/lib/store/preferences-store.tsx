@@ -1,62 +1,60 @@
-import { create } from "zustand";
+import { create } from "zustand"
 
-import { ListStyle, Order, SortBy, Windows } from "../types";
-import { createSelectors } from "./create-selectors";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { ListStyle, Order, SortBy } from "../types"
+import { createSelectors } from "./create-selectors"
+import { createJSONStorage, persist } from "zustand/middleware"
 
-export type TyperTextDisplay = "cylinder" | "flat";
-export type QueueStorage = "localStorage" | "sessionStorage";
+export type TyperTextDisplay = "cylinder" | "flat"
+export type QueueStorage = "localStorage" | "sessionStorage"
 
-// const PreferenceStoreName = "typer-preferences-storage";
-
-type SongList = { listStyle: ListStyle; sortBy: SortBy; order: Order };
+type SongList = { listStyle: ListStyle; sortBy: SortBy; order: Order }
 
 type ExportSongs = {
-    cover: boolean;
-    completion: boolean;
-    record: boolean;
-    createdAt: boolean;
-};
+    cover: boolean
+    completion: boolean
+    record: boolean
+    createdAt: boolean
+}
 
 type ImportSongs = {
-    cover: boolean;
-    completion: boolean;
-    record: boolean;
-    createdAt: boolean;
-};
+    cover: boolean
+    completion: boolean
+    record: boolean
+    createdAt: boolean
+}
 
 type State = {
-    typerTextDisplay: TyperTextDisplay;
-    verseTyperTextDisplay: TyperTextDisplay;
-    queueStorage: QueueStorage;
-    isCompletionAnim: boolean;
-    isErrorAnim: boolean;
-    isCorrectAnim: boolean;
-    isQueueColour: boolean;
-    isOpenEndScreenInitially: boolean;
-    isOpenEndScreenInitiallyVersePage: boolean;
-    songList: SongList;
-    exportSongs: ExportSongs;
-    importSongs: ImportSongs;
-};
+    typerTextDisplay: TyperTextDisplay
+    verseTyperTextDisplay: TyperTextDisplay
+    queueStorage: QueueStorage
+    isCompletionAnim: boolean
+    isErrorAnim: boolean
+    isCorrectAnim: boolean
+    isQueueColour: boolean
+    isOpenEndScreenInitially: boolean
+    isOpenEndScreenInitiallyVersePage: boolean
+    songList: SongList
+    exportSongs: ExportSongs
+    importSongs: ImportSongs
+}
 
 type Actions = {
-    setTyperTextDisplay: (val: TyperTextDisplay) => void;
-    setVerseTyperTextDisplay: (val: TyperTextDisplay) => void;
-    setQueueStorage: (val: QueueStorage) => void;
-    setCompletionAnim: (val: boolean) => void;
-    setErrorAnim: (val: boolean) => void;
-    setCorrectAnim: (val: boolean) => void;
-    setQueueColour: (val: boolean) => void;
-    setSongListPref: (val: SongList) => void;
-    setOpenEndScreenInitially: (val: boolean) => void;
-    setOpenEndScreenInitiallyVersePage: (val: boolean) => void;
-    setExportSongs: (val: ExportSongs) => void;
-    setImportSongs: (val: ImportSongs) => void;
-    resetPreferences: () => void;
-    resetImportPref: () => void;
-    resetExportPref: () => void;
-};
+    setTyperTextDisplay: (val: TyperTextDisplay) => void
+    setVerseTyperTextDisplay: (val: TyperTextDisplay) => void
+    setQueueStorage: (val: QueueStorage) => void
+    setCompletionAnim: (val: boolean) => void
+    setErrorAnim: (val: boolean) => void
+    setCorrectAnim: (val: boolean) => void
+    setQueueColour: (val: boolean) => void
+    setSongListPref: (val: SongList) => void
+    setOpenEndScreenInitially: (val: boolean) => void
+    setOpenEndScreenInitiallyVersePage: (val: boolean) => void
+    setExportSongs: (val: ExportSongs) => void
+    setImportSongs: (val: ImportSongs) => void
+    resetPreferences: () => void
+    resetImportPref: () => void
+    resetExportPref: () => void
+}
 
 const defaults: State = {
     typerTextDisplay: "cylinder",
@@ -81,71 +79,71 @@ const defaults: State = {
         createdAt: true,
         record: false,
     },
-};
+}
 
 const usePreferenceStoreBase = create<State & Actions>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             ...defaults,
             setTyperTextDisplay: (val: TyperTextDisplay) =>
                 set(() => {
-                    return { typerTextDisplay: val };
+                    return { typerTextDisplay: val }
                 }),
             setVerseTyperTextDisplay: (val: TyperTextDisplay) =>
                 set(() => {
-                    return { verseTyperTextDisplay: val };
+                    return { verseTyperTextDisplay: val }
                 }),
             setQueueStorage: (val: QueueStorage) =>
                 set(() => {
-                    return { queueStorage: val };
+                    return { queueStorage: val }
                 }),
             setCompletionAnim: (val: boolean) =>
                 set(() => {
-                    return { isCompletionAnim: val };
+                    return { isCompletionAnim: val }
                 }),
             setErrorAnim: (val: boolean) =>
                 set(() => {
-                    return { isErrorAnim: val };
+                    return { isErrorAnim: val }
                 }),
             setCorrectAnim: (val: boolean) =>
                 set(() => {
-                    return { isCorrectAnim: val };
+                    return { isCorrectAnim: val }
                 }),
             setOpenEndScreenInitially: (val: boolean) =>
                 set(() => {
-                    return { isOpenEndScreenInitially: val };
+                    return { isOpenEndScreenInitially: val }
                 }),
             setOpenEndScreenInitiallyVersePage: (val: boolean) =>
                 set(() => {
-                    return { isOpenEndScreenInitiallyVersePage: val };
+                    return { isOpenEndScreenInitiallyVersePage: val }
                 }),
             setSongListPref: (val: SongList) =>
                 set(() => {
-                    return { songList: val };
+                    return { songList: val }
                 }),
             setQueueColour: (val: boolean) =>
                 set(() => {
-                    return { isQueueColour: val };
+                    return { isQueueColour: val }
                 }),
             setExportSongs: (val: ExportSongs) =>
                 set(() => {
-                    return { exportSongs: val };
+                    return { exportSongs: val }
                 }),
             setImportSongs: (val: ImportSongs) =>
                 set(() => {
-                    return { importSongs: val };
+                    return { importSongs: val }
                 }),
             resetExportPref: () =>
                 set(() => {
-                    return { exportSongs: defaults.exportSongs };
+                    return { exportSongs: defaults.exportSongs }
                 }),
             resetImportPref: () =>
                 set(() => {
-                    return { importSongs: defaults.importSongs };
+                    return { importSongs: defaults.importSongs }
                 }),
             resetPreferences: () =>
                 set(() => {
-                    return defaults;
+                    return defaults
                 }),
         }),
         {
@@ -153,8 +151,8 @@ const usePreferenceStoreBase = create<State & Actions>()(
             storage: createJSONStorage(() => localStorage),
         }
     )
-);
+)
 
-const usePreferenceStore = createSelectors(usePreferenceStoreBase);
+const usePreferenceStore = createSelectors(usePreferenceStoreBase)
 
-export { usePreferenceStore };
+export { usePreferenceStore }

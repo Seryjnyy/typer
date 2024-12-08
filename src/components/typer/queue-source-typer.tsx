@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useSongStore } from "@/lib/store/song-store.tsx"
-import NoSongSelected from "@/routes/typer/no-song-selected.tsx"
+import NoSongSelected from "@/components/typer/no-song-selected.tsx"
 import { Song } from "@/lib/types.ts"
 import { GameState, TypingStats } from "@/components/typer/types.ts"
 import { calculateAccuracy, cn, wpm } from "@/lib/utils.ts"
@@ -21,7 +21,12 @@ export default function QueueSourceTyper() {
     const editSongCompletion = useSongStore.use.editSongCompletion()
     const editSongRecord = useSongStore.use.editSongRecord()
 
-    if (!currentSong) return <NoSongSelected />
+    if (!currentSong)
+        return (
+            <div className={"flex items-center h-full "}>
+                <NoSongSelected />
+            </div>
+        )
 
     // Only save if txt mods not used
     const saveStats = (source: Song, stats: TypingStats & { time: number }) => {

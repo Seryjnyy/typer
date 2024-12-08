@@ -24,7 +24,6 @@ import TestPage2 from "./test-page-2"
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import QueueSourceTyper from "@/components/typer/queue-source-typer.tsx"
-import TyperPage from "@/routes/typer/typer-page.tsx"
 
 const queryClient = new QueryClient()
 
@@ -38,7 +37,6 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                // element: <TyperPage />,
                 element: <QueueSourceTyper />,
             },
             { path: "verse", element: <VerseSourceTyper /> },
