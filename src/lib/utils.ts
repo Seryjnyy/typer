@@ -14,7 +14,7 @@ export function round(num: number, decimalPlaces: number = 0) {
 
 // TODO : Maybe reshuffle again if shuffled arrafy is the same as original
 //  would have to check for array of length 1
-export function shuffleArray(array: never[]) {
+export function shuffleArray<T>(array: T[]) {
     const cpy = [...array]
     for (let i = cpy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
