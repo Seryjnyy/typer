@@ -6,8 +6,10 @@ import { Link } from "react-router-dom"
 import BackButton from "@/components/ui/back-button.tsx"
 import { Song } from "@/lib/types.ts"
 import { SongProviderForTyper } from "@/components/typer/typer.tsx"
-import Display from "@/components/typer/flat-display.tsx"
+import FlatDisplay from "@/components/typer/flat-display.tsx"
 import { VerseEndScreen } from "@/components/typer/end-screen.tsx"
+import CylinderDisplay from "@/components/typer/cylinder-display.tsx"
+import { usePreferenceStore } from "@/lib/store/preferences-store.tsx"
 
 const SomethingWentWrong = () => {
     return (
@@ -47,7 +49,7 @@ const Top = ({ song, cameFrom }: TopProps) => {
 }
 
 export default function VerseSourceTyper() {
-    // const verseTyperTextDisplay = usePreferenceStore.use.verseTyperTextDisplay()
+    const typerDisplayFormat = usePreferenceStore.use.verseTyperTextDisplay()
     const { state } = useLocation()
     const { content, id, cameFrom } = state
         ? (state as { content: string; id: string; cameFrom: string })
@@ -59,7 +61,13 @@ export default function VerseSourceTyper() {
         <SongProviderForTyper
             sourceID={id}
             content={content}
-            renderDisplay={(props) => <Display {...props} />}
+            renderDisplay={(props) => {
+                if (typerDisplayFormat === "cylinder") {
+                    return <CylinderDisplay {...props} />
+                } else {
+                    return <FlatDisplay {...props} />
+                }
+            }}
             renderDecorations={(props) => <Top song={props.source} cameFrom={cameFrom} />}
             renderWhenComplete={({ stats, difficultyModsUsed, handleRestart, source, time }) => (
                 <>

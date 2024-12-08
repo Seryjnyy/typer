@@ -4,18 +4,20 @@ import NoSongSelected from "@/routes/typer/no-song-selected.tsx"
 import { Song } from "@/lib/types.ts"
 import { GameState, TypingStats } from "@/components/typer/types.ts"
 import { calculateAccuracy, cn, wpm } from "@/lib/utils.ts"
-import Display from "@/components/typer/flat-display.tsx"
+import FlatDisplay from "@/components/typer/flat-display.tsx"
 import { NormalEndScreen } from "@/components/typer/end-screen.tsx"
 import { SongProviderForTyper } from "@/components/typer/typer.tsx"
 import { useQueueStore } from "@/lib/store/queue-store.tsx"
 import { useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { useCurrentSong } from "@/components/typer/use-current-song.ts"
+import CylinderDisplay from "@/components/typer/cylinder-display.tsx"
+import { usePreferenceStore } from "@/lib/store/preferences-store.tsx"
 
 export default function QueueSourceTyper() {
     const currentSong = useCurrentSong()
     const navigate = useNavigate()
-
+    const typerDisplayFormat = usePreferenceStore.use.typerTextDisplay()
     const editSongCompletion = useSongStore.use.editSongCompletion()
     const editSongRecord = useSongStore.use.editSongRecord()
 
@@ -39,20 +41,39 @@ export default function QueueSourceTyper() {
             <SongProviderForTyper
                 sourceID={currentSong.id}
                 content={currentSong.content}
-                renderDisplay={(props) => (
-                    <Display
-                        {...props}
-                        tryVerse={(verse) => {
-                            navigate("verse", {
-                                state: {
-                                    id: props.source.id,
-                                    content: verse,
-                                    cameFrom: "/",
-                                },
-                            })
-                        }}
-                    />
-                )}
+                renderDisplay={(props) => {
+                    if (typerDisplayFormat === "cylinder") {
+                        return (
+                            <CylinderDisplay
+                                {...props}
+                                tryVerse={(verse) => {
+                                    navigate("verse", {
+                                        state: {
+                                            id: props.source.id,
+                                            content: verse,
+                                            cameFrom: "/",
+                                        },
+                                    })
+                                }}
+                            />
+                        )
+                    } else {
+                        return (
+                            <FlatDisplay
+                                {...props}
+                                tryVerse={(verse) => {
+                                    navigate("verse", {
+                                        state: {
+                                            id: props.source.id,
+                                            content: verse,
+                                            cameFrom: "/",
+                                        },
+                                    })
+                                }}
+                            />
+                        )
+                    }
+                }}
                 renderWhenComplete={({ gameState, stats, difficultyModsUsed, handleRestart, source, time }) => (
                     <>
                         <NormalEndScreen
