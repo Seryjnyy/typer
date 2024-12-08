@@ -16,6 +16,7 @@ import { CheckIcon, DividerVerticalIcon, KeyboardIcon, ReloadIcon } from "@radix
 import { useSong } from "@/lib/hooks/use-song.tsx"
 import { GameState, TypingStats } from "@/components/typer/types.ts"
 import { CompletionAnim } from "@/components/typer/completion-anim.tsx"
+import { useTyperShortcuts } from "@/lib/hooks/use-typer-shortcuts.ts"
 
 enum StateActionKind {
     START = "START",
@@ -134,6 +135,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
         triggerCompleteAnim: () => void
     }>(null)
     const renderTestProps = useRef<{ getStats: () => TypingStats }>(null)
+    useTyperShortcuts({ onShortcut: () => handleRestart() })
 
     const startGame = () => {
         dispatch({ type: StateActionKind.START })
@@ -310,6 +312,7 @@ const Indicators = ({ gameState }: { gameState: GameState }) => {
                     </span>
                 )}
             </div>
+            {(gameState === "idle" || gameState === "out-of-focus") && <div className={"flex items-center"}>(esc) to restart</div>}
         </>
     )
 }
@@ -343,7 +346,7 @@ const RestartButton = ({ handleRestart }: { handleRestart: () => void }) => {
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Restart</p>
+                    <p>Restart (esc)</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
