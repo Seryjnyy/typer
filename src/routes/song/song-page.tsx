@@ -15,6 +15,7 @@ import { useNavigate, useParams } from "react-router"
 import PlayThroughSpotifyButton from "@/components/spotify/play-through-spotify-button"
 import { useSongCover } from "@/lib/hooks/use-song-cover"
 import SongPopover from "./song-popover"
+import { Icons } from "@/components/icons.tsx"
 
 interface SongContentProps {
     song: SongType
@@ -136,7 +137,10 @@ export default function Song() {
                                 <SongBanner song={song} size={"xl"} />
                                 <div className="flex flex-col justify-center items-start px-8">
                                     <h1 className="text-2xl font-bold">{song.title}</h1>
-                                    <p className="text-muted-foreground">{song.source}</p>
+                                    <div className={"flex items-center gap-2"}>
+                                        {song.spotifyUri && <Icons.spotify className={"size-4 fill-white"} />}
+                                        <p className="text-muted-foreground">{song.source}</p>
+                                    </div>
                                 </div>
                             </SongHeader>
                         </div>
