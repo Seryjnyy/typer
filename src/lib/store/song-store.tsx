@@ -1,37 +1,34 @@
-import { create } from "zustand";
+import { create } from "zustand"
 
-import { persist, createJSONStorage } from "zustand/middleware";
-import { createSelectors } from "./create-selectors";
-import { Song } from "../types";
+import { persist, createJSONStorage } from "zustand/middleware"
+import { createSelectors } from "./create-selectors"
+import { Song } from "../types"
 
 interface Store {
-    songs: Song[];
-    addSong: (song: Song) => void;
-    removeSong: (songId: string) => void;
-    setSongs: (songs: Song[]) => void;
-    getSongData: (songId: string) => Song | undefined;
-    editSongCompletion: (id: string, completion: number) => void;
-    editSongRecord: (
-        id: string,
-        record: { wpm: number; accuracy: number }
-    ) => void;
-    editSong: (song: Song) => void;
+    songs: Song[]
+    addSong: (song: Song) => void
+    removeSong: (songId: string) => void
+    setSongs: (songs: Song[]) => void
+    getSongData: (songId: string) => Song | undefined
+    editSongCompletion: (id: string, completion: number) => void
+    editSongRecord: (id: string, record: { wpm: number; accuracy: number }) => void
+    editSong: (song: Song) => void
 }
 
 // Breaks stuff in typer so very important it is done, therefore this is here
 // Split into lines, trim each line
 // Remove empty strings (where line was just space)
 const trimSongContent = (content: string) => {
-    const split = content.split("\n");
+    const split = content.split("\n")
 
-    const replaced = split.map((x) => (x == "" ? "\n" : x));
+    const replaced = split.map((x) => (x == "" ? "\n" : x))
 
-    const trimmed = replaced.map((x) => x.trim());
+    const trimmed = replaced.map((x) => x.trim())
 
     // join verses with new lines, but replace multiple new lines into a single one
     // not sure why there are multiple new lines sometimes, have to check, but this is a quick fix for it
-    return trimmed.join("\n");
-};
+    return trimmed.join("\n")
+}
 
 const formatTitleOrSource = (str: string) => {
     // Replace new lines and tabs with a space
@@ -40,8 +37,8 @@ const formatTitleOrSource = (str: string) => {
     return str
         .replace(/[\n\t\r]+/g, " ")
         .replace(/\s+/g, " ")
-        .trim();
-};
+        .trim()
+}
 
 const useSongStoreBase = create<Store>()(
     persist(
@@ -50,7 +47,7 @@ const useSongStoreBase = create<Store>()(
             addSong: (song) =>
                 set(() => {
                     if (get().songs.find((x) => x.id == song.id) != null) {
-                        return { songs: get().songs };
+                        return { songs: get().songs }
                     }
 
                     return {
@@ -63,55 +60,56 @@ const useSongStoreBase = create<Store>()(
                                 source: formatTitleOrSource(song.source),
                             },
                         ],
-                    };
+                    }
                 }),
             setSongs: (songs) =>
                 set(() => {
-                    return { songs: songs };
+                    return { songs: songs }
                 }),
             removeSong: (songId) =>
                 set(() => {
-                    const filtered = get().songs.filter((x) => x.id != songId);
-                    return { songs: filtered };
+                    const filtered = get().songs.filter((x) => x.id != songId)
+                    return { songs: filtered }
                 }),
             getSongData: (songId) => {
-                return get().songs.find((song) => song.id == songId);
+                return get().songs.find((song) => song.id == songId)
             },
             editSongCompletion: (id, completion) =>
                 set(() => {
-                    const song = get().songs.find((x) => x.id == id);
+                    const song = get().songs.find((x) => x.id == id)
 
-                    if (!song) return {};
+                    if (!song) return {}
 
-                    const songs = get().songs.filter((x) => x.id != id);
-                    console.log(completion);
+                    const songs = get().songs.filter((x) => x.id != id)
+                    console.log(completion)
                     return {
                         songs: [...songs, { ...song, completion: completion }],
-                    };
+                    }
                 }),
             editSongRecord: (id, record) =>
                 set(() => {
-                    const state = get();
-                    const song = state.songs.find((x) => x.id == id);
+                    const state = get()
+                    const song = state.songs.find((x) => x.id == id)
 
-                    if (!song) return state;
+                    if (!song) return state
 
-                    const songs = get().songs.filter((x) => x.id != id);
+                    const songs = get().songs.filter((x) => x.id != id)
 
                     return {
                         songs: [...songs, { ...song, record: record }],
-                    };
+                    }
                 }),
             editSong: (song) =>
                 set(() => {
-                    const filtered = get().songs.filter((x) => x.id != song.id);
+                    const filtered = get().songs.filter((x) => x.id != song.id)
 
                     return {
                         songs: [
                             ...filtered,
-                            { ...song, content: trimSongContent(song.content) },
+                            { ...song, content: trimSongContent(song.content).replace(/\s{2,}/g, " ") }, // removes multiple whitespaces
+                            // in a row
                         ],
-                    };
+                    }
                 }),
         }),
         {
@@ -119,8 +117,8 @@ const useSongStoreBase = create<Store>()(
             storage: createJSONStorage(() => localStorage),
         }
     )
-);
+)
 
-const useSongStore = createSelectors(useSongStoreBase);
+const useSongStore = createSelectors(useSongStoreBase)
 
-export { useSongStore };
+export { useSongStore }

@@ -1,36 +1,26 @@
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { PlayIcon } from "@radix-ui/react-icons";
-import { Link } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { useSongStore } from "../store/song-store";
-import { Optional, Song } from "../types";
-import usePlaySong from "./use-play-song";
-import useRandomCoverGradient from "./use-random-cover-gradient";
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
+import { PlayIcon } from "@radix-ui/react-icons"
+import { Link } from "react-router-dom"
+import { v4 as uuidv4 } from "uuid"
+import { useSongStore } from "../store/song-store"
+import { Optional, Song } from "../types"
+import usePlaySong from "./use-play-song"
+import useRandomCoverGradient from "./use-random-cover-gradient"
 
 // TODO : Needs testing with localStorage, like when its full etc.
 // TODO : Since cover is passed in as a string it can be anything, should validate it, if wrong then generate a new one
 // use-import-songs already has validation for parsing cover
 export default function useCreateSong() {
-    const addSong = useSongStore.use.addSong();
-    const playSong = usePlaySong();
-    const { toast } = useToast();
-    const { cover, generateRandomCover } = useRandomCoverGradient();
+    const addSong = useSongStore.use.addSong()
+    const playSong = usePlaySong()
+    const { toast } = useToast()
+    const { cover, generateRandomCover } = useRandomCoverGradient()
 
-    return (
-        song: Optional<
-            Song,
-            | "id"
-            | "cover"
-            | "completion"
-            | "createdAt"
-            | "lastModifiedAt"
-            | "record"
-            | "spotifyUri"
-        >
-    ) => {
+    return (song: Optional<Song, "id" | "cover" | "completion" | "createdAt" | "lastModifiedAt" | "record" | "spotifyUri">) => {
         const newSong: Song = {
             ...song,
+            content: song.content.replace(/\s{2,}/g, " "), // remove multiple whitespaces in a row, replace with a single whitespace
             id: song.id ?? uuidv4(),
             cover: song.cover ?? JSON.stringify(cover),
             completion: song.completion ?? 0,
@@ -38,10 +28,10 @@ export default function useCreateSong() {
             lastModifiedAt: song.lastModifiedAt ?? Date.now(),
             record: song.record ?? { wpm: 0, accuracy: 0 },
             spotifyUri: song.spotifyUri,
-        };
+        }
 
         try {
-            addSong(newSong);
+            addSong(newSong)
 
             toast({
                 title: "Successfully added your song.",
@@ -53,7 +43,7 @@ export default function useCreateSong() {
                             variant={"outline"}
                             size={"icon"}
                             onClick={() => {
-                                playSong(newSong.id);
+                                playSong(newSong.id)
                             }}
                         >
                             <PlayIcon />
@@ -63,10 +53,10 @@ export default function useCreateSong() {
                         </Link>
                     </div>
                 ),
-            });
+            })
 
             // TODO : I don't like how this is done, it doesn't seem right
-            generateRandomCover();
+            generateRandomCover()
         } catch (e) {
             // TODO : This is untested
             toast({
@@ -75,9 +65,9 @@ export default function useCreateSong() {
                     JSON.stringify(localStorage).length
                 }storage size ${JSON.stringify(newSong).length}`,
                 variant: "destructive",
-            });
+            })
         }
 
-        return true;
-    };
+        return true
+    }
 }

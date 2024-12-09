@@ -11,14 +11,17 @@ interface LineBaseProps extends HTMLProps<HTMLDivElement> {
 
 const LineBase = forwardRef<HTMLDivElement, LineBaseProps>(({ line, input, isCurrentLine, className, ...props }, ref) => {
     const difficultyModifiers = useTextModificationsStore.use.harderOptions()
-    console.log("line rerender", line)
+
     return (
         <div className={"tracking-wide"} ref={ref} {...props}>
-            {line.split("").map((ch, index) => {
+            {Array.from(line).map((ch, index) => {
                 const char = input.at(index)
 
                 let variant: chVariant
 
+                // TODO : potential issue, multiple whitespaces in a row don't render as expected, they all combine into a single
+                //  whitespace that fools the user into thinking they are onto the next part. This is partly fixed for now by removing
+                //  multiple whitespaces when saving the content of a song.e
                 if (char === ch) {
                     variant = "correct"
                 } else if (index >= input.length) {
@@ -66,6 +69,7 @@ const LineBase = forwardRef<HTMLDivElement, LineBaseProps>(({ line, input, isCur
                         }
                     }
                 }
+
                 return (
                     <Ch key={`char-${index}`} variant={variant} className={className}>
                         {ch}
