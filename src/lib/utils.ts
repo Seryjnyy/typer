@@ -90,6 +90,12 @@ export const textModification = (s: string, options: TextModificationOptions) =>
     return res
 }
 
+// remove multiple whitespaces in a row, replace with a single
+// whitespace
+export const removeMultipleWhitespacesInARow = (s: string) => {
+    return s.replace(/[ \t]+/g, " ")
+}
+
 export const formatDurationMS = (duration_ms: number): string => {
     const seconds = Math.floor(duration_ms / 1000) % 60
     const minutes = Math.floor(duration_ms / 1000 / 60)

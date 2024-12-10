@@ -7,6 +7,7 @@ import { useSongStore } from "../store/song-store"
 import { Optional, Song } from "../types"
 import usePlaySong from "./use-play-song"
 import useRandomCoverGradient from "./use-random-cover-gradient"
+import { removeMultipleWhitespacesInARow } from "@/lib/utils.ts"
 
 // TODO : Needs testing with localStorage, like when its full etc.
 // TODO : Since cover is passed in as a string it can be anything, should validate it, if wrong then generate a new one
@@ -20,7 +21,7 @@ export default function useCreateSong() {
     return (song: Optional<Song, "id" | "cover" | "completion" | "createdAt" | "lastModifiedAt" | "record" | "spotifyUri">) => {
         const newSong: Song = {
             ...song,
-            content: song.content.replace(/\s{2,}/g, " "), // remove multiple whitespaces in a row, replace with a single whitespace
+            content: removeMultipleWhitespacesInARow(song.content),
             id: song.id ?? uuidv4(),
             cover: song.cover ?? JSON.stringify(cover),
             completion: song.completion ?? 0,

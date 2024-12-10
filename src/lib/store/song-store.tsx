@@ -3,6 +3,7 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import { createSelectors } from "./create-selectors"
 import { Song } from "../types"
+import { removeMultipleWhitespacesInARow } from "@/lib/utils.ts"
 
 interface Store {
     songs: Song[]
@@ -104,11 +105,7 @@ const useSongStoreBase = create<Store>()(
                     const filtered = get().songs.filter((x) => x.id != song.id)
 
                     return {
-                        songs: [
-                            ...filtered,
-                            { ...song, content: trimSongContent(song.content).replace(/\s{2,}/g, " ") }, // removes multiple whitespaces
-                            // in a row
-                        ],
+                        songs: [...filtered, { ...song, content: removeMultipleWhitespacesInARow(trimSongContent(song.content)) }],
                     }
                 }),
         }),
