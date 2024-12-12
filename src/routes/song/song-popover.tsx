@@ -18,10 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { DotsHorizontalIcon, DownloadIcon, EyeOpenIcon, Pencil1Icon, PlayIcon, PlusIcon, TrashIcon } from "@radix-ui/react-icons"
-
-import { Icons } from "@/components/icons"
-import MusicPlaying from "@/components/music-playing"
-import { usePlaySongThroughSpotify } from "@/components/spotify/use-play-song-through-spotify"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -124,8 +120,6 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
     const playSong = usePlaySong()
     const { exportSongs } = useExportSongs()
 
-    const { setPlayableSong, currentPlayableSong } = usePlaySongThroughSpotify()
-
     const onAddToQueue = (songId: string) => {
         enqueue(songId)
     }
@@ -162,18 +156,19 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     <PlusIcon />
                     <span> Queue</span>
                 </DropdownMenuItem>
-                {song.spotifyUri && (
-                    <DropdownMenuItem
-                        className="flex gap-1 items-center"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setPlayableSong(song)
-                        }}
-                    >
-                        <Icons.spotify className="size-4 fill-primary-foreground " /> Play
-                        {song.id === currentPlayableSong?.id && <MusicPlaying variant={"primary"} className="ml-1" />}
-                    </DropdownMenuItem>
-                )}
+                {/*TODO : maybe make the button just play the song in typer instead*/}
+                {/*{song.spotifyUri && (*/}
+                {/*    <DropdownMenuItem*/}
+                {/*        className="flex gap-1 items-center"*/}
+                {/*        onClick={(e) => {*/}
+                {/*            e.stopPropagation()*/}
+                {/*            setPlayableSong(song)*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        <Icons.spotify className="size-4 fill-primary-foreground " /> Play*/}
+                {/*        {song.id === currentPlayableSong?.id && <MusicPlaying variant={"primary"} className="ml-1" />}*/}
+                {/*    </DropdownMenuItem>*/}
+                {/*)}*/}
 
                 <DropdownMenuItem
                     className="space-x-1"

@@ -11,8 +11,6 @@ import { cn, formatTimestamp } from "@/lib/utils"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router"
-
-import PlayThroughSpotifyButton from "@/components/spotify/play-through-spotify-button"
 import { useSongCover } from "@/lib/hooks/use-song-cover"
 import SongPopover from "./song-popover"
 import { Icons } from "@/components/icons.tsx"
@@ -187,9 +185,10 @@ export default function Song() {
                                 <SongPopover song={song} exclude={{ viewMore: true }} />
                             </div>
                         </div>
-                        <div className="w-full flex justify-end">
-                            <PlayThroughSpotifyButton song={song} variant={"outline"} size={"sm"} />
-                        </div>
+                        {/*TODO : Maybe add a button for this where it just plays the song in the queue instead*/}
+                        {/*<div className="w-full flex justify-end">*/}
+                        {/*    <PlayThroughSpotifyButton song={song} variant={"outline"} size={"sm"} />*/}
+                        {/*</div>*/}
                     </div>
                 </div>
 
