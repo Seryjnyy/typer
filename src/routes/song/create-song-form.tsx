@@ -20,11 +20,15 @@ import { coverAsStyle, createRandomCover, parseGeneratedCoverString } from "@/li
 import { Track } from "@spotify/web-api-ts-sdk"
 import { createContext } from "react"
 import CreateSongFormSongAssociation from "./create-song-form-song-association"
+import SpotifyWebSDKProvider from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
+import FindSongUsingSpotify from "@/components/spotify/find-song-using-spotify.tsx"
+import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
 
 // TODO : this whole thing seems messy
 // I think I need separate context from form for this because if the user uses spotify option I need to associate it with the spotify song
 // (need access to name etc) because the user can still change the title and artist of the song
 // Or maybe only allow the user to use either spotify or manual option, not both
+
 interface SongAssociation {
     song: Track | null
     setSong: (value: Track | null) => void
@@ -32,6 +36,7 @@ interface SongAssociation {
 
 const SongAssociationContext = createContext<SongAssociation | null>(null)
 
+// TODO : Need to move this stuff out of here for hmr
 export const useSongAssociation = () => {
     const context = useContext(SongAssociationContext)
     if (context == undefined) {
@@ -39,8 +44,6 @@ export const useSongAssociation = () => {
     }
     return context
 }
-
-// type s = Omit<songSchemaType, "spotifyURI">
 
 export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }) {
     const createSong = useCreateSong()
@@ -79,11 +82,13 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
 
         if (!result) return
 
+        // It needs  to specify the object again because need to generate a new unique cover instead of the forms defaultValue for it
         form.reset({
             title: "",
             source: "",
             content: "",
             cover: JSON.stringify(createRandomCover()),
+            spotifyURI: "",
         })
 
         setResetSignal((prev) => !prev)
@@ -149,7 +154,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
                                     <ManualArtistTrack ref={titleInputRef} />
                                 </TabsContent>
                                 <TabsContent value="spotify">
-                                    <SpotifyArtistTrack triggerRerender={resetChildState} />
+                                    <SpotifyArtistTrack />
                                 </TabsContent>
                             </Tabs>
                         </div>
@@ -177,17 +182,15 @@ const SpotifyArtistTrack = () => {
 
     return (
         <div className="space-y-6 px-1">
-            <div className="pt-2">{/*<SpotifyEnable redirectPath="/songs?tab=add-song" />*/}</div>
-            {/*{apiSDK && (*/}
-            {/*    // TODO : feels very hacky*/}
-            {/*    <FindSongUsingSpotify*/}
-            {/*        key={triggerRerender ? "r" : "n"}*/}
-            {/*        apiSDK={apiSDK}*/}
-            {/*        onSelectSong={handleSelectTrack}*/}
-            {/*        initialTitle={form.getValues().title}*/}
-            {/*        initialArtist={form.getValues().source}*/}
-            {/*    />*/}
-            {/*)}*/}
+            <SpotifyFeatureGuard>
+                <SpotifyWebSDKProvider>
+                    <FindSongUsingSpotify
+                        onSelectSong={handleSelectTrack}
+                        initialArtist={form.getValues("source")}
+                        initialTitle={form.getValues("title")}
+                    />
+                </SpotifyWebSDKProvider>
+            </SpotifyFeatureGuard>
         </div>
     )
 }
