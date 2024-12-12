@@ -86,7 +86,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
             cover: JSON.stringify(createRandomCover()),
         })
 
-        setResetChildState((prev) => !prev)
+        setResetSignal((prev) => !prev)
 
         setSongAssociation(null)
 
