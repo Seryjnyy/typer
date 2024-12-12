@@ -1,34 +1,14 @@
-import { Button } from "@/components/ui/button";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Textarea } from "@/components/ui/textarea";
-import { songSchemaType } from "@/lib/schemas/song";
-import { textModification } from "@/lib/utils";
-import {
-    CaretDownIcon,
-    Cross1Icon,
-    InfoCircledIcon,
-    ResetIcon,
-} from "@radix-ui/react-icons";
-import React, { useEffect, useMemo, useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { Button } from "@/components/ui/button"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Textarea } from "@/components/ui/textarea"
+import { SongSchemaType } from "@/lib/schemas/song"
+import { textModification } from "@/lib/utils"
+import { CaretDownIcon, Cross1Icon, InfoCircledIcon, ResetIcon } from "@radix-ui/react-icons"
+import React, { useEffect, useMemo, useState } from "react"
+import { useFormContext } from "react-hook-form"
 
 const SongContentInfo = () => {
     return (
@@ -38,13 +18,10 @@ const SongContentInfo = () => {
                     <InfoCircledIcon />
                 </PopoverTrigger>
                 <PopoverContent>
-                    <span className="font-semibold">
-                        How to format song lyrics?
-                    </span>
+                    <span className="font-semibold">How to format song lyrics?</span>
                     <div>
                         <p className="text-muted-foreground pb-5 pt-2 text-sm ">
-                            Lines placed together without a empty line between
-                            them form a verse.
+                            Lines placed together without a empty line between them form a verse.
                         </p>
 
                         <div className="w-full border rounded-sm p-4  bg-background space-y-1">
@@ -62,87 +39,87 @@ const SongContentInfo = () => {
                 </PopoverContent>
             </Popover>
         </div>
-    );
-};
+    )
+}
 
 // TODO : turn redo/undo into hook, or use the one from useHooks
 export default function SongContentFormField({
-    resetState,
+    resetSignal,
     initialVal,
     changeIndicator,
     onContentChange,
 }: {
-    resetState?: boolean;
-    initialVal?: string;
-    changeIndicator?: boolean;
-    onContentChange?: (content: string) => void;
+    resetSignal?: boolean
+    initialVal?: string
+    changeIndicator?: boolean
+    onContentChange?: (content: string) => void
 }) {
-    const form = useFormContext<songSchemaType>();
-    const maxLength = 10;
+    const form = useFormContext<SongSchemaType>()
+    const maxLength = 10
 
-    const [history, setHistory] = useState<string[]>([initialVal ?? ""]);
-    const [redoHistory, setRedoHistory] = useState<string[]>([]);
+    const [history, setHistory] = useState<string[]>([initialVal ?? ""])
+    const [redoHistory, setRedoHistory] = useState<string[]>([])
     const currentValue = useMemo(() => {
-        const currVal = history.length > 0 ? history[history.length - 1] : "";
+        const currVal = history.length > 0 ? history[history.length - 1] : ""
 
-        return currVal;
-    }, [history]);
+        return currVal
+    }, [history])
 
     // TODO: Bit of a hack but eh
     useEffect(() => {
-        if (resetState == undefined) return;
-        setHistory([]);
-        setRedoHistory([]);
-    }, [resetState]);
+        if (resetSignal == undefined) return
+        setHistory([])
+        setRedoHistory([])
+    }, [resetSignal])
 
     const updateHistory = (val: string, updateRedoHistory?: boolean) => {
         setHistory((prev) => {
-            const newHistory = [...prev, val];
+            const newHistory = [...prev, val]
 
             if (newHistory.length > maxLength) {
-                newHistory.splice(0, newHistory.length - maxLength);
-                return newHistory;
+                newHistory.splice(0, newHistory.length - maxLength)
+                return newHistory
             }
 
-            return newHistory;
-        });
+            return newHistory
+        })
 
         if (updateRedoHistory == true) {
-            setRedoHistory([]);
+            setRedoHistory([])
         }
 
-        onContentChange?.(val);
-        form.setValue("content", val);
-    };
+        onContentChange?.(val)
+        form.setValue("content", val)
+    }
 
     // on user input log history
     const handleUserInput = (val: string) => {
-        updateHistory(val, true);
-    };
+        updateHistory(val, true)
+    }
 
     const undo = () => {
-        if (history.length <= 1) return;
+        if (history.length <= 1) return
 
         setRedoHistory((prev) => {
-            const newHistory = [...prev, currentValue];
-            return newHistory;
-        });
+            const newHistory = [...prev, currentValue]
+            return newHistory
+        })
 
         setHistory((prev) => {
-            return prev.slice(0, prev.length - 1);
-        });
-    };
+            return prev.slice(0, prev.length - 1)
+        })
+    }
 
     const redo = () => {
-        if (redoHistory.length == 0) return;
+        if (redoHistory.length == 0) return
 
-        updateHistory(redoHistory[redoHistory.length - 1], false);
-        setRedoHistory((prev) => prev.slice(0, prev.length - 1));
-    };
+        updateHistory(redoHistory[redoHistory.length - 1], false)
+        setRedoHistory((prev) => prev.slice(0, prev.length - 1))
+    }
 
     React.useEffect(() => {
-        console.log(history);
-    }, [history]);
+        console.log(history)
+    }, [history])
 
     const handleUseSmallerCase = () => {
         updateHistory(
@@ -152,8 +129,8 @@ export default function SongContentFormField({
                 punctuation: "normal",
             }),
             true
-        );
-    };
+        )
+    }
 
     const handleUseUpperCase = () => {
         updateHistory(
@@ -163,8 +140,8 @@ export default function SongContentFormField({
                 punctuation: "normal",
             }),
             true
-        );
-    };
+        )
+    }
 
     const handleRemoveNumbers = () => {
         updateHistory(
@@ -174,8 +151,8 @@ export default function SongContentFormField({
                 punctuation: "normal",
             }),
             true
-        );
-    };
+        )
+    }
 
     const handleRemovePunctuation = () => {
         updateHistory(
@@ -185,8 +162,8 @@ export default function SongContentFormField({
                 punctuation: "removed",
             }),
             true
-        );
-    };
+        )
+    }
 
     const options = [
         {
@@ -223,7 +200,7 @@ export default function SongContentFormField({
                 </>
             ),
         },
-    ];
+    ]
 
     return (
         <FormField
@@ -234,14 +211,10 @@ export default function SongContentFormField({
                     <FormLabel className="space-x-1">
                         <span className="capitalize">
                             {field.name}
-                            {changeIndicator && currentValue != initialVal && (
-                                <span className="text-primary">*</span>
-                            )}
+                            {changeIndicator && currentValue != initialVal && <span className="text-primary">*</span>}
                         </span>
 
-                        <span className="text-xs text-muted-foreground">
-                            (Lyrics)
-                        </span>
+                        <span className="text-xs text-muted-foreground">(Lyrics)</span>
                         <SongContentInfo />
                     </FormLabel>
                     <FormControl>
@@ -250,9 +223,7 @@ export default function SongContentFormField({
                                 <Textarea
                                     {...field}
                                     value={currentValue}
-                                    onChange={(e) =>
-                                        handleUserInput(e.target.value)
-                                    }
+                                    onChange={(e) => handleUserInput(e.target.value)}
                                     className="min-h-[12rem] "
                                 />
                                 <Collapsible>
@@ -263,13 +234,8 @@ export default function SongContentFormField({
                                     <CollapsibleContent className="px-4 border pb-4 rounded-sm">
                                         <div className="flex flex-wrap py-4">
                                             {options.map((option) => (
-                                                <div
-                                                    className="flex gap-4 items-center border p-3 w-fit"
-                                                    key={option.id}
-                                                >
-                                                    <Label htmlFor={option.id}>
-                                                        {option.label}
-                                                    </Label>
+                                                <div className="flex gap-4 items-center border p-3 w-fit" key={option.id}>
+                                                    <Label htmlFor={option.id}>{option.label}</Label>
                                                     <Button
                                                         type="button"
                                                         id="use-smaller-case-button"
@@ -293,24 +259,18 @@ export default function SongContentFormField({
                                                 size={"sm"}
                                             >
                                                 <ResetIcon />
-                                                <span className="text-muted-foreground text-xs">
-                                                    undo
-                                                </span>
+                                                <span className="text-muted-foreground text-xs">undo</span>
                                             </Button>
                                             <Button
                                                 type="button"
                                                 variant={"secondary"}
                                                 onClick={redo}
-                                                disabled={
-                                                    redoHistory.length == 0
-                                                }
+                                                disabled={redoHistory.length == 0}
                                                 className="space-x-2"
                                                 size={"sm"}
                                             >
                                                 <ResetIcon className="-scale-x-100 " />
-                                                <span className="text-muted-foreground text-xs">
-                                                    redo
-                                                </span>
+                                                <span className="text-muted-foreground text-xs">redo</span>
                                             </Button>
                                         </div>
                                     </CollapsibleContent>
@@ -318,13 +278,10 @@ export default function SongContentFormField({
                             </div>
                         </div>
                     </FormControl>
-                    <FormDescription className="sr-only">
-                        This is the content of the song. It is what you will be
-                        typing.
-                    </FormDescription>
+                    <FormDescription className="sr-only">This is the content of the song. It is what you will be typing.</FormDescription>
                     <FormMessage />
                 </FormItem>
             )}
         />
-    );
+    )
 }

@@ -48,7 +48,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
     const titleInputRef = useRef<HTMLInputElement>(null)
     const [songAssociation, setSongAssociation] = useState<Track | null>(null)
 
-    const [resetChildState, setResetChildState] = useState(false)
+    const [resetSignal, setResetSignal] = useState(false)
 
     const randomCoverGradient = useMemo(() => createRandomCover(), [])
 
@@ -154,7 +154,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
                             </Tabs>
                         </div>
                         <CreateSongFormSongAssociation />
-                        <SongContentFormField resetState={resetChildState} />
+                        <SongContentFormField resetSignal={resetSignal} />
                         <SearchForLyrics artist={source} track={title} />
                         <Button type="submit">Submit</Button>
                     </form>
