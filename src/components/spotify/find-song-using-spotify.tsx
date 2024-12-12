@@ -1,37 +1,39 @@
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { ChangeEvent, useEffect, useMemo, useState } from "react"
 
-import { SpotifyApi, Track } from "@spotify/web-api-ts-sdk"
+import { Track } from "@spotify/web-api-ts-sdk"
 import { debounce } from "lodash"
 import { Loader2 } from "lucide-react"
-import { ChangeEvent, useCallback } from "react"
 import { Label } from "../ui/label"
+import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
 
 interface FindSongUsingSpotifyProps {
-    apiSDK: SpotifyApi
     onSelectSong: (track: Track) => void
     initialArtist?: string
     initialTitle?: string
 }
 
-const FindSongUsingSpotify = ({ apiSDK, onSelectSong, initialArtist, initialTitle }: FindSongUsingSpotifyProps) => {
+const FindSongUsingSpotify = ({ onSelectSong, initialArtist, initialTitle }: FindSongUsingSpotifyProps) => {
     const [results, setResults] = useState<Track[]>([])
-    const [search, setSearch] = useState(initialTitle || "")
+    const [search, setSearch] = useState("")
+
+    const webSDK = useSpotifyWebSDKContext()
+
+    useEffect(() => {
+        setSearch((initialTitle ?? "") + " " + (initialArtist ?? ""))
+    }, [initialArtist, initialTitle])
 
     const [isSearchLoading, setIsSearchLoading] = useState(false)
 
     // TODO : should this use useQuery?
-    // TODO : artist is not done like initialTitle here
-    // TODO : I fixed this function, test it pls (added () => before debounce)
-    const debouncedSearch = useCallback(
+    const debouncedSearch = useMemo(
         () =>
             debounce(async (search: string) => {
-                if (search.trim()) {
+                const query = search.trim()
+                if (query) {
                     setIsSearchLoading(true)
 
-                    const query = initialArtist ? `${search} artist:${initialArtist}` : search
-
-                    const results = await apiSDK?.search(query, ["track"], undefined, 3)
+                    const results = await webSDK?.search(query, ["track"], undefined, 3)
                     if (!results) return
                     setResults(results.tracks.items)
                     setIsSearchLoading(false)
@@ -39,12 +41,12 @@ const FindSongUsingSpotify = ({ apiSDK, onSelectSong, initialArtist, initialTitl
                     setResults([])
                 }
             }, 500),
-        [initialArtist, apiSDK]
+        [webSDK]
     )
 
-    const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleInput = async (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
-        debouncedSearch(e.target.value)
+        await debouncedSearch(e.target.value)
     }
 
     const handleSelect = (track: Track) => {
@@ -53,13 +55,19 @@ const FindSongUsingSpotify = ({ apiSDK, onSelectSong, initialArtist, initialTitl
         setResults([])
     }
 
+    useEffect(() => {
+        return () => {
+            debouncedSearch.cancel()
+        }
+    }, [debouncedSearch])
+
     return (
         <div>
             <div>
                 <Label>
                     Search <span className="text-muted-foreground text-xs">(Song name)</span>
                 </Label>
-                <Input onChange={handleInput} value={search} disabled={!apiSDK} onFocus={() => debouncedSearch(search)} />
+                <Input onChange={handleInput} value={search} disabled={!webSDK} onFocus={() => debouncedSearch(search)} />
             </div>
             <ul className="flex flex-col gap-3 pt-2">
                 {results.map((track) => (

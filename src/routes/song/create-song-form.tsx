@@ -164,13 +164,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
     )
 }
 
-interface SpotifyArtistTrackProps {
-    triggerRerender: boolean
-}
-
-const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
-    // const { apiSDK } = useSpotify({})
-    const form = useFormContext<songSchemaType>()
+const SpotifyArtistTrack = () => {
     const form = useFormContext<SongSchemaType>()
     const { setSong } = useSongAssociation()
 
