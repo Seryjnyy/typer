@@ -17,7 +17,12 @@ function SpotifyFeatureGuard({ children }: { children: ReactNode }) {
     if (!isWantToUseSpotify)
         return (
             <div>
-                <Button onClick={() => setIsWantToUseSpotify(true)} variant={"secondary"} className={"flex items-center gap-2"}>
+                <Button
+                    type={"button"}
+                    onClick={() => setIsWantToUseSpotify(true)}
+                    variant={"secondary"}
+                    className={"flex items-center" + " gap-2"}
+                >
                     <Icons.spotify className={"size-4"} /> Turn on Spotify
                 </Button>
             </div>

@@ -31,7 +31,7 @@ const SpotifyWebSDKProvider = ({ children }: { children: ReactNode }) => {
     if (isAuthenticated === false)
         return (
             <div>
-                <Button onClick={connectSDK} className={"flex items-center gap-2"} variant={"secondary"}>
+                <Button type="button" onClick={connectSDK} className={"flex items-center gap-2"} variant={"secondary"}>
                     <Icons.spotify className={"size-4"} /> Connect
                 </Button>
             </div>
