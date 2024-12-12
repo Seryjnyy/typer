@@ -27,7 +27,7 @@ export const useSpotifyWebSDK = () => {
 
     // Manual authentication
     const connectSDK = async () => {
-        if (!clientSDK) return
+        if (!clientSDK) return false
         const res = await clientSDK?.authenticate()
         return res.authenticated
     }
