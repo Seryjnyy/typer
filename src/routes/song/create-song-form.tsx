@@ -3,18 +3,16 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-import SpotifyEnable from "@/components/spotify/spotify-enable"
 import { Input } from "@/components/ui/input"
 import useCreateSong from "@/lib/hooks/use-create-song"
 import { songSchema, songSchemaType } from "@/lib/schemas/song"
 import { cn } from "@/lib/utils"
-import { useSpotify } from "@/spotify/use-spotify"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { forwardRef, useContext, useMemo, useRef, useState } from "react"
 import { useForm, useFormContext } from "react-hook-form"
 import SongContentFormField from "./song-content-form-field"
 
-import FindSongUsingSpotify from "@/components/spotify/find-song-using-spotify"
 import SearchForLyrics from "@/components/spotify/search-for-lyrics"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -171,7 +169,7 @@ interface SpotifyArtistTrackProps {
 }
 
 const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
-    const { apiSDK } = useSpotify({})
+    // const { apiSDK } = useSpotify({})
     const form = useFormContext<songSchemaType>()
     const { setSong } = useSongAssociation()
 
@@ -184,18 +182,17 @@ const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
 
     return (
         <div className="space-y-6 px-1">
-            <div className="pt-2">
-                <SpotifyEnable redirectPath="/songs?tab=add-song" />
-            </div>
-            {apiSDK && (
-                // TODO : feels very hacky
-                <FindSongUsingSpotify
-                    key={triggerRerender ? "r" : "n"}
-                    apiSDK={apiSDK}
-                    onSelectSong={handleSelectTrack}
-                    initialTitle={form.getValues().title}
-                />
-            )}
+            <div className="pt-2">{/*<SpotifyEnable redirectPath="/songs?tab=add-song" />*/}</div>
+            {/*{apiSDK && (*/}
+            {/*    // TODO : feels very hacky*/}
+            {/*    <FindSongUsingSpotify*/}
+            {/*        key={triggerRerender ? "r" : "n"}*/}
+            {/*        apiSDK={apiSDK}*/}
+            {/*        onSelectSong={handleSelectTrack}*/}
+            {/*        initialTitle={form.getValues().title}*/}
+            {/*        initialArtist={form.getValues().source}*/}
+            {/*    />*/}
+            {/*)}*/}
         </div>
     )
 }
