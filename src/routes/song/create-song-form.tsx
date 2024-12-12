@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { Input } from "@/components/ui/input"
 import useCreateSong from "@/lib/hooks/use-create-song"
-import { songSchema, songSchemaType } from "@/lib/schemas/song"
+import { songSchema, SongSchemaType } from "@/lib/schemas/song"
 import { cn } from "@/lib/utils"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -52,7 +52,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
 
     const randomCoverGradient = useMemo(() => createRandomCover(), [])
 
-    const form = useForm<songSchemaType>({
+    const form = useForm<SongSchemaType>({
         resolver: zodResolver(songSchema),
         defaultValues: {
             source: "",
@@ -63,7 +63,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
         },
     })
 
-    function onSubmit(values: songSchemaType) {
+    function onSubmit(values: SongSchemaType) {
         console.log(values)
 
         // gets spotify uri from song association state
@@ -171,6 +171,7 @@ interface SpotifyArtistTrackProps {
 const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
     // const { apiSDK } = useSpotify({})
     const form = useFormContext<songSchemaType>()
+    const form = useFormContext<SongSchemaType>()
     const { setSong } = useSongAssociation()
 
     const handleSelectTrack = (track: Track) => {
@@ -200,7 +201,7 @@ const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
 interface ManualArtistTrackProps {}
 
 const ManualArtistTrack = forwardRef<HTMLInputElement, ManualArtistTrackProps>((_, ref) => {
-    const form = useFormContext<songSchemaType>()
+    const form = useFormContext<SongSchemaType>()
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mx-1">
