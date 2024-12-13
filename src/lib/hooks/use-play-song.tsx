@@ -1,25 +1,28 @@
-import { useQueueStore } from "@/lib/store/queue-store";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useQueueStore } from "@/lib/store/queue-store"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export default function usePlaySong() {
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate = useNavigate()
+    const location = useLocation()
 
-    const songs = useQueueStore.use.songs();
-    const enqueue = useQueueStore.use.enqueue();
-    const setCurrent = useQueueStore.use.setCurrent();
+    const songs = useQueueStore.use.songs()
+    const enqueue = useQueueStore.use.enqueue()
+    const setCurrent = useQueueStore.use.setCurrent()
 
-    return (songId: string) => {
+    return (songId: string, redirect?: boolean) => {
+        redirect = redirect == undefined ? true : redirect
         if (!songs.includes(songId)) {
             // TODO : Should enqueue the song at the top of the queue if no current
             // Otherwise enqueue after current
-            enqueue(songId, true);
+            enqueue(songId, true)
         } else {
-            setCurrent(songId);
+            setCurrent(songId)
         }
 
-        if (location.pathname != "/") {
-            navigate("/");
+        if (redirect) {
+            if (location.pathname != "/") {
+                navigate("/")
+            }
         }
-    };
+    }
 }
