@@ -32,6 +32,8 @@ import { useQueueStore } from "../../lib/store/queue-store"
 import { useSongStore } from "../../lib/store/song-store"
 import CreatePlaylistForm from "./create-playlist-form"
 import { PlaylistBanner } from "./playlist-header"
+import { Icons } from "@/components/icons.tsx"
+import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
 
 const AddToPlaylistDialog = ({ song }: { song: Song }) => {
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
@@ -113,6 +115,7 @@ interface SongPopoverProps {
     destructiveMenuItems?: ReactNode
 }
 
+// TODO : this is a dropdown not popover
 export default function SongPopover({ song, exclude, destructiveMenuItems }: SongPopoverProps) {
     const queueNext = useQueueStore.use.queueNext()
     const removeSong = useSongStore.use.removeSong()
@@ -156,19 +159,20 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     <PlusIcon />
                     <span> Queue</span>
                 </DropdownMenuItem>
-                {/*TODO : maybe make the button just play the song in typer instead*/}
-                {/*{song.spotifyUri && (*/}
-                {/*    <DropdownMenuItem*/}
-                {/*        className="flex gap-1 items-center"*/}
-                {/*        onClick={(e) => {*/}
-                {/*            e.stopPropagation()*/}
-                {/*            setPlayableSong(song)*/}
-                {/*        }}*/}
-                {/*    >*/}
-                {/*        <Icons.spotify className="size-4 fill-primary-foreground " /> Play*/}
-                {/*        {song.id === currentPlayableSong?.id && <MusicPlaying variant={"primary"} className="ml-1" />}*/}
-                {/*    </DropdownMenuItem>*/}
-                {/*)}*/}
+                {song.spotifyUri && (
+                    <SpotifyFeatureGuard>
+                        <DropdownMenuItem
+                            onClick={(e) => {
+                                playSong(song.id, false)
+                                e.stopPropagation()
+                            }}
+                        >
+                            <div className={"flex gap-2 items-center"}>
+                                <Icons.spotify className="size-4 fill-[#1DB954]" /> Play
+                            </div>
+                        </DropdownMenuItem>
+                    </SpotifyFeatureGuard>
+                )}
 
                 <DropdownMenuItem
                     className="space-x-1"
