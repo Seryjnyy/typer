@@ -4,7 +4,7 @@ import SpotifyAccessTokenProvider from "@/components/spotify-new/providers/spoti
 import SpotifyWebPlayerSDKProvider from "@/components/spotify-new/providers/spotify-web-player-sdk-provider.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import MyDevices from "@/components/spotify-new/player/components/my-devices.tsx"
-import { usePlaybackState, useWebPlaybackSDKReady } from "react-spotify-web-playback-sdk"
+import { usePlaybackState, usePlayerDevice, useWebPlaybackSDKReady } from "react-spotify-web-playback-sdk"
 import { useColor } from "color-thief-react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import PlaybackControl from "@/components/spotify-new/player/components/playback-control.tsx"
@@ -37,9 +37,10 @@ const WebPlayerProvider = ({ children }: { children: ReactNode }) => {
 const WebPlayerContent = () => {
     const webPlaybackSDKReady = useWebPlaybackSDKReady()
     const [open, setOpen] = useState(true)
+    const device = usePlayerDevice()
     usePlayback()
 
-    if (!webPlaybackSDKReady) return <LoadingMessage />
+    if (!webPlaybackSDKReady || !device) return <LoadingMessage />
 
     if (!open)
         return (
