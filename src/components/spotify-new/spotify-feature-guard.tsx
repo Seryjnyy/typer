@@ -11,10 +11,10 @@ const useSpotifySetting = () => useAtom(isUseSpotify)
 // TODO :I'm not sure if this component is needed anymore, I added this because Spotify did auto redirect because it was set up to
 // authenticate
 // in useEffect. But its manual now so idk.
-function SpotifyFeatureGuard({ children }: { children: ReactNode }) {
+function SpotifyFeatureGuard({ children, returnEnable = true }: { children: ReactNode; returnEnable?: boolean }) {
     const [isWantToUseSpotify, setIsWantToUseSpotify] = useSpotifySetting()
 
-    if (!isWantToUseSpotify)
+    if (!isWantToUseSpotify && returnEnable) {
         return (
             <div>
                 <Button
@@ -27,6 +27,9 @@ function SpotifyFeatureGuard({ children }: { children: ReactNode }) {
                 </Button>
             </div>
         )
+    }
+
+    if (!isWantToUseSpotify && !returnEnable) return null
 
     return children
 }
