@@ -14,6 +14,8 @@ import { useNavigate, useParams } from "react-router"
 import { useSongCover } from "@/lib/hooks/use-song-cover"
 import SongPopover from "./song-popover"
 import { Icons } from "@/components/icons.tsx"
+import PlayButton from "@/components/play-button.tsx"
+import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
 
 interface SongContentProps {
     song: SongType
@@ -185,10 +187,23 @@ export default function Song() {
                                 <SongPopover song={song} exclude={{ viewMore: true }} />
                             </div>
                         </div>
-                        {/*TODO : Maybe add a button for this where it just plays the song in the queue instead*/}
-                        {/*<div className="w-full flex justify-end">*/}
-                        {/*    <PlayThroughSpotifyButton song={song} variant={"outline"} size={"sm"} />*/}
-                        {/*</div>*/}
+                        <div className="w-full flex justify-end">
+                            {song.spotifyUri && (
+                                <SpotifyFeatureGuard returnEnable={false}>
+                                    <PlayButton
+                                        songID={song.id}
+                                        redirect={false}
+                                        size={"sm"}
+                                        variant={"outline"}
+                                        className={"hover:bg-secondary" + " hover:text-secondary-foreground"}
+                                    >
+                                        <div className={"flex gap-2"}>
+                                            <Icons.spotify className="size-4 fill-[#1DB954]  " /> Play
+                                        </div>
+                                    </PlayButton>
+                                </SpotifyFeatureGuard>
+                            )}
+                        </div>
                     </div>
                 </div>
 
