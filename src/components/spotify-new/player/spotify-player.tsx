@@ -5,7 +5,7 @@ import SpotifyAccessTokenProvider from "@/components/spotify-new/providers/spoti
 import SpotifyWebPlayerSDKProvider from "@/components/spotify-new/providers/spotify-web-player-sdk-provider.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import MyDevices from "@/components/spotify-new/player/components/my-devices.tsx"
-import { usePlaybackState, usePlayerDevice, useWebPlaybackSDKReady } from "react-spotify-web-playback-sdk"
+import { usePlaybackState, usePlayerDevice, useSpotifyPlayer, useWebPlaybackSDKReady } from "react-spotify-web-playback-sdk"
 import { useColor } from "color-thief-react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import PlaybackControl from "@/components/spotify-new/player/components/playback-control.tsx"
@@ -36,6 +36,29 @@ const WebPlayerProvider = ({ children }: { children: ReactNode }) => {
     )
 }
 
+const ResetPlaybackButton = () => {
+    const spotifyPlayer = useSpotifyPlayer()
+
+    const handleReset = () => {
+        spotifyPlayer?.seek(0)
+    }
+
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button size={"icon"} variant={"outline"} onClick={handleReset}>
+                        <ReloadIcon />
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent side={"top"} sideOffset={16}>
+                    <p>Reset track</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
+
 const WebPlayerContent = () => {
     const webPlaybackSDKReady = useWebPlaybackSDKReady()
     const [open, setOpen] = useState(true)
@@ -51,18 +74,7 @@ const WebPlayerContent = () => {
                     <div className={" flex items-center gap-3 "}>
                         <CurrentTrackDetail smallVersion={true} />
                         <PlaybackControl />
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button size={"icon"} variant={"outline"} onClick={() => setOpen((prev) => !prev)}>
-                                        <ReloadIcon />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side={"top"} sideOffset={16}>
-                                    <p>Reset track</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <ResetPlaybackButton />
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
