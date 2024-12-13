@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button.tsx"
 import { LoopIcon } from "@radix-ui/react-icons"
 import { cn } from "@/lib/utils.ts"
 import { Label } from "@/components/ui/label.tsx"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx"
 
 const REPEAT_MODES_MAP = {
     0: "NO_REPEAT",
@@ -31,9 +32,18 @@ const LoopButton = () => {
 
     return (
         <div className={"flex items-center justify-start gap-1"}>
-            <Button size={"icon"} variant={"outline"} onClick={toggleRepeat}>
-                <LoopIcon className={cn({ "text-[#1DB954] ": isLoop })} />
-            </Button>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild={true}>
+                        <Button size={"icon"} variant={"outline"} onClick={toggleRepeat}>
+                            <LoopIcon className={cn({ "text-[#1DB954] ": isLoop })} />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side={"right"}>
+                        <p>{isLoop ? "Don't repeat track" : "Repeat track"}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
             <Label className={"text-muted-foreground"}>Repeat is {isLoop ? "on" : "off"}</Label>
         </div>
     )

@@ -9,7 +9,7 @@ export default function FloatingSpotifyPlayer() {
     return (
         <div
             className={cn(
-                "fixed bottom-[4rem] right-0 backdrop-blur-md z-50 p-3  m-3 outline-1 outline rounded-lg max-w-screen-md flex overflow-hidden" +
+                "fixed bottom-[4rem] right-0 backdrop-blur-md z-50 p-3  m-3 outline-1 outline rounded-lg max-w-screen-md flex " +
                     " items-center"
             )}
         >

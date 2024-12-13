@@ -1,3 +1,4 @@
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
 import { ReactNode, useState } from "react"
 import SpotifyWebSDKProvider from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
 import SpotifyAccessTokenProvider from "@/components/spotify-new/providers/spotify-access-token-provider.tsx"
@@ -15,6 +16,7 @@ import { Progress } from "@/components/ui/progress.tsx"
 import { usePlayback } from "@/components/spotify-new/player/use-playback.ts"
 import LoadingMessage from "@/components/spotify-new/loading-message.tsx"
 import LoopToggle from "@/components/spotify-new/player/components/loop-toggle.tsx"
+import { cn } from "@/lib/utils.ts"
 
 const SpotifyPlayer = () => {
     return (
@@ -44,32 +46,60 @@ const WebPlayerContent = () => {
 
     if (!open)
         return (
-            <div className=" rounded-lg    flex flex-col gap-2  relative ">
-                <div className={" flex items-center gap-3 "}>
-                    <CurrentTrackDetail smallVersion={true} />
-                    <PlaybackControl />
-                    <Button size={"icon"} variant={"outline"} onClick={() => setOpen((prev) => !prev)}>
-                        <ReloadIcon />
-                    </Button>
-                    <Button size={"icon"} variant={"outline"} onClick={() => setOpen((prev) => !prev)}>
-                        <Menu />
-                    </Button>
+            <>
+                <div className=" rounded-lg    flex flex-col gap-2  relative ">
+                    <div className={" flex items-center gap-3 "}>
+                        <CurrentTrackDetail smallVersion={true} />
+                        <PlaybackControl />
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button size={"icon"} variant={"outline"} onClick={() => setOpen((prev) => !prev)}>
+                                        <ReloadIcon />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side={"top"} sideOffset={16}>
+                                    <p>Reset track</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button size={"icon"} variant={"outline"} onClick={() => setOpen((prev) => !prev)}>
+                                        <Menu />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side={"top"} sideOffset={16}>
+                                    <p>Maximise</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                    <div className={"absolute  w-full  rounded-lg -bottom-3 "}>
+                        <SongProgressBar />
+                    </div>
                 </div>
-                <div className={"absolute -bottom-[18px] w-full"}>
-                    <SongProgressBar />
-                </div>
-                <BackgroundGradientFromTrack />
-            </div>
+                <BackgroundGradientFromTrack className={"left-0"} />
+            </>
         )
 
     return (
         <div className="flex flex-col justify-end gap-4  rounded-lg relative  w-[40rem] ">
-            <BackgroundGradientFromTrack />
             <div className={"flex justify-between items-center"}>
                 <CurrentTrackDetail />
-                <Button className={"ml-auto"} variant={"outline"} size={"icon"} onClick={() => setOpen((prev) => !prev)}>
-                    <XIcon />
-                </Button>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button className={"ml-auto"} variant={"outline"} size={"icon"} onClick={() => setOpen((prev) => !prev)}>
+                                <XIcon />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side={"left"}>
+                            <p>Minimise</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
             </div>
             <div className="grid grid-cols-2 ">
                 <div className="justify-self-end">
@@ -96,7 +126,7 @@ const SongProgressBar = () => {
     const duration = playbackState?.duration ?? 0
     const progress = duration === 0 ? 0 : (position / duration) * 100
 
-    return <Progress value={progress} className={"h-2 bg-transparent "} />
+    return <Progress value={progress} className={"h-1 bg-transparent rounded-b-lg"} />
 }
 
 const CurrentTrackDetail = ({ smallVersion }: { smallVersion?: boolean }) => {
@@ -119,7 +149,7 @@ const CurrentTrackDetail = ({ smallVersion }: { smallVersion?: boolean }) => {
     )
 }
 
-const BackgroundGradientFromTrack = () => {
+const BackgroundGradientFromTrack = ({ className }: { className?: string }) => {
     const playbackState = usePlaybackState()
 
     const currentTrack = playbackState?.track_window.current_track
@@ -129,11 +159,9 @@ const BackgroundGradientFromTrack = () => {
 
     if (currentTrack === null || !data || error || loading) return null
 
-    // Bit hacky because this is made to overflow the current set up because it is the parent that adds padding, so the gradient wouldn't
-    //  cover the entire thing
     return (
         <div
-            className="w-full h-full absolute -top-4 -left-4 -z-10 opacity-60 rounded-lg px-[22.3rem]"
+            className={cn("w-full h-full absolute left-0 top-0  -z-10 opacity-60 rounded-lg ", className)}
             style={{
                 backgroundImage: `linear-gradient(to bottom, ${data}, transparent)`,
             }}

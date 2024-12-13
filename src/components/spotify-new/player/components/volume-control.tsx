@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react"
 import { useRef } from "react"
 import { usePlaybackState, useSpotifyPlayer } from "react-spotify-web-playback-sdk"
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
 
 export default function VolumeControl() {
     const spotifyPlayer = useSpotifyPlayer()
@@ -48,9 +49,18 @@ export default function VolumeControl() {
 
     return (
         <div className="flex gap-1 items-center">
-            <Button variant={"ghost"} size={"icon"} onClick={toggleMute} disabled={!playbackState}>
-                {getIcon()}
-            </Button>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"ghost"} size={"icon"} onClick={toggleMute} disabled={!playbackState}>
+                            {getIcon()}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side={"left"}>
+                        <p>Mute</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
             <Slider disabled={!playbackState} value={[data ?? 0]} min={0} max={1} step={0.01} onValueChange={(val) => setVolume(val[0])} />
         </div>
     )

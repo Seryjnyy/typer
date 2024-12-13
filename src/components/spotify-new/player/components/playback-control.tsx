@@ -27,7 +27,7 @@ export default function PlaybackControl() {
                         )}
                     </Button>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side={"top"} sideOffset={16}>
                     <p>{playbackState?.paused ? "Play" : "Pause"}</p>
                 </TooltipContent>
             </Tooltip>
