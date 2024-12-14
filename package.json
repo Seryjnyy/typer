@@ -54,6 +54,7 @@
     "react-hook-form": "^7.52.1",
     "react-hotkeys-hook": "^4.5.0",
     "react-responsive": "^10.0.0",
+    "react-rnd": "^10.4.13",
     "react-router": "^6.26.1",
     "react-router-dom": "^6.26.1",
     "react-spotify-web-playback-sdk": "^3.0.2",
