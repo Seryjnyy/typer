@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button.tsx"
 import { Loader2, Pause, Play } from "lucide-react"
 import { usePlaybackState, useSpotifyPlayer } from "react-spotify-web-playback-sdk"
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
+import { SPOTIFY_WEB_PLAYER_SHORTCUTS, useShortcutInfo } from "@/lib/store/shortcuts-store.ts"
+import ShortcutKeys from "@/components/shortcut-keys.tsx"
 
 export default function PlaybackControl() {
     const player = useSpotifyPlayer()
     const playbackState = usePlaybackState()
+    const shortcutInfo = useShortcutInfo(SPOTIFY_WEB_PLAYER_SHORTCUTS.TOGGLE_PLAYBACK)
 
     return (
         <TooltipProvider>
@@ -28,7 +31,8 @@ export default function PlaybackControl() {
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent side={"top"} sideOffset={16}>
-                    <p>{playbackState?.paused ? "Play" : "Pause"}</p>
+                    <p>{playbackState?.paused ? "Play" : "Pause"} </p>
+                    <ShortcutKeys shortcut={shortcutInfo} />
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
