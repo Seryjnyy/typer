@@ -204,13 +204,13 @@ const WebPlayerContent = () => {
                         <SongProgressBar />
                     </div>
                 </div>
-                <BackgroundGradientFromTrack className={"left-0 top-0"} />
+                <BackgroundGradientFromTrack />
             </>
         )
 
     return (
         <>
-            <div className="flex flex-col justify-end gap-4  rounded-lg relative  w-[40rem] ">
+            <div className="flex flex-col justify-end gap-4  rounded-lg relative  w-full ">
                 <div className={"flex justify-between items-center"}>
                     <CurrentTrackDetail />
                     <TooltipProvider>
@@ -242,7 +242,7 @@ const WebPlayerContent = () => {
                     </div>
                 </div>
             </div>
-            <BackgroundGradientFromTrack className={"left-0 top-0"} />
+            <BackgroundGradientFromTrack />
         </>
     )
 }

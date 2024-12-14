@@ -11,7 +11,7 @@ function Root() {
         <div>
             <ThemeProvider defaultTheme="dark-rose" storageKey="vite-ui-theme">
                 <TooltipProvider delayDuration={100}>
-                    <div className="h-screen overflow-hidden">
+                    <div className="h-screen overflow-hidden relative">
                         <FloatingSpotifyPlayer />
                         {/*<TyperSpotifyLink />*/}
 

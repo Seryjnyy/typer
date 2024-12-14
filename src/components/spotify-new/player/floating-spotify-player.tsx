@@ -1,26 +1,38 @@
-import { cn } from "@/lib/utils.ts"
 import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
 import SpotifyPlayer from "@/components/spotify-new/player/spotify-player.tsx"
-import { GripVertical } from "lucide-react"
-import { Button } from "@/components/ui/button.tsx"
+import { Rnd } from "react-rnd"
+import { useIsSpotifyPlayerOpen } from "@/components/spotify-new/player/spotify-player-state.ts"
 
-// TODO : React rnd
 export default function FloatingSpotifyPlayer() {
+    const [open] = useIsSpotifyPlayerOpen()
     return (
-        <div
-            className={cn(
-                "fixed bottom-[4rem] right-0 backdrop-blur-md z-50 p-3  m-3 outline-1 outline rounded-lg max-w-screen-md flex " +
-                    " items-center"
-            )}
+        <Rnd
+            className={"z-[100] backdrop-blur-sm flex items-center justify-center outline-1 outline rounded-lg "}
+            default={{
+                x: 16,
+                y: 16,
+                width: 768,
+                height: 200,
+            }}
+            size={
+                open
+                    ? {
+                          width: 768,
+                          height: 200,
+                      }
+                    : {
+                          width: 200,
+                          height: 60,
+                      }
+            }
+            bounds={"parent"}
+            enableResizing={false}
         >
-            <SpotifyFeatureGuard>
-                <SpotifyPlayer />
-            </SpotifyFeatureGuard>
-            <div>
-                <Button variant={"outline"} size={"icon"} className={"ml-3"}>
-                    <GripVertical />
-                </Button>
+            <div className={"    rounded-lg  flex  p-3  w-full h-full  "}>
+                <SpotifyFeatureGuard>
+                    <SpotifyPlayer />
+                </SpotifyFeatureGuard>
             </div>
-        </div>
+        </Rnd>
     )
 }
