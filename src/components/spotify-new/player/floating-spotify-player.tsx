@@ -1,10 +1,14 @@
 import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
 import SpotifyPlayer from "@/components/spotify-new/player/spotify-player.tsx"
 import { Rnd } from "react-rnd"
-import { useIsSpotifyPlayerOpen } from "@/components/spotify-new/player/spotify-player-state.ts"
+import { useIsSpotifyPlayerEnabled, useIsSpotifyPlayerOpen } from "@/components/spotify-new/player/spotify-player-state.ts"
 
 export default function FloatingSpotifyPlayer() {
     const [open] = useIsSpotifyPlayerOpen()
+    const [isSpotifyPlayerEnabled] = useIsSpotifyPlayerEnabled()
+
+    if (!isSpotifyPlayerEnabled) return null
+
     return (
         <Rnd
             className={"z-[100] backdrop-blur-sm flex items-center justify-center outline-1 outline rounded-lg "}
