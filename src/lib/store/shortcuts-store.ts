@@ -9,8 +9,13 @@ export const SPOTIFY_WEB_PLAYER_SHORTCUTS = {
     PLAYBACK_SEEK_BACKWARD: "playback-seek-backward",
 }
 
+export const TYPER_SHORTCUTS = {
+    RESTART: "restart-typer",
+}
+
 export const ALL_SHORTCUTS = {
     ...SPOTIFY_WEB_PLAYER_SHORTCUTS,
+    ...TYPER_SHORTCUTS,
 }
 
 type AvailableShortcut = (typeof ALL_SHORTCUTS)[keyof typeof ALL_SHORTCUTS]
@@ -60,6 +65,13 @@ const DEFAULTS: State = {
             hotkeys: ["alt+j"],
             defaultHotkeys: ["alt+j"],
             label: "Playback seek backward",
+            enabled: true,
+        },
+        {
+            id: TYPER_SHORTCUTS.RESTART,
+            hotkeys: ["esc"],
+            defaultHotkeys: ["esc"],
+            label: "Restart",
             enabled: true,
         },
     ],
