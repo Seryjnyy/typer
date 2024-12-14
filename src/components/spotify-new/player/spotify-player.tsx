@@ -1,5 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx"
-import { ReactNode, useState } from "react"
+import { ReactNode } from "react"
 import SpotifyWebSDKProvider from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
 import SpotifyAccessTokenProvider from "@/components/spotify-new/providers/spotify-access-token-provider.tsx"
 import SpotifyWebPlayerSDKProvider from "@/components/spotify-new/providers/spotify-web-player-sdk-provider.tsx"
@@ -21,6 +21,7 @@ import { useHotkeys } from "react-hotkeys-hook"
 import { debounce } from "lodash"
 import { SPOTIFY_WEB_PLAYER_SHORTCUTS, useShortcutInfo } from "@/lib/store/shortcuts-store.ts"
 import ShortcutKeys from "@/components/shortcut-keys.tsx"
+import { useIsSpotifyPlayerOpen } from "@/components/spotify-new/player/spotify-player-state.ts"
 
 const SpotifyPlayer = () => {
     return (
@@ -172,7 +173,7 @@ const WithWebPlayerShortcuts = ({ children }: { children: ReactNode }) => {
 
 const WebPlayerContent = () => {
     const webPlaybackSDKReady = useWebPlaybackSDKReady()
-    const [open, setOpen] = useState(true)
+    const [open, setOpen] = useIsSpotifyPlayerOpen()
     const device = usePlayerDevice()
     usePlayback()
 
