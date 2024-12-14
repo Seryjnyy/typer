@@ -1,4 +1,4 @@
-import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip.tsx"
 import { ReactNode, useState } from "react"
 import SpotifyWebSDKProvider from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
 import SpotifyAccessTokenProvider from "@/components/spotify-new/providers/spotify-access-token-provider.tsx"
@@ -17,11 +17,17 @@ import { usePlayback } from "@/components/spotify-new/player/use-playback.ts"
 import LoadingMessage from "@/components/spotify-new/loading-message.tsx"
 import LoopToggle from "@/components/spotify-new/player/components/loop-toggle.tsx"
 import { cn } from "@/lib/utils.ts"
+import { useHotkeys } from "react-hotkeys-hook"
+import { debounce } from "lodash"
+import { SPOTIFY_WEB_PLAYER_SHORTCUTS, useShortcutInfo } from "@/lib/store/shortcuts-store.ts"
+import ShortcutKeys from "@/components/shortcut-keys.tsx"
 
 const SpotifyPlayer = () => {
     return (
         <WebPlayerProvider>
-            <WebPlayerContent />
+            <WithWebPlayerShortcuts>
+                <WebPlayerContent />
+            </WithWebPlayerShortcuts>
         </WebPlayerProvider>
     )
 }
@@ -36,8 +42,9 @@ const WebPlayerProvider = ({ children }: { children: ReactNode }) => {
     )
 }
 
-const ResetPlaybackButton = () => {
+const RestartPlaybackButton = () => {
     const spotifyPlayer = useSpotifyPlayer()
+    const shortcutInfo = useShortcutInfo(SPOTIFY_WEB_PLAYER_SHORTCUTS.RESTART_PLAYBACK)
 
     const handleReset = () => {
         spotifyPlayer?.seek(0)
@@ -53,9 +60,113 @@ const ResetPlaybackButton = () => {
                 </TooltipTrigger>
                 <TooltipContent side={"top"} sideOffset={16}>
                     <p>Reset track</p>
+                    <ShortcutKeys shortcut={shortcutInfo} />
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
+    )
+}
+
+const RestartPlaybackShortcut = () => {
+    const spotifyPlayer = useSpotifyPlayer()
+    const shortcut = useShortcutInfo(SPOTIFY_WEB_PLAYER_SHORTCUTS.RESTART_PLAYBACK)
+
+    useHotkeys(
+        shortcut?.hotkeys.join(",") ?? "",
+        (e) => {
+            e.preventDefault()
+            spotifyPlayer?.seek(0)
+        },
+        {
+            enabled: shortcut?.enabled ?? false,
+            enableOnFormTags: true,
+        }
+    )
+
+    return null
+}
+
+const TogglePlaybackShortcut = () => {
+    const spotifyPlayer = useSpotifyPlayer()
+    const shortcut = useShortcutInfo(SPOTIFY_WEB_PLAYER_SHORTCUTS.TOGGLE_PLAYBACK)
+
+    useHotkeys(
+        shortcut?.hotkeys.join(",") ?? "",
+        (e) => {
+            e.preventDefault()
+            spotifyPlayer?.togglePlay()
+        },
+        {
+            enabled: shortcut?.enabled ?? false,
+            enableOnFormTags: true,
+        }
+    )
+
+    return null
+}
+
+const SEEK_AMOUNT = 10000
+
+const SeekShortcuts = () => {
+    const spotifyPlayer = useSpotifyPlayer()
+    const seekForwardShortcut = useShortcutInfo(SPOTIFY_WEB_PLAYER_SHORTCUTS.PLAYBACK_SEEK_FORWARD)
+    const seekBackwardShortcut = useShortcutInfo(SPOTIFY_WEB_PLAYER_SHORTCUTS.PLAYBACK_SEEK_BACKWARD)
+
+    const seek = debounce((amount: number) => {
+        spotifyPlayer?.seek(amount)
+    }, 300)
+
+    // Could be improved but leaving as is for now.
+    // Make it so holding down the shortcut seeks the song proportionally, the longer the hold the larger the seek amount.
+
+    const seekShortcut = async (amount: number) => {
+        const currentState = await spotifyPlayer?.getCurrentState()
+
+        if (!currentState) return
+
+        const duration = currentState.duration
+        const position = currentState.position
+
+        if (position + amount < 0 || position + amount > duration) return
+
+        seek(position + amount)
+    }
+
+    useHotkeys(
+        seekBackwardShortcut?.hotkeys.join(",") ?? "",
+        (e) => {
+            e.preventDefault()
+            seekShortcut(-SEEK_AMOUNT)
+        },
+        {
+            enabled: seekBackwardShortcut?.enabled ?? false,
+            enableOnFormTags: true,
+        }
+    )
+
+    useHotkeys(
+        seekForwardShortcut?.hotkeys.join(",") ?? "",
+        (e) => {
+            e.preventDefault()
+            seekShortcut(SEEK_AMOUNT)
+        },
+        {
+            enabled: seekForwardShortcut?.enabled ?? false,
+            enableOnFormTags: true,
+        }
+    )
+
+    return null
+}
+
+const WithWebPlayerShortcuts = ({ children }: { children: ReactNode }) => {
+    return (
+        <>
+            {children}
+            <TogglePlaybackShortcut />
+            <SeekShortcuts />
+            <RestartPlaybackShortcut />
+        </>
     )
 }
 
@@ -74,7 +185,7 @@ const WebPlayerContent = () => {
                     <div className={" flex items-center gap-3 "}>
                         <CurrentTrackDetail smallVersion={true} />
                         <PlaybackControl />
-                        <ResetPlaybackButton />
+                        <RestartPlaybackButton />
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -92,43 +203,46 @@ const WebPlayerContent = () => {
                         <SongProgressBar />
                     </div>
                 </div>
-                <BackgroundGradientFromTrack className={"left-0"} />
+                <BackgroundGradientFromTrack className={"left-0 top-0"} />
             </>
         )
 
     return (
-        <div className="flex flex-col justify-end gap-4  rounded-lg relative  w-[40rem] ">
-            <div className={"flex justify-between items-center"}>
-                <CurrentTrackDetail />
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button className={"ml-auto"} variant={"outline"} size={"icon"} onClick={() => setOpen((prev) => !prev)}>
-                                <XIcon />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side={"left"}>
-                            <p>Minimise</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
-            <div className="grid grid-cols-2 ">
-                <div className="justify-self-end">
-                    <PlaybackControl />
+        <>
+            <div className="flex flex-col justify-end gap-4  rounded-lg relative  w-[40rem] ">
+                <div className={"flex justify-between items-center"}>
+                    <CurrentTrackDetail />
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button className={"ml-auto"} variant={"outline"} size={"icon"} onClick={() => setOpen((prev) => !prev)}>
+                                    <XIcon />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side={"left"}>
+                                <p>Minimise</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
-                <div className="justify-self-end">
-                    <MyDevices />
+                <div className="grid grid-cols-2 ">
+                    <div className="justify-self-end">
+                        <PlaybackControl />
+                    </div>
+                    <div className="justify-self-end">
+                        <MyDevices />
+                    </div>
+                </div>
+                <PlaybackSeekBar />
+                <div className="flex justify-between">
+                    <LoopToggle />
+                    <div className={"w-[10rem]"}>
+                        <VolumeControl />
+                    </div>
                 </div>
             </div>
-            <PlaybackSeekBar />
-            <div className="flex justify-between">
-                <LoopToggle />
-                <div className={"w-[10rem]"}>
-                    <VolumeControl />
-                </div>
-            </div>
-        </div>
+            <BackgroundGradientFromTrack className={"left-0 top-0"} />
+        </>
     )
 }
 

@@ -101,3 +101,18 @@ export const formatDurationMS = (duration_ms: number): string => {
     const minutes = Math.floor(duration_ms / 1000 / 60)
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
 }
+
+export const mapShortcutKey = (hotkey: string) => {
+    if (hotkey === "down") return "down arrow key"
+    if (hotkey === "up") return "up arrow key"
+    if (hotkey === "left") return "left arrow key"
+    if (hotkey === "right") return "right arrow key"
+
+    if (hotkey.includes("+")) return hotkey + " keys"
+
+    return hotkey + " key"
+}
+
+export const formatHotKeys = (hotkeys: string[]) => {
+    return hotkeys.map(mapShortcutKey).join(" or ")
+}
