@@ -4,7 +4,7 @@ import { ThemeProvider } from "../components/theme-provider"
 import { Toaster } from "../components/ui/toaster"
 import { TooltipProvider } from "../components/ui/tooltip"
 import Queue from "../components/queue"
-import FloatingSpotifyPlayer from "@/components/spotify-new/player/floating-spotify-player.tsx"
+import FloatingSpotifyPlayer from "@/components/spotify/player/floating-spotify-player.tsx"
 
 function Root() {
     return (

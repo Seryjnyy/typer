@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
 import { usePlaybackState, usePlayerDevice } from "react-spotify-web-playback-sdk"
 import { useCurrentSong } from "@/components/typer/use-current-song.ts"
 

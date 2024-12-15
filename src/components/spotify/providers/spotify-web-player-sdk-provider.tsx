@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { useSpotifyAccessTokenContext } from "@/components/spotify-new/providers/spotify-access-token-provider.tsx"
+import { useSpotifyAccessTokenContext } from "@/components/spotify/providers/spotify-access-token-provider.tsx"
 import { WebPlaybackSDK } from "react-spotify-web-playback-sdk"
 
 const SpotifyWebPlayerSDKProvider = ({ children }: { children: ReactNode }) => {

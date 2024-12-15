@@ -33,7 +33,7 @@ import { useSongStore } from "../../lib/store/song-store"
 import CreatePlaylistForm from "./create-playlist-form"
 import { PlaylistBanner } from "./playlist-header"
 import { Icons } from "@/components/icons.tsx"
-import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 
 const AddToPlaylistDialog = ({ song }: { song: Song }) => {
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)

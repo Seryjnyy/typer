@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { SpotifyApi } from "@spotify/web-api-ts-sdk"
-import { useSpotifyAccessTokenContext } from "@/components/spotify-new/providers/spotify-access-token-provider.tsx"
-import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
+import { useSpotifyAccessTokenContext } from "@/components/spotify/providers/spotify-access-token-provider.tsx"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
 
 const useSpotifyData = <T, Keys extends unknown[]>(
     name: string,

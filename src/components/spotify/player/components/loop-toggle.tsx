@@ -1,5 +1,5 @@
 import { usePlaybackState } from "react-spotify-web-playback-sdk"
-import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { LoopIcon } from "@radix-ui/react-icons"
 import { cn } from "@/lib/utils.ts"

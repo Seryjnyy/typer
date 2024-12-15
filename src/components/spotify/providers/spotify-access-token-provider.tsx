@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { AccessToken } from "@spotify/web-api-ts-sdk"
-import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
-import LoadingMessage from "@/components/spotify-new/loading-message.tsx"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
+import LoadingMessage from "@/components/spotify/loading-message.tsx"
 
 const SpotifyAccessTokenContext = createContext<AccessToken | null>(null)
 

@@ -1,9 +1,9 @@
 import { createContext, ReactNode, useContext, useEffect } from "react"
-import { useSpotifyWebSDK } from "@/components/spotify-new/use-spotify-web-sdk.ts"
+import { useSpotifyWebSDK } from "@/components/spotify/use-spotify-web-sdk.ts"
 import { Button } from "@/components/ui/button.tsx"
 import { SpotifyApi } from "@spotify/web-api-ts-sdk"
 import { Icons } from "@/components/icons.tsx"
-import LoadingMessage from "@/components/spotify-new/loading-message.tsx"
+import LoadingMessage from "@/components/spotify/loading-message.tsx"
 import { useLocation, useNavigate } from "react-router-dom"
 
 const SpotifyWebSDKContext = createContext<SpotifyApi | null>(null)
@@ -32,7 +32,7 @@ const SpotifyWebSDKProvider = ({ children, autoAuthenticate }: { children: React
 
     // TODO : will brake if the redirect path used by the SDK is changed
     const pathForSpotifyRedirect = "/settings/spotify"
-    const isOnEnablePage = path && path.pathname === pathForSpotifyRedirect
+    const isOnEnablePage = path && path.pathname == pathForSpotifyRedirect
 
     // This is here instead of the hook to control where and when auto connect happens
     useEffect(() => {

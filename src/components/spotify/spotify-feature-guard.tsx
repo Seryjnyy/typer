@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button.tsx"
 import { ReactNode } from "react"
 import { Icons } from "@/components/icons.tsx"
-import { useIsSpotifyEnabled } from "@/components/spotify-new/spotify-state.ts"
+import { useIsSpotifyEnabled } from "@/components/spotify/spotify-state.ts"
 
 function SpotifyFeatureGuard({
     children,

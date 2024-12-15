@@ -1,8 +1,8 @@
-import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
-import SpotifyPlayer from "@/components/spotify-new/player/spotify-player.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
+import SpotifyPlayer from "@/components/spotify/player/spotify-player.tsx"
 import { Rnd } from "react-rnd"
-import { useIsSpotifyPlayerEnabled, useIsSpotifyPlayerOpen } from "@/components/spotify-new/player/spotify-player-state.ts"
-import { useIsSpotifyEnabled } from "@/components/spotify-new/spotify-state.ts"
+import { useIsSpotifyPlayerEnabled, useIsSpotifyPlayerOpen } from "@/components/spotify/player/spotify-player-state.ts"
+import { useIsSpotifyEnabled } from "@/components/spotify/spotify-state.ts"
 
 export default function FloatingSpotifyPlayer() {
     const [open] = useIsSpotifyPlayerOpen()

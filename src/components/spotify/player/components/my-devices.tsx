@@ -5,8 +5,8 @@ import { Computer, Keyboard, Loader2, MonitorSmartphone, Smartphone, Speaker } f
 import { cn } from "@/lib/utils.ts"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
-import { useAvailableDevices } from "@/components/spotify-new/spotify-api.ts"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
+import { useAvailableDevices } from "@/components/spotify/spotify-api.ts"
 
 // TODO : There is still an issue with this not showing that typer is currently connected at the start unless this is opened
 //  Not sure if it should stay like this where the current device is not really important, or should it hide everything

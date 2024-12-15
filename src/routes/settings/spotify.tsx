@@ -1,10 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
-import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
-import SpotifyWebSDKProvider from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
-import SpotifyPlayerFeatureGuard from "@/components/spotify-new/spotify-player-feature-guard.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
+import SpotifyWebSDKProvider from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
+import SpotifyPlayerFeatureGuard from "@/components/spotify/spotify-player-feature-guard.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Icons } from "@/components/icons"
-import { useSpotifyWebSDK } from "@/components/spotify-new/use-spotify-web-sdk.ts"
+import { useSpotifyWebSDK } from "@/components/spotify/use-spotify-web-sdk.ts"
 
 export default function Spotify() {
     const { disconnectSDK } = useSpotifyWebSDK()

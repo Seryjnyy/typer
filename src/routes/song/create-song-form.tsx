@@ -13,16 +13,16 @@ import { forwardRef, useContext, useMemo, useRef, useState } from "react"
 import { useForm, useFormContext } from "react-hook-form"
 import SongContentFormField from "./song-content-form-field"
 
-import SearchForLyrics from "@/components/spotify/search-for-lyrics"
+import SearchForLyrics from "@/components/spotify/search/search-for-lyrics.tsx"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { coverAsStyle, createRandomCover, parseGeneratedCoverString } from "@/lib/gradient"
 import { Track } from "@spotify/web-api-ts-sdk"
 import { createContext } from "react"
 import CreateSongFormSongAssociation from "./create-song-form-song-association"
-import SpotifyWebSDKProvider from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
-import FindSongUsingSpotify from "@/components/spotify/find-song-using-spotify.tsx"
-import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
+import SpotifyWebSDKProvider from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
+import FindSongUsingSpotify from "@/components/spotify/search/find-song-using-spotify.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 
 // TODO : this whole thing seems messy
 // I think I need separate context from form for this because if the user uses spotify option I need to associate it with the spotify song

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button.tsx"
 import { ReactNode } from "react"
 import { Icons } from "@/components/icons.tsx"
-import { useIsSpotifyPlayerEnabled } from "@/components/spotify-new/player/spotify-player-state.ts"
+import { useIsSpotifyPlayerEnabled } from "@/components/spotify/player/spotify-player-state.ts"
 
 // Currently only used in the settings page, not sure if its really needed, but will leave this as is for now
 function SpotifyPlayerFeatureGuard({

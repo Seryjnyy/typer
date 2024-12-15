@@ -1,11 +1,11 @@
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input.tsx"
 import { ChangeEvent, useEffect, useMemo, useState } from "react"
 
 import { Track } from "@spotify/web-api-ts-sdk"
 import { debounce } from "lodash"
 import { Loader2 } from "lucide-react"
-import { Label } from "../ui/label"
-import { useSpotifyWebSDKContext } from "@/components/spotify-new/providers/spotify-web-sdk-provider.tsx"
+import { Label } from "../../ui/label.tsx"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
 
 interface FindSongUsingSpotifyProps {
     onSelectSong: (track: Track) => void

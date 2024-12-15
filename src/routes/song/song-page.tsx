@@ -15,7 +15,7 @@ import { useSongCover } from "@/lib/hooks/use-song-cover"
 import SongPopover from "./song-popover"
 import { Icons } from "@/components/icons.tsx"
 import PlayButton from "@/components/play-button.tsx"
-import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 
 interface SongContentProps {
     song: SongType
