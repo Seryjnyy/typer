@@ -24,6 +24,7 @@ import TestPage2 from "./test-page-2"
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import QueueSourceTyper from "@/components/typer/queue-source-typer.tsx"
+import Shortcuts from "@/routes/settings/shortcuts.tsx"
 
 const queryClient = new QueryClient()
 
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
                     {
                         path: "import-export",
                         element: <ImportExport />,
+                    },
+                    {
+                        path: "shortcuts",
+                        element: <Shortcuts />,
                     },
                 ],
             },
