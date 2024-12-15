@@ -1,16 +1,8 @@
 import { Button } from "@/components/ui/button.tsx"
-import { atomWithStorage } from "jotai/utils"
-import { useAtom } from "jotai/index"
 import { ReactNode } from "react"
 import { Icons } from "@/components/icons.tsx"
+import { useIsSpotifyEnabled } from "@/components/spotify-new/spotify-state.ts"
 
-// TODO : move this out
-const isUseSpotify = atomWithStorage("typer:is-use-spotify", false)
-const useSpotifySetting = () => useAtom(isUseSpotify)
-
-// TODO :I'm not sure if this component is needed anymore, I added this because Spotify did auto redirect because it was set up to
-// authenticate
-// in useEffect. But its manual now so idk.
 function SpotifyFeatureGuard({
     children,
     returnEnable = true,
@@ -20,24 +12,17 @@ function SpotifyFeatureGuard({
     returnEnable?: boolean
     returnDisable?: boolean
 }) {
-    const [isWantToUseSpotify, setIsWantToUseSpotify] = useSpotifySetting()
+    const [isSpotifyEnabled, setIsSpotifyEnabled] = useIsSpotifyEnabled()
 
-    if (!isWantToUseSpotify && returnEnable) {
+    if (!isSpotifyEnabled && returnEnable) {
         return (
-            <div>
-                <Button
-                    type={"button"}
-                    onClick={() => setIsWantToUseSpotify(true)}
-                    variant={"secondary"}
-                    className={"flex items-center" + " gap-2"}
-                >
-                    <Icons.spotify className={"size-4"} /> Turn on Spotify
-                </Button>
-            </div>
+            <Button type={"button"} onClick={() => setIsSpotifyEnabled(true)} variant={"secondary"} className={"flex items-center gap-2"}>
+                <Icons.spotify className={"size-4"} /> Turn on Spotify
+            </Button>
         )
     }
 
-    if (!isWantToUseSpotify && !returnEnable) return null
+    if (!isSpotifyEnabled && !returnEnable) return null
 
     if (returnDisable)
         return (
@@ -46,8 +31,8 @@ function SpotifyFeatureGuard({
                 <Button
                     type={"button"}
                     variant={"secondary"}
-                    className={"flex items-center" + " gap-2"}
-                    onClick={() => setIsWantToUseSpotify(false)}
+                    className={"flex items-center  gap-2"}
+                    onClick={() => setIsSpotifyEnabled(false)}
                 >
                     <Icons.spotify className={"size-4"} /> Turn off Spotify
                 </Button>
