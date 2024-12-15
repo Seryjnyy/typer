@@ -20,11 +20,11 @@ import Spotify from "./routes/settings/spotify"
 import Stats from "./routes/settings/stats"
 import PlaylistPage from "./routes/song/playlist/playlist-page"
 import PlaylistEdit from "./routes/song/playlist/playlist-edit"
-import TestPage2 from "./test-page-2"
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import QueueSourceTyper from "@/components/typer/queue-source-typer.tsx"
 import Shortcuts from "@/routes/settings/shortcuts.tsx"
+import TestPage from "@/test-page.tsx"
 
 const queryClient = new QueryClient()
 
@@ -107,7 +107,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/test",
-                element: <TestPage2 />,
+                element: <TestPage />,
             },
         ],
     },
