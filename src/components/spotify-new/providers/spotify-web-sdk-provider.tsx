@@ -17,6 +17,7 @@ export const useSpotifyWebSDKContext = () => {
 const SpotifyWebSDKProvider = ({ children }: { children: ReactNode }) => {
     const { clientSDK, isSDKAuthenticated, connectSDK } = useSpotifyWebSDK()
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(undefined)
+    const { clientSDK, isAuthenticated, connectSDK } = useSpotifyWebSDK()
 
     useEffect(() => {
         const checkIfAuthenticated = async () => {
