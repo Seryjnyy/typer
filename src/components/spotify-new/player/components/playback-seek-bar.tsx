@@ -55,7 +55,7 @@ const PlaybackSeekShortcutsInfo = () => {
     useEffect(() => {
         const timeout = setTimeout(() => {
             setHide(true)
-        }, 10000)
+        }, 3000)
 
         return () => clearTimeout(timeout)
     }, [])
@@ -63,13 +63,21 @@ const PlaybackSeekShortcutsInfo = () => {
     return (
         <>
             {seekBackwardShortcut && seekBackwardShortcut.enabled && (
-                <span className={cn({ "opacity-0 transition-opacity duration-500": hide })}>
+                <span
+                    className={cn(" fade-in animate-in  transition-opacity duration-1000 opacity-100 ", {
+                        "opacity-0": hide,
+                    })}
+                >
                     <ArrowLeft className={"size-3 inline"} />
                     (alt + j)
                 </span>
             )}
             {seekForwardShortcut && seekForwardShortcut.enabled && (
-                <span className={cn({ "opacity-0 transition-opacity duration-500": hide })}>
+                <span
+                    className={cn(" fade-in animate-in  transition-opacity duration-1000 opacity-100 ", {
+                        "opacity-0": hide,
+                    })}
+                >
                     (alt + l) <ArrowRight className={"size-3 inline"} />
                 </span>
             )}
