@@ -13,6 +13,8 @@ const useClientSDK = () => useAtom(clientSDK)
 const isAuthenticatedAtom = atom<boolean | undefined>(undefined)
 const useIsAuthenticatedAtom = () => useAtom(isAuthenticatedAtom)
 
+// When using this hook the auth functions on the sdk should not be used, instead use the functions provided by the hook because it keeps
+// track of isAuthenticated state, and the client functions will not update it
 export const useSpotifyWebSDK = () => {
     const [clientSDK, setClientSDK] = useClientSDK()
     const [isAuthenticated, setIsAuthenticated] = useIsAuthenticatedAtom()
@@ -58,9 +60,17 @@ export const useSpotifyWebSDK = () => {
         checkIsSDKAuthenticated()
     }, [checkIsSDKAuthenticated, clientSDK])
 
+    const disconnectSDK = useCallback(() => {
+        if (!clientSDK) return
+
+        clientSDK.logOut()
+        checkIsSDKAuthenticated()
+    }, [checkIsSDKAuthenticated, clientSDK])
+
     return {
         clientSDK,
         connectSDK,
+        disconnectSDK,
         isAuthenticated,
     }
 }
