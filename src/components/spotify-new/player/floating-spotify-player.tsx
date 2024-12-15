@@ -11,7 +11,7 @@ export default function FloatingSpotifyPlayer() {
 
     return (
         <Rnd
-            className={"z-[100] backdrop-blur-sm flex items-center justify-center outline-1 outline rounded-lg "}
+            className={"z-[50] backdrop-blur-sm flex items-center justify-center outline-1 outline rounded-lg "}
             default={{
                 x: 16,
                 y: 16,
