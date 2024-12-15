@@ -44,7 +44,7 @@ export const useSpotifyWebSDK = () => {
         //  haven't tested that yet. Coming back to the site after a while does cause a redirect tho, but that might be because the
         //  refresh token is no longer valid since the access token it came with expired
         if (!clientSDK) {
-            const sdk = SpotifyApi.withUserAuthorization(clientId, redirectUrl + "/settings/spotify", scopes, {})
+            const sdk = SpotifyApi.withUserAuthorization(clientId, window.location.origin + "/settings/spotify", scopes, {})
             setClientSDK(sdk)
             checkIsSDKAuthenticated()
         }
