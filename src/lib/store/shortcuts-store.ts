@@ -18,6 +18,8 @@ export const ALL_SHORTCUTS = {
     ...TYPER_SHORTCUTS,
 }
 
+export type SHORTCUT_TYPE = "typer" | "spotify-player"
+
 type AvailableShortcut = (typeof ALL_SHORTCUTS)[keyof typeof ALL_SHORTCUTS]
 
 export type Shortcut = {
@@ -26,6 +28,8 @@ export type Shortcut = {
     id: AvailableShortcut
     enabled: boolean
     label: string
+    type: SHORTCUT_TYPE
+    desc?: string
 }
 
 type State = {
@@ -45,6 +49,8 @@ const DEFAULTS: State = {
             defaultHotkeys: ["alt+j"],
             label: "Toggle playback",
             enabled: true,
+            type: "spotify-player",
+            desc: "Pause or resume playback.",
         },
         {
             id: SPOTIFY_WEB_PLAYER_SHORTCUTS.RESTART_PLAYBACK,
@@ -52,6 +58,8 @@ const DEFAULTS: State = {
             defaultHotkeys: ["alt+r"],
             label: "Restart playback",
             enabled: true,
+            type: "spotify-player",
+            desc: "Restart the track.",
         },
         {
             id: SPOTIFY_WEB_PLAYER_SHORTCUTS.PLAYBACK_SEEK_FORWARD,
@@ -59,6 +67,8 @@ const DEFAULTS: State = {
             defaultHotkeys: ["alt+l"],
             label: "Playback seek forward",
             enabled: true,
+            type: "spotify-player",
+            desc: "Seek forward in the track.",
         },
         {
             id: SPOTIFY_WEB_PLAYER_SHORTCUTS.PLAYBACK_SEEK_BACKWARD,
@@ -66,6 +76,8 @@ const DEFAULTS: State = {
             defaultHotkeys: ["alt+j"],
             label: "Playback seek backward",
             enabled: true,
+            type: "spotify-player",
+            desc: "Seek backward in the track.",
         },
         {
             id: TYPER_SHORTCUTS.RESTART,
@@ -73,6 +85,8 @@ const DEFAULTS: State = {
             defaultHotkeys: ["esc"],
             label: "Restart",
             enabled: true,
+            type: "typer",
+            desc: "Restart typer.",
         },
     ],
 }
