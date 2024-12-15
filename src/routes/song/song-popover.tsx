@@ -168,7 +168,7 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                             }}
                         >
                             <div className={"flex gap-2 items-center"}>
-                                <Icons.spotify className="size-4 fill-[#1DB954]" /> Play
+                                <Icons.spotify className="size-4 fill-spotifyGreen" /> Play
                             </div>
                         </DropdownMenuItem>
                     </SpotifyFeatureGuard>

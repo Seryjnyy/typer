@@ -198,7 +198,7 @@ export default function Song() {
                                         className={"hover:bg-secondary" + " hover:text-secondary-foreground"}
                                     >
                                         <div className={"flex gap-2"}>
-                                            <Icons.spotify className="size-4 fill-[#1DB954]  " /> Play
+                                            <Icons.spotify className="size-4 fill-spotifyGreen  " /> Play
                                         </div>
                                     </PlayButton>
                                 </SpotifyFeatureGuard>

@@ -36,7 +36,7 @@ const LoopButton = () => {
                 <Tooltip>
                     <TooltipTrigger asChild={true}>
                         <Button size={"icon"} variant={"outline"} onClick={toggleRepeat}>
-                            <LoopIcon className={cn({ "text-[#1DB954] ": isLoop })} />
+                            <LoopIcon className={cn({ "text-spotifyGreen ": isLoop })} />
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent side={"right"}>
