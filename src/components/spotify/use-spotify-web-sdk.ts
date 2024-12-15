@@ -3,8 +3,7 @@ import { Scopes, SpotifyApi } from "@spotify/web-api-ts-sdk"
 import { useCallback, useEffect } from "react"
 
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string
-const redirectUrl = import.meta.env.VITE_SPOTIFY_BASE_REDIRECT_URL as string
-const scopes = Scopes.all
+const scopes = [...Scopes.userPlayback, ...Scopes.userPlaybackRead, ...Scopes.userPlaybackModify]
 
 // Singleton
 const clientSDK = atom<SpotifyApi | null>(null)
