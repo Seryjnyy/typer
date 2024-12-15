@@ -16,7 +16,8 @@ import { CheckIcon, DividerVerticalIcon, KeyboardIcon, ReloadIcon } from "@radix
 import { useSong } from "@/lib/hooks/use-song.tsx"
 import { GameState, TypingStats } from "@/components/typer/types.ts"
 import { CompletionAnim } from "@/components/typer/completion-anim.tsx"
-import { useTyperShortcuts } from "@/lib/hooks/use-typer-shortcuts.ts"
+import { TYPER_SHORTCUTS, useShortcutInfo } from "@/lib/store/shortcuts-store.ts"
+import ShortcutKeys from "@/components/shortcut-keys.tsx"
 
 enum StateActionKind {
     START = "START",
@@ -123,6 +124,23 @@ interface GameEngineProps extends PassThroughToGameEngine {
     content: string
 }
 
+const RestartTyperShortcut = ({ handleRestart }: { handleRestart: () => void }) => {
+    const shortcut = useShortcutInfo(TYPER_SHORTCUTS.RESTART)
+
+    useHotkeys(
+        shortcut?.hotkeys.join(",") ?? "",
+        () => {
+            handleRestart()
+        },
+        {
+            enabled: shortcut?.enabled ?? false,
+            enableOnFormTags: true,
+        }
+    )
+
+    return null
+}
+
 const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, renderDecorations, onCompletion }: GameEngineProps) => {
     const [state, dispatch] = useReducer(reducer, "idle")
     const txtMods = useTextModificationsStore.use.textModifications()
@@ -135,7 +153,6 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
         triggerCompleteAnim: () => void
     }>(null)
     const renderTestProps = useRef<{ getStats: () => TypingStats }>(null)
-    useTyperShortcuts({ onShortcut: () => handleRestart() })
 
     const startGame = () => {
         dispatch({ type: StateActionKind.START })
@@ -244,6 +261,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
                     handleRestart: handleRestart,
                 })}
             {renderDecorations?.({ source: source })}
+            <RestartTyperShortcut handleRestart={handleRestart} />
         </div>
     )
 }
@@ -290,6 +308,8 @@ const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: 
 }
 
 const Indicators = ({ gameState }: { gameState: GameState }) => {
+    const shortcutInfo = useShortcutInfo(TYPER_SHORTCUTS.RESTART)
+
     return (
         <>
             <span
@@ -312,7 +332,9 @@ const Indicators = ({ gameState }: { gameState: GameState }) => {
                     </span>
                 )}
             </div>
-            {(gameState === "idle" || gameState === "out-of-focus") && <div className={"flex items-center"}>(esc) to restart</div>}
+            {(gameState === "idle" || gameState === "out-of-focus") && (
+                <div className={"flex items-center"}>{shortcutInfo && `(${shortcutInfo.hotkeys.join(",")}) to restart`}</div>
+            )}
         </>
     )
 }
@@ -337,6 +359,7 @@ const CompleteAnimations = forwardRef<CompleteAnimationsRef, CompleteAnimationsP
 })
 
 const RestartButton = ({ handleRestart }: { handleRestart: () => void }) => {
+    const shortcutInfo = useShortcutInfo(TYPER_SHORTCUTS.RESTART)
     return (
         <TooltipProvider>
             <Tooltip>
@@ -346,7 +369,8 @@ const RestartButton = ({ handleRestart }: { handleRestart: () => void }) => {
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Restart (esc)</p>
+                    <p>Restart </p>
+                    <ShortcutKeys shortcut={shortcutInfo} />
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

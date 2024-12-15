@@ -70,8 +70,14 @@ const SongDetail = ({ song, isCurrent = false, className, length, ...props }: So
             <span className={cn(songDetailVariants({ length }), isCurrent ? "text-secondary-foreground" : "text-foreground")}>
                 {song.title}
             </span>
-            <span className={cn("text-muted-foreground text-sm  flex items-center gap-1", songDetailVariants({ length }))}>
-                {song.spotifyUri && <Icons.spotify className={"size-[0.9rem] fill-white inline"} />} {song.source}
+            <span
+                className={cn(
+                    "text-muted-foreground text-sm  flex items-center gap-1 justify-start overflow-hidden ",
+                    songDetailVariants({ length })
+                )}
+            >
+                {song.spotifyUri && <Icons.spotify className={"size-[0.9rem] min-w-[0.9rem] min-h-[0.9rem] fill-white "} />}
+                <span> {song.source}</span>
             </span>
         </div>
     )

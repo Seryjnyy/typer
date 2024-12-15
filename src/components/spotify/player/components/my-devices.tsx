@@ -1,18 +1,24 @@
 import { Device as DeviceType } from "@spotify/web-api-ts-sdk"
 import { useEffect, useMemo, useState } from "react"
-import { useAvailableDevices } from "../spotify-api"
-import { useSpotify } from "../use-spotify"
-import { Computer, Keyboard, Loader2, MonitorSmartphone, Smartphone, Speaker } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
 
-// TODO : still not the best, some could still not know when its connected or not, or how to fix that its not connected
-// TODO : When device is changed, it changes the device properly, but doesn't not update the UI Here
+import { Computer, Keyboard, Loader2, MonitorSmartphone, Smartphone, Speaker } from "lucide-react"
+import { cn } from "@/lib/utils.ts"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx"
+import { Button } from "@/components/ui/button.tsx"
+import { useSpotifyWebSDKContext } from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
+import { useAvailableDevices } from "@/components/spotify/spotify-api.ts"
+
+// TODO : There is still an issue with this not showing that typer is currently connected at the start unless this is opened
+//  Not sure if it should stay like this where the current device is not really important, or should it hide everything
+//  unless typer is the current device and force the user to transfer playback to typer. Would also need to stop playback then from
+//  doing things.
+//  Currently the user can change typer song and usePlayback will make the request to play the track on this device which will
+//  automatically transfer playback here.
 // TODO : Could do with a tooltip
 // TODO : unhandeled error
 const MyDevices = () => {
     const [open, setOpen] = useState(false)
+
     const {
         data,
         isLoading,
@@ -32,8 +38,6 @@ const MyDevices = () => {
             refetch()
         }
     }, [open, refetch])
-
-    console.log("rerenders")
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -64,13 +68,13 @@ const MyDevices = () => {
 }
 
 const Device = ({ device, onChangeDevice }: { device: DeviceType; onChangeDevice?: () => void }) => {
-    const { apiSDK } = useSpotify({})
+    const webSDK = useSpotifyWebSDKContext()
     const [isPending, setIsPending] = useState(false)
 
     const handleClick = async () => {
-        if (!device.id || device.is_active || !apiSDK) return
+        if (!device.id || device.is_active || !webSDK) return
         setIsPending(true)
-        await apiSDK.player.transferPlayback([device.id], true)
+        await webSDK.player.transferPlayback([device.id], true)
         setIsPending(false)
         onChangeDevice?.()
     }

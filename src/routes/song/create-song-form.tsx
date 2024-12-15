@@ -3,30 +3,32 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-import SpotifyEnable from "@/components/spotify/spotify-enable"
 import { Input } from "@/components/ui/input"
 import useCreateSong from "@/lib/hooks/use-create-song"
-import { songSchema, songSchemaType } from "@/lib/schemas/song"
+import { songSchema, SongSchemaType } from "@/lib/schemas/song"
 import { cn } from "@/lib/utils"
-import { useSpotify } from "@/spotify/use-spotify"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { forwardRef, useContext, useMemo, useRef, useState } from "react"
 import { useForm, useFormContext } from "react-hook-form"
 import SongContentFormField from "./song-content-form-field"
 
-import FindSongUsingSpotify from "@/components/spotify/find-song-using-spotify"
-import SearchForLyrics from "@/components/spotify/search-for-lyrics"
+import SearchForLyrics from "@/components/spotify/search/search-for-lyrics.tsx"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { coverAsStyle, createRandomCover, parseGeneratedCoverString } from "@/lib/gradient"
 import { Track } from "@spotify/web-api-ts-sdk"
 import { createContext } from "react"
 import CreateSongFormSongAssociation from "./create-song-form-song-association"
+import SpotifyWebSDKProvider from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
+import FindSongUsingSpotify from "@/components/spotify/search/find-song-using-spotify.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 
 // TODO : this whole thing seems messy
 // I think I need separate context from form for this because if the user uses spotify option I need to associate it with the spotify song
 // (need access to name etc) because the user can still change the title and artist of the song
 // Or maybe only allow the user to use either spotify or manual option, not both
+
 interface SongAssociation {
     song: Track | null
     setSong: (value: Track | null) => void
@@ -34,6 +36,7 @@ interface SongAssociation {
 
 const SongAssociationContext = createContext<SongAssociation | null>(null)
 
+// TODO : Need to move this stuff out of here for hmr
 export const useSongAssociation = () => {
     const context = useContext(SongAssociationContext)
     if (context == undefined) {
@@ -42,19 +45,17 @@ export const useSongAssociation = () => {
     return context
 }
 
-// type s = Omit<songSchemaType, "spotifyURI">
-
 export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }) {
     const createSong = useCreateSong()
     // TODO : can't do focus on input after submit for spotify like its in manual because it gets rerendered with through changing key
     const titleInputRef = useRef<HTMLInputElement>(null)
     const [songAssociation, setSongAssociation] = useState<Track | null>(null)
 
-    const [resetChildState, setResetChildState] = useState(false)
+    const [resetSignal, setResetSignal] = useState(false)
 
     const randomCoverGradient = useMemo(() => createRandomCover(), [])
 
-    const form = useForm<songSchemaType>({
+    const form = useForm<SongSchemaType>({
         resolver: zodResolver(songSchema),
         defaultValues: {
             source: "",
@@ -65,7 +66,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
         },
     })
 
-    function onSubmit(values: songSchemaType) {
+    function onSubmit(values: SongSchemaType) {
         console.log(values)
 
         // gets spotify uri from song association state
@@ -81,14 +82,16 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
 
         if (!result) return
 
+        // It needs  to specify the object again because need to generate a new unique cover instead of the forms defaultValue for it
         form.reset({
             title: "",
             source: "",
             content: "",
             cover: JSON.stringify(createRandomCover()),
+            spotifyURI: "",
         })
 
-        setResetChildState((prev) => !prev)
+        setResetSignal((prev) => !prev)
 
         setSongAssociation(null)
 
@@ -151,12 +154,12 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
                                     <ManualArtistTrack ref={titleInputRef} />
                                 </TabsContent>
                                 <TabsContent value="spotify">
-                                    <SpotifyArtistTrack triggerRerender={resetChildState} />
+                                    <SpotifyArtistTrack />
                                 </TabsContent>
                             </Tabs>
                         </div>
                         <CreateSongFormSongAssociation />
-                        <SongContentFormField resetState={resetChildState} />
+                        <SongContentFormField resetSignal={resetSignal} />
                         <SearchForLyrics artist={source} track={title} />
                         <Button type="submit">Submit</Button>
                     </form>
@@ -166,13 +169,8 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
     )
 }
 
-interface SpotifyArtistTrackProps {
-    triggerRerender: boolean
-}
-
-const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
-    const { apiSDK } = useSpotify({})
-    const form = useFormContext<songSchemaType>()
+const SpotifyArtistTrack = () => {
+    const form = useFormContext<SongSchemaType>()
     const { setSong } = useSongAssociation()
 
     const handleSelectTrack = (track: Track) => {
@@ -184,18 +182,15 @@ const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
 
     return (
         <div className="space-y-6 px-1">
-            <div className="pt-2">
-                <SpotifyEnable redirectPath="/songs?tab=add-song" />
-            </div>
-            {apiSDK && (
-                // TODO : feels very hacky
-                <FindSongUsingSpotify
-                    key={triggerRerender ? "r" : "n"}
-                    apiSDK={apiSDK}
-                    onSelectSong={handleSelectTrack}
-                    initialTitle={form.getValues().title}
-                />
-            )}
+            <SpotifyFeatureGuard>
+                <SpotifyWebSDKProvider>
+                    <FindSongUsingSpotify
+                        onSelectSong={handleSelectTrack}
+                        initialArtist={form.getValues("source")}
+                        initialTitle={form.getValues("title")}
+                    />
+                </SpotifyWebSDKProvider>
+            </SpotifyFeatureGuard>
         </div>
     )
 }
@@ -203,7 +198,7 @@ const SpotifyArtistTrack = ({ triggerRerender }: SpotifyArtistTrackProps) => {
 interface ManualArtistTrackProps {}
 
 const ManualArtistTrack = forwardRef<HTMLInputElement, ManualArtistTrackProps>((_, ref) => {
-    const form = useFormContext<songSchemaType>()
+    const form = useFormContext<SongSchemaType>()
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mx-1">

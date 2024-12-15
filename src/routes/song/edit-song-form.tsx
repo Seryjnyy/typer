@@ -4,7 +4,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 import { coverAsStyle, createRandomCover, parseGeneratedCoverString } from "@/lib/gradient"
-import { songSchema, songSchemaType } from "@/lib/schemas/song"
+import { songSchema, SongSchemaType } from "@/lib/schemas/song"
 import { useSongStore } from "@/lib/store/song-store"
 import { Song } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -25,7 +25,7 @@ export default function EditSongForm({ onSuccess, song }: { onSuccess?: () => vo
     const [, setContentRerender] = useState(false)
     const [, setRerenderChildren] = useState(false)
 
-    const form = useForm<songSchemaType>({
+    const form = useForm<SongSchemaType>({
         resolver: zodResolver(songSchema),
         defaultValues: {
             source: song.source,
@@ -35,7 +35,7 @@ export default function EditSongForm({ onSuccess, song }: { onSuccess?: () => vo
         },
     })
 
-    function onSubmit(values: songSchemaType) {
+    function onSubmit(values: SongSchemaType) {
         console.log(values)
 
         let completion = song.completion

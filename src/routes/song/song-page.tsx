@@ -11,11 +11,11 @@ import { cn, formatTimestamp } from "@/lib/utils"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router"
-
-import PlayThroughSpotifyButton from "@/components/spotify/play-through-spotify-button"
 import { useSongCover } from "@/lib/hooks/use-song-cover"
 import SongPopover from "./song-popover"
 import { Icons } from "@/components/icons.tsx"
+import PlayButton from "@/components/play-button.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 
 interface SongContentProps {
     song: SongType
@@ -188,7 +188,21 @@ export default function Song() {
                             </div>
                         </div>
                         <div className="w-full flex justify-end">
-                            <PlayThroughSpotifyButton song={song} variant={"outline"} size={"sm"} />
+                            {song.spotifyUri && (
+                                <SpotifyFeatureGuard returnEnable={false}>
+                                    <PlayButton
+                                        songID={song.id}
+                                        redirect={false}
+                                        size={"sm"}
+                                        variant={"outline"}
+                                        className={"hover:bg-secondary" + " hover:text-secondary-foreground"}
+                                    >
+                                        <div className={"flex gap-2"}>
+                                            <Icons.spotify className="size-4 fill-spotifyGreen  " /> Play
+                                        </div>
+                                    </PlayButton>
+                                </SpotifyFeatureGuard>
+                            )}
                         </div>
                     </div>
                 </div>

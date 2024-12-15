@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button.tsx"
 
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { ExternalLink } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover.tsx"
 
 export default function SearchForLyrics({ artist, track }: { artist: string; track: string }) {
     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(`${track} by ${artist} lyrics`)}`

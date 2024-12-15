@@ -18,10 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { DotsHorizontalIcon, DownloadIcon, EyeOpenIcon, Pencil1Icon, PlayIcon, PlusIcon, TrashIcon } from "@radix-ui/react-icons"
-
-import { Icons } from "@/components/icons"
-import MusicPlaying from "@/components/music-playing"
-import { usePlaySongThroughSpotify } from "@/components/spotify/use-play-song-through-spotify"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -36,6 +32,8 @@ import { useQueueStore } from "../../lib/store/queue-store"
 import { useSongStore } from "../../lib/store/song-store"
 import CreatePlaylistForm from "./create-playlist-form"
 import { PlaylistBanner } from "./playlist-header"
+import { Icons } from "@/components/icons.tsx"
+import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 
 const AddToPlaylistDialog = ({ song }: { song: Song }) => {
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
@@ -117,14 +115,13 @@ interface SongPopoverProps {
     destructiveMenuItems?: ReactNode
 }
 
+// TODO : this is a dropdown not popover
 export default function SongPopover({ song, exclude, destructiveMenuItems }: SongPopoverProps) {
     const queueNext = useQueueStore.use.queueNext()
     const removeSong = useSongStore.use.removeSong()
     const enqueue = useQueueStore.use.enqueue()
     const playSong = usePlaySong()
     const { exportSongs } = useExportSongs()
-
-    const { setPlayableSong, currentPlayableSong } = usePlaySongThroughSpotify()
 
     const onAddToQueue = (songId: string) => {
         enqueue(songId)
@@ -163,16 +160,18 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     <span> Queue</span>
                 </DropdownMenuItem>
                 {song.spotifyUri && (
-                    <DropdownMenuItem
-                        className="flex gap-1 items-center"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setPlayableSong(song)
-                        }}
-                    >
-                        <Icons.spotify className="size-4 fill-primary-foreground " /> Play
-                        {song.id === currentPlayableSong?.id && <MusicPlaying variant={"primary"} className="ml-1" />}
-                    </DropdownMenuItem>
+                    <SpotifyFeatureGuard>
+                        <DropdownMenuItem
+                            onClick={(e) => {
+                                playSong(song.id, false)
+                                e.stopPropagation()
+                            }}
+                        >
+                            <div className={"flex gap-2 items-center"}>
+                                <Icons.spotify className="size-4 fill-spotifyGreen" /> Play
+                            </div>
+                        </DropdownMenuItem>
+                    </SpotifyFeatureGuard>
                 )}
 
                 <DropdownMenuItem

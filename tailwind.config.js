@@ -14,6 +14,7 @@ module.exports = {
         },
         extend: {
             colors: {
+                spotifyGreen: "hsl(141, 73%, 42%)",
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",

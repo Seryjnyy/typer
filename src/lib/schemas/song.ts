@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 export const songSchema = z.object({
     source: z
@@ -8,13 +8,9 @@ export const songSchema = z.object({
         .regex(/\S+/, {
             message: "Source cannot be just whitespace characters.",
         }),
-    title: z
-        .string()
-        .min(1, "Title must be at least 1 character.")
-        .max(150, "Title must be less than 150 characters.")
-        .regex(/\S+/, {
-            message: "Title cannot be just whitespace characters.",
-        }),
+    title: z.string().min(1, "Title must be at least 1 character.").max(150, "Title must be less than 150 characters.").regex(/\S+/, {
+        message: "Title cannot be just whitespace characters.",
+    }),
 
     content: z
         .string()
@@ -25,6 +21,6 @@ export const songSchema = z.object({
         }),
     cover: z.string(),
     spotifyURI: z.string().optional(),
-});
+})
 
-export type songSchemaType = z.infer<typeof songSchema>;
+export type SongSchemaType = z.infer<typeof songSchema>
