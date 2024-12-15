@@ -2,12 +2,16 @@ import SpotifyFeatureGuard from "@/components/spotify-new/spotify-feature-guard.
 import SpotifyPlayer from "@/components/spotify-new/player/spotify-player.tsx"
 import { Rnd } from "react-rnd"
 import { useIsSpotifyPlayerEnabled, useIsSpotifyPlayerOpen } from "@/components/spotify-new/player/spotify-player-state.ts"
+import { useIsSpotifyEnabled } from "@/components/spotify-new/spotify-state.ts"
 
 export default function FloatingSpotifyPlayer() {
     const [open] = useIsSpotifyPlayerOpen()
-    const [isSpotifyPlayerEnabled] = useIsSpotifyPlayerEnabled()
 
-    if (!isSpotifyPlayerEnabled) return null
+    // Even though the player is wrapped in these checks we want to not show this component at all if these are disabled
+    const [isSpotifyPlayerEnabled] = useIsSpotifyPlayerEnabled()
+    const [isSpotifyEnabled] = useIsSpotifyEnabled()
+
+    if (!isSpotifyPlayerEnabled || !isSpotifyEnabled) return null
 
     return (
         <Rnd
