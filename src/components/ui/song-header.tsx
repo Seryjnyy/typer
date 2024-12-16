@@ -32,6 +32,13 @@ const SongBanner = ({ song, className, size, children, playButton = false, ...pr
 
     return (
         <div className={cn(songBannerVariants({ size, className }))} {...props} style={coverAsAvatarStyle}>
+            {song.spotifyCover && (
+                <img
+                    src={song.spotifyCover}
+                    alt={song.title + " album cover."}
+                    className={"absolute top-0 left-0 w-full h-full object-cover"}
+                />
+            )}
             {playButton && (
                 <div className="z-40 peer">
                     <PlayButton songID={song.id} />
