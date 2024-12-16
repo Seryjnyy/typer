@@ -148,7 +148,7 @@ export default function Song() {
                         <div className="flex items-end justify-between   w-full ">
                             <div className="flex gap-4 border border-dashed p-2 rounded-lg w-fit ">
                                 <span className="text-xs text-muted-foreground">{song.record.accuracy}%</span>
-                                <span className="text-xs text-muted-foreground">{song.record.wpm} chpm</span>
+                                <span className="text-xs text-muted-foreground">{song.record.wpm} wpm</span>
                                 <span className="text-xs text-muted-foreground">{song.completion} completions</span>
                             </div>
                             {/* <div className="w-fit">
