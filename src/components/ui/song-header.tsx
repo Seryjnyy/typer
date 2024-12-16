@@ -27,7 +27,7 @@ interface SongBannerProps extends React.ButtonHTMLAttributes<HTMLDivElement>, Va
     playButton?: boolean
 }
 
-const SongBanner = ({ song, className, size, playButton = false, ...props }: SongBannerProps) => {
+const SongBanner = ({ song, className, size, children, playButton = false, ...props }: SongBannerProps) => {
     const { coverAsAvatarStyle } = useSongCover(song)
 
     return (
@@ -40,6 +40,7 @@ const SongBanner = ({ song, className, size, playButton = false, ...props }: Son
             {playButton && (
                 <div className="w-full h-full hover:backdrop-brightness-75 absolute  z-20 peer-hover:backdrop-brightness-75 rounded-md"></div>
             )}
+            {children}
         </div>
     )
 }
