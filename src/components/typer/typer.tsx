@@ -238,7 +238,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
             <div className="absolute sm:bottom-2 bottom-14 left-2 text-xs text-muted-foreground flex items-center gap-1 z-0">
                 <Timer gameState={state} ref={timerRef} />
                 {renderTestProps.current && timerRef.current && (
-                    <WPM gameState={state} getStats={renderTestProps.current?.getStats} getTime={getTime} />
+                    <Stats gameState={state} getStats={renderTestProps.current?.getStats} getTime={getTime} />
                 )}
                 <Indicators gameState={state} />
             </div>
@@ -280,12 +280,15 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
     )
 }
 
-const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: () => number; getStats: () => TypingStats }) => {
+const Stats = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: () => number; getStats: () => TypingStats }) => {
     const [isRunning, setIsRunning] = useState(false)
     const [wpm, setWpm] = useState(0)
+    const [skippedLine, setSkippedLine] = useState(false)
+
     useEffect(() => {
         if (gameState === "idle") {
             setWpm(0)
+            setSkippedLine(false)
             setIsRunning(false)
         } else if (gameState === "started") {
             if (!isRunning) setIsRunning(true)
@@ -301,12 +304,17 @@ const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: 
         if (isRunning) {
             intervalId = setInterval(() => {
                 const stats = getStats()
+
+                // Update wpm
                 const time = getTime()
                 if (time === 0) {
                     setWpm(stats.current)
                 } else {
                     setWpm(calcWpm(stats.current, time))
                 }
+
+                // Update skip line used
+                setSkippedLine(stats.skipLineUsed)
             }, 1000)
         }
 
@@ -318,7 +326,12 @@ const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: 
         }
     }, [getStats, getTime, isRunning])
 
-    return <div className={"border-l pl-1"}>{wpm}wpm</div>
+    return (
+        <div className={"flex items-center gap-1"}>
+            <div className={"border-l pl-1"}>{wpm}wpm</div>
+            {skippedLine && <div className={"border-l pl-1"}>Skip line used</div>}
+        </div>
+    )
 }
 
 const Indicators = ({ gameState }: { gameState: GameState }) => {
