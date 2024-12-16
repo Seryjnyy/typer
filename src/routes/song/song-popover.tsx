@@ -122,6 +122,7 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
     const enqueue = useQueueStore.use.enqueue()
     const playSong = usePlaySong()
     const { exportSongs } = useExportSongs()
+    const [open, setOpen] = useState(false)
 
     const onAddToQueue = (songId: string) => {
         enqueue(songId)
@@ -133,138 +134,140 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
     }
 
     return (
-        <DropdownMenu>
+        <DropdownMenu open={open} onOpenChange={(val) => setOpen(val)}>
             <DropdownMenuTrigger className="p-2  rounded-sm">
                 <DotsHorizontalIcon />
             </DropdownMenuTrigger>
-            <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        playSong(song.id)
-                    }}
-                >
-                    <PlayIcon />
-                    <span> Play</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        onAddToQueue(song.id)
-                    }}
-                >
-                    <PlusIcon />
-                    <span> Queue</span>
-                </DropdownMenuItem>
-                {song.spotifyUri && (
-                    <SpotifyFeatureGuard>
-                        <DropdownMenuItem
-                            onClick={(e) => {
-                                playSong(song.id, false)
-                                e.stopPropagation()
-                            }}
-                        >
-                            <div className={"flex gap-2 items-center"}>
-                                <Icons.spotify className="size-4 fill-spotifyGreen" /> Play
-                            </div>
-                        </DropdownMenuItem>
-                    </SpotifyFeatureGuard>
-                )}
+            {open && (
+                <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem
+                        className="space-x-1"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            playSong(song.id)
+                        }}
+                    >
+                        <PlayIcon />
+                        <span> Play</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        className="space-x-1"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            onAddToQueue(song.id)
+                        }}
+                    >
+                        <PlusIcon />
+                        <span> Queue</span>
+                    </DropdownMenuItem>
+                    {song.spotifyUri && (
+                        <SpotifyFeatureGuard>
+                            <DropdownMenuItem
+                                onClick={(e) => {
+                                    playSong(song.id, false)
+                                    e.stopPropagation()
+                                }}
+                            >
+                                <div className={"flex gap-2 items-center"}>
+                                    <Icons.spotify className="size-4 fill-spotifyGreen" /> Play
+                                </div>
+                            </DropdownMenuItem>
+                        </SpotifyFeatureGuard>
+                    )}
 
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        queueNext(song.id)
-                    }}
-                >
-                    <PlusIcon />
-                    <span> Next</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {!exclude?.viewMore && (
-                    <>
-                        <DropdownMenuItem
-                            className="space-x-1"
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                navigate(`/songs/${song.id}`)
-                            }}
-                        >
-                            <EyeOpenIcon />
-                            <span>View more</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                    </>
-                )}
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        navigate(`/songs/${song.id}/edit`)
-                    }}
-                >
-                    <Pencil1Icon />
-                    <span>Edit</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                    <AddToPlaylistDialog song={song} />
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                    className="space-x-1"
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        handleExportSong()
-                    }}
-                >
-                    <DownloadIcon />
-                    <span>Export</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {destructiveMenuItems}
+                    <DropdownMenuItem
+                        className="space-x-1"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            queueNext(song.id)
+                        }}
+                    >
+                        <PlusIcon />
+                        <span> Next</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    {!exclude?.viewMore && (
+                        <>
+                            <DropdownMenuItem
+                                className="space-x-1"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    navigate(`/songs/${song.id}`)
+                                }}
+                            >
+                                <EyeOpenIcon />
+                                <span>View more</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        </>
+                    )}
+                    <DropdownMenuItem
+                        className="space-x-1"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/songs/${song.id}/edit`)
+                        }}
+                    >
+                        <Pencil1Icon />
+                        <span>Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                        <AddToPlaylistDialog song={song} />
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        className="space-x-1"
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            handleExportSong()
+                        }}
+                    >
+                        <DownloadIcon />
+                        <span>Export</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    {destructiveMenuItems}
 
-                <DropdownMenuItem className="space-x-1 text-destructive">
-                    {/* TODO: Is this delete stuff duplicate with delete button on songItem? */}
-                    <AlertDialog>
-                        <AlertDialogTrigger
-                            asChild
-                            onClick={(e) => {
-                                e.stopPropagation()
-                            }}
-                        >
-                            <div className="gap-1 relative flex  cursor-default select-none items-center rounded-sm   text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground ">
-                                <TrashIcon />
-                                Delete
-                            </div>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete the song.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        removeSong(song.id)
-                                        navigate("/songs")
-                                    }}
-                                >
-                                    Continue
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
+                    <DropdownMenuItem className="space-x-1 text-destructive">
+                        {/* TODO: Is this delete stuff duplicate with delete button on songItem? */}
+                        <AlertDialog>
+                            <AlertDialogTrigger
+                                asChild
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                }}
+                            >
+                                <div className="gap-1 relative flex  cursor-default select-none items-center rounded-sm   text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground ">
+                                    <TrashIcon />
+                                    Delete
+                                </div>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete the song.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            removeSong(song.id)
+                                            navigate("/songs")
+                                        }}
+                                    >
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            )}
         </DropdownMenu>
     )
 }
