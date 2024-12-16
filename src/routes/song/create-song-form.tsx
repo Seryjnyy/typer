@@ -9,20 +9,25 @@ import { songSchema, SongSchemaType } from "@/lib/schemas/song"
 import { cn } from "@/lib/utils"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { forwardRef, useContext, useMemo, useRef, useState } from "react"
+import { forwardRef, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useForm, useFormContext } from "react-hook-form"
 import SongContentFormField from "./song-content-form-field"
 
 import SearchForLyrics from "@/components/spotify/search/search-for-lyrics.tsx"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { coverAsStyle, createRandomCover, parseGeneratedCoverString } from "@/lib/gradient"
+import { coverAsStyle, createRandomCover, createRandomCoverWithColours, parseGeneratedCoverString } from "@/lib/gradient"
 import { Track } from "@spotify/web-api-ts-sdk"
 import { createContext } from "react"
 import CreateSongFormSongAssociation from "./create-song-form-song-association"
 import SpotifyWebSDKProvider from "@/components/spotify/providers/spotify-web-sdk-provider.tsx"
 import FindSongUsingSpotify from "@/components/spotify/search/find-song-using-spotify.tsx"
 import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
+import { getPalette } from "color-thief-react"
+import { Label } from "@/components/ui/label.tsx"
+import { Checkbox } from "@/components/ui/checkbox.tsx"
+import { atomWithStorage } from "jotai/utils"
+import { useAtom } from "jotai/index"
 
 // TODO : this whole thing seems messy
 // I think I need separate context from form for this because if the user uses spotify option I need to associate it with the spotify song
@@ -35,6 +40,9 @@ interface SongAssociation {
 }
 
 const SongAssociationContext = createContext<SongAssociation | null>(null)
+
+const isUseSpotifyCoverAtom = atomWithStorage("typer-create-song-form:isUseSpotifyCover", false)
+const useIsUseSpotifyCover = () => useAtom(isUseSpotifyCoverAtom)
 
 // TODO : Need to move this stuff out of here for hmr
 export const useSongAssociation = () => {
@@ -50,6 +58,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
     // TODO : can't do focus on input after submit for spotify like its in manual because it gets rerendered with through changing key
     const titleInputRef = useRef<HTMLInputElement>(null)
     const [songAssociation, setSongAssociation] = useState<Track | null>(null)
+    const [isUseSpotifyCover] = useIsUseSpotifyCover()
 
     const [resetSignal, setResetSignal] = useState(false)
 
@@ -66,16 +75,19 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
         },
     })
 
-    function onSubmit(values: SongSchemaType) {
+    async function onSubmit(values: SongSchemaType) {
         console.log(values)
 
-        // gets spotify uri from song association state
         const song = {
             title: values.title,
             content: values.content.replace(/\[.*?]/g, "").trim(), // Removes [Verse 1] [Chorus] etc.
             source: values.source,
             cover: values.cover,
             spotifyUri: songAssociation?.uri,
+            spotifyCover:
+                isUseSpotifyCover && songAssociation && songAssociation.album.images.length > 0
+                    ? songAssociation.album.images[0].url
+                    : undefined,
         }
 
         const result = createSong(song)
@@ -100,6 +112,19 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
         if (onSuccess) onSuccess()
     }
 
+    useEffect(() => {
+        const updateFormCoverField = async () => {
+            if (songAssociation && songAssociation.album.images.length > 0) {
+                const palette = await getPalette(songAssociation.album.images[0].url, 2, "rgbString", "anonymous")
+
+                const cover = JSON.stringify(createRandomCoverWithColours(palette))
+                form.setValue("cover", cover)
+            }
+        }
+
+        updateFormCoverField()
+    }, [form, songAssociation])
+
     const [title, source] = form.watch(["title", "source"])
     return (
         <ScrollArea className="h-[100%] px-2 sm:px-6 md:px-12   overflow-hidden border-t ">
@@ -117,9 +142,16 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
                                             <FormControl>
                                                 <div className="flex gap-2 items-end">
                                                     <div
-                                                        className={cn("w-20 h-20 rounded-md")}
+                                                        className={cn("w-20 h-20 rounded-md relative overflow-hidden")}
                                                         style={coverAsStyle(parseGeneratedCoverString(field.value))}
-                                                    ></div>
+                                                    >
+                                                        {isUseSpotifyCover && songAssociation && songAssociation.album.images[0].url && (
+                                                            <img
+                                                                src={songAssociation.album.images[0].url}
+                                                                alt={songAssociation.name + " album cover."}
+                                                            />
+                                                        )}
+                                                    </div>
                                                     <Button
                                                         type="button"
                                                         variant={"outline"}
@@ -172,6 +204,7 @@ export default function CreateSongForm({ onSuccess }: { onSuccess?: () => void }
 const SpotifyArtistTrack = () => {
     const form = useFormContext<SongSchemaType>()
     const { setSong } = useSongAssociation()
+    const [isUseSpotifyCover, setIsUseSpotifyCover] = useIsUseSpotifyCover()
 
     const handleSelectTrack = (track: Track) => {
         form.setValue("title", track.name)
@@ -189,6 +222,18 @@ const SpotifyArtistTrack = () => {
                         initialArtist={form.getValues("source")}
                         initialTitle={form.getValues("title")}
                     />
+                    <div className={"flex items-center gap-3"}>
+                        <Label htmlFor={"use-spotify-cover-checkbox"}>Use Spotify cover</Label>
+                        <Checkbox
+                            id={"use-spotify-cover-checkbox"}
+                            checked={isUseSpotifyCover}
+                            onCheckedChange={(val) => {
+                                if (val === "indeterminate") return
+
+                                setIsUseSpotifyCover(val)
+                            }}
+                        />
+                    </div>
                 </SpotifyWebSDKProvider>
             </SpotifyFeatureGuard>
         </div>

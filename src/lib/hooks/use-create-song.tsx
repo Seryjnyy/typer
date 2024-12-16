@@ -18,7 +18,9 @@ export default function useCreateSong() {
     const { toast } = useToast()
     const { cover, generateRandomCover } = useRandomCoverGradient()
 
-    return (song: Optional<Song, "id" | "cover" | "completion" | "createdAt" | "lastModifiedAt" | "record" | "spotifyUri">) => {
+    return (
+        song: Optional<Song, "id" | "cover" | "completion" | "createdAt" | "lastModifiedAt" | "record" | "spotifyUri" | "spotifyCover">
+    ) => {
         const newSong: Song = {
             ...song,
             content: removeMultipleWhitespacesInARow(song.content),
@@ -29,6 +31,7 @@ export default function useCreateSong() {
             lastModifiedAt: song.lastModifiedAt ?? Date.now(),
             record: song.record ?? { wpm: 0, accuracy: 0 },
             spotifyUri: song.spotifyUri,
+            spotifyCover: song.spotifyCover,
         }
 
         try {
