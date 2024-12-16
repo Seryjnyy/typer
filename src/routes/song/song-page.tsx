@@ -134,7 +134,11 @@ export default function Song() {
                     <div className="space-y-4 w-full">
                         <div>
                             <SongHeader>
-                                <SongBanner song={song} size={"xl"} />
+                                <SongBanner song={song} size={"xl"} className={"group"}>
+                                    <div className={"absolute bottom-2 right-2 group-hover:inline md:hidden inline"}>
+                                        <PlayButton songID={song.id} />
+                                    </div>
+                                </SongBanner>
                                 <div className="flex flex-col justify-center items-start px-8">
                                     <h1 className="text-2xl font-bold">{song.title}</h1>
                                     <div className={"flex items-center gap-2"}>
