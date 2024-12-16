@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { memo, ReactNode, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { ScrollArea } from "../../components/ui/scroll-area-two.tsx"
+import { ScrollAreaForVirtualization } from "../../components/ui/scroll-area.tsx"
 import { useQueueStore } from "../../lib/store/queue-store"
 import { useSongStore } from "../../lib/store/song-store"
 
@@ -37,7 +37,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ListStyle, Order, Song, SortBy } from "@/lib/types"
 import SongPopover from "./song-popover"
 import { usePreferenceStore } from "@/lib/store/preferences-store"
-import { useUiStateStore } from "@/lib/store/ui-state-store"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { cn } from "@/lib/utils.ts"
 
@@ -118,24 +117,24 @@ const SongLyricHoverCard = memo(({ song }: { song: Song }) => {
 })
 
 // TODO : this wasn't even being displayed
-const SongStats = ({ song }: { song: Song }) => {
-    const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen()
-    const songListStylePref = usePreferenceStore.use.songList()
-
-    if (isQueueWindowOpen) return null
-
-    return (
-        <div
-            className={" gap-4   p-2 rounded-lg hidden sm:flex" + (songListStylePref.listStyle == "list" ? "border border-dashed" : "")}
-            onClick={(e) => e.stopPropagation()}
-        >
-            <span className="text-xs text-muted-foreground border-r pr-3">{song.content.length} ch</span>
-            <span className="text-xs text-muted-foreground">{song.record.accuracy}%</span>
-            <span className="text-xs text-muted-foreground">{song.record.wpm} wpm</span>
-            <span className="text-xs text-muted-foreground">{song.completion} completions</span>
-        </div>
-    )
-}
+// const SongStats = ({ song }: { song: Song }) => {
+//     const isQueueWindowOpen = useUiStateStore.use.queueWindowOpen()
+//     const songListStylePref = usePreferenceStore.use.songList()
+//
+//     if (isQueueWindowOpen) return null
+//
+//     return (
+//         <div
+//             className={" gap-4   p-2 rounded-lg hidden sm:flex" + (songListStylePref.listStyle == "list" ? "border border-dashed" : "")}
+//             onClick={(e) => e.stopPropagation()}
+//         >
+//             <span className="text-xs text-muted-foreground border-r pr-3">{song.content.length} ch</span>
+//             <span className="text-xs text-muted-foreground">{song.record.accuracy}%</span>
+//             <span className="text-xs text-muted-foreground">{song.record.wpm} wpm</span>
+//             <span className="text-xs text-muted-foreground">{song.completion} completions</span>
+//         </div>
+//     )
+// }
 
 type SongItemExclude = { deleteButton: boolean }
 
@@ -604,45 +603,101 @@ const SongsList = ({ songsList, exclude, listItemPopoverDestructiveRender, listI
                         </Drawer>
                     </div>
                 </div>
-                {/* <Button>Add all to queue</Button> */}
-                <ScrollArea className="h-[calc(100%-3.8rem)] pr-3 mt-1 pb-1">
-                    {/* <div className="space-y-2  pr-2"> */}
-                    <div className="flex flex-col gap-2 ">
-                        {filteredAndSortedSongs.length > 0 &&
-                            filteredAndSortedSongs.map((song, index) => (
-                                <SongItem
-                                    exclude={exclude}
-                                    buttonRender={(song) => listItemButtonRender?.(song)}
-                                    popoverDestructiveRender={(song) => listItemPopoverDestructiveRender?.(song)}
-                                    key={song.id}
-                                    song={song}
-                                    index={index}
-                                    listStyle={songListPreferences.listStyle}
-                                />
-                            ))}
-                        {songsList.length > 0 && filteredAndSortedSongs.length == 0 && (
-                            <div className="w-full flex items-center justify-center mt-12">
-                                <div className="flex flex-col text-center">
-                                    <h3 className="font-semibold text-2xl">No results found</h3>
-                                    <span className="text-muted-foreground ">Couldn't find what you searched for.</span>
-                                </div>
+
+                <div className="flex flex-col gap-2 h-[calc(100%-3.8rem)]">
+                    {filteredAndSortedSongs.length > 0 && (
+                        <VirtualizedSongList
+                            key={songListPreferences.listStyle}
+                            songsList={songsList}
+                            exclude={exclude}
+                            listItemButtonRender={listItemButtonRender}
+                            listItemPopoverDestructiveRender={listItemPopoverDestructiveRender}
+                        />
+                    )}
+                    {songsList.length > 0 && filteredAndSortedSongs.length == 0 && (
+                        <div className="w-full flex items-center justify-center mt-12">
+                            <div className="flex flex-col text-center">
+                                <h3 className="font-semibold text-2xl">No results found</h3>
+                                <span className="text-muted-foreground ">Couldn't find what you searched for.</span>
                             </div>
-                        )}
-                        {songsList.length == 0 && (
-                            <div className="w-full flex items-center justify-center mt-12">
-                                <div className="flex flex-col text-center">
-                                    <h3 className="font-semibold text-2xl">You don't have any songs</h3>
-                                    <span className="text-muted-foreground ">Add some.</span>
-                                </div>
+                        </div>
+                    )}
+                    {songsList.length == 0 && (
+                        <div className="w-full flex items-center justify-center mt-12">
+                            <div className="flex flex-col text-center">
+                                <h3 className="font-semibold text-2xl">You don't have any songs</h3>
+                                <span className="text-muted-foreground ">Add some.</span>
                             </div>
-                        )}
-                    </div>
-                    {/* </div> */}
-                </ScrollArea>
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     )
 }
+
+// Virtualized the song list because a single row is already slow to render, with only ~30 songs there is noticeable lag
+const VirtualizedSongList = ({ songsList, exclude, listItemPopoverDestructiveRender, listItemButtonRender }: SongsListProps) => {
+    const parentRef = useRef<HTMLDivElement | null>(null)
+    const songListPreferences = usePreferenceStore.use.songList()
+
+    const estimateSize = useMemo(() => {
+        if (songListPreferences.listStyle === "list") return 80
+        else if (songListPreferences.listStyle === "compact") return 40
+
+        return 80
+    }, [songListPreferences.listStyle])
+
+    const rowVirtualizer = useVirtualizer({
+        count: songsList.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => estimateSize,
+        gap: 10,
+    })
+
+    return (
+        <>
+            {/* The scrollable element for your list */}
+            <ScrollAreaForVirtualization ref={parentRef} className="h-full overflow-auto">
+                {/* The large inner element to hold all of the items */}
+                <ol
+                    style={{
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                        width: "100%",
+                        position: "relative",
+                    }}
+                >
+                    {/* Only the visible items in the virtualizer, manually positioned to be in view */}
+                    {rowVirtualizer.getVirtualItems().map((virtualItem) => (
+                        <li
+                            key={virtualItem.key}
+                            className={"pr-3"}
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: `${virtualItem.size}px`,
+                                transform: `translateY(${virtualItem.start}px)`,
+                            }}
+                        >
+                            <SongItemMemoed
+                                exclude={exclude}
+                                buttonRender={(song) => listItemButtonRender?.(song)}
+                                popoverDestructiveRender={(song) => listItemPopoverDestructiveRender?.(song)}
+                                key={songsList[virtualItem.index].id}
+                                song={songsList[virtualItem.index]}
+                                index={virtualItem.index}
+                                listStyle={songListPreferences.listStyle}
+                            />
+                        </li>
+                    ))}
+                </ol>
+            </ScrollAreaForVirtualization>
+        </>
+    )
+}
+
 const SongItemMemoed = memo(SongItem)
 
 export default SongsList
