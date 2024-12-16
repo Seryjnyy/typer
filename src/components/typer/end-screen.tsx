@@ -4,7 +4,7 @@ import { useSongCover } from "@/lib/hooks/use-song-cover"
 import { useQueueStore } from "@/lib/store/queue-store"
 import { useSongStore } from "@/lib/store/song-store"
 import { Song } from "@/lib/types"
-import { calculateAccuracy, chpm, cn, wpm } from "@/lib/utils"
+import { calculateAccuracy, cn, wpm } from "@/lib/utils"
 import { Cross1Icon, HamburgerMenuIcon, ReloadIcon, TrackNextIcon, TrackPreviousIcon } from "@radix-ui/react-icons"
 import { ButtonHTMLAttributes, ReactNode, useState } from "react"
 import { TextModificationOptions } from "@/lib/store/text-modifications-store.tsx"
@@ -97,7 +97,6 @@ const EndScreenStats = ({ stats, txtMods }: { stats: TypingStats & { time: numbe
 
                 <Stat title="s" value={stats.time} />
                 <div className="border-l  pl-2 flex gap-2">
-                    <Stat title="chpm" value={stats.time == 0 ? stats.current : chpm(stats.current, stats.time)} />
                     <Stat title="wpm" value={stats.time == 0 ? stats.current : wpm(stats.current, stats.time)} />
                 </div>
             </div>
@@ -113,6 +112,7 @@ const EndScreenStats = ({ stats, txtMods }: { stats: TypingStats & { time: numbe
             </div>
             {/*TODO : This should not appear in verse page, since stats will not be saved either way.*/}
             {isTxtModUsed && <span className="text-xs text-orange-400">*Text modifications are on, so stats will not be saved.</span>}
+            {stats.skipLineUsed && <span className="text-xs text-orange-400">*You skipped lines, so stats will not be saved.</span>}
             <div>
                 {txtMods.letterCase !== "normal" && <span className="text-xs text-accent-foreground">*Letter case is on</span>}
                 {txtMods.punctuation !== "normal" && <span className="text-xs text-accent-foreground">*Punctuation is on</span>}

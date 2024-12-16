@@ -32,8 +32,10 @@ export default function QueueSourceTyper() {
     const saveStats = (source: Song, stats: TypingStats & { time: number }) => {
         editSongCompletion(source.id, source.completion + 1)
 
-        const wpmRes = wpm(stats.time > 0 ? stats.time : 1, stats.current)
+        const wpmRes = stats.time === 0 ? stats.current : wpm(stats.current, stats.time)
         const accRes = calculateAccuracy(stats.correct, stats.current)
+
+        // TODO : need to decide when to save the stat. You can have a very high wpm with terrible accuracy
 
         editSongRecord(source.id, {
             wpm: wpmRes,
@@ -92,7 +94,7 @@ export default function QueueSourceTyper() {
                 )}
                 onCompletion={({ stats, textMods, source }) => {
                     const isTxtModUsed = Object.values(textMods).some((mod) => mod !== "normal")
-                    if (isTxtModUsed) return
+                    if (isTxtModUsed || stats.skipLineUsed) return
                     saveStats(source, stats)
                 }}
             />

@@ -163,7 +163,14 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
 
         onCompletion?.({
             stats: {
-                ...(renderTestProps.current?.getStats() ?? { current: 0, errorMap: new Set(), correct: 0, total: 0, incorrect: 0 }),
+                ...(renderTestProps.current?.getStats() ?? {
+                    current: 0,
+                    errorMap: new Set(),
+                    correct: 0,
+                    total: 0,
+                    incorrect: 0,
+                    skipLineUsed: false,
+                }),
                 time: timerRef.current?.getCurrentTime() ?? 0,
             },
             textMods: txtMods,
@@ -231,7 +238,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
             <div className="absolute sm:bottom-2 bottom-14 left-2 text-xs text-muted-foreground flex items-center gap-1 z-0">
                 <Timer gameState={state} ref={timerRef} />
                 {renderTestProps.current && timerRef.current && (
-                    <WPM gameState={state} getStats={renderTestProps.current?.getStats} getTime={getTime} />
+                    <Stats gameState={state} getStats={renderTestProps.current?.getStats} getTime={getTime} />
                 )}
                 <Indicators gameState={state} />
             </div>
@@ -254,7 +261,14 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
             {state === "completed" &&
                 renderWhenComplete?.({
                     gameState: state,
-                    stats: renderTestProps.current?.getStats() ?? { current: 0, total: 0, correct: 0, errorMap: new Set(), incorrect: 0 },
+                    stats: renderTestProps.current?.getStats() ?? {
+                        current: 0,
+                        total: 0,
+                        correct: 0,
+                        errorMap: new Set(),
+                        incorrect: 0,
+                        skipLineUsed: false,
+                    },
                     difficultyModsUsed: txtMods,
                     time: timerRef.current?.getCurrentTime() ?? 0,
                     source: source,
@@ -266,12 +280,15 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
     )
 }
 
-const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: () => number; getStats: () => TypingStats }) => {
+const Stats = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: () => number; getStats: () => TypingStats }) => {
     const [isRunning, setIsRunning] = useState(false)
     const [wpm, setWpm] = useState(0)
+    const [skippedLine, setSkippedLine] = useState(false)
+
     useEffect(() => {
         if (gameState === "idle") {
             setWpm(0)
+            setSkippedLine(false)
             setIsRunning(false)
         } else if (gameState === "started") {
             if (!isRunning) setIsRunning(true)
@@ -287,12 +304,17 @@ const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: 
         if (isRunning) {
             intervalId = setInterval(() => {
                 const stats = getStats()
+
+                // Update wpm
                 const time = getTime()
                 if (time === 0) {
                     setWpm(stats.current)
                 } else {
                     setWpm(calcWpm(stats.current, time))
                 }
+
+                // Update skip line used
+                setSkippedLine(stats.skipLineUsed)
             }, 1000)
         }
 
@@ -304,7 +326,12 @@ const WPM = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: 
         }
     }, [getStats, getTime, isRunning])
 
-    return <div className={"border-l pl-1"}>{wpm}wpm</div>
+    return (
+        <div className={"flex items-center gap-1"}>
+            <div className={"border-l pl-1"}>{wpm}wpm</div>
+            {skippedLine && <div className={"border-l pl-1"}>Skip line used</div>}
+        </div>
+    )
 }
 
 const Indicators = ({ gameState }: { gameState: GameState }) => {
@@ -462,6 +489,21 @@ interface TyperRef {
     getStats: () => TypingStats
 }
 
+function replaceWithDifferentChar(input: string): string {
+    const allChars = "xz"
+
+    return input
+        .split("")
+        .map((char) => {
+            // Filter out the current character from the replacement pool
+            const possibleReplacements = allChars.split("").filter((c) => c !== char)
+
+            // Pick a random replacement from the filtered list
+            return possibleReplacements[Math.floor(Math.random() * possibleReplacements.length)]
+        })
+        .join("")
+}
+
 const Typer = forwardRef<TyperRef, TyperProps>(
     ({ gameState, content, stateActions, source, onInput: onInputChange, renderDisplay }, ref) => {
         const songSplit = useMemo(() => content.split(/\n\s*\n/) || [], [content])
@@ -484,6 +526,8 @@ const Typer = forwardRef<TyperRef, TyperProps>(
         const [inputHistory, setInputHistory] = useState<InputHistory>([])
         const [currentInput, setCurrentInput] = useState("")
 
+        const [skipLineUsed, setSkipLineUsed] = useState(false)
+
         // It's a ref because this component doesn't need the stats, no need to rerender
         // Also because async nature of state it means getStats would be getting old state
         const statTracker = useRef<TypingStats>({
@@ -492,6 +536,7 @@ const Typer = forwardRef<TyperRef, TyperProps>(
             current: 0,
             total: totalCharCount,
             errorMap: new Set<number>(),
+            skipLineUsed: skipLineUsed,
         })
         const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -504,31 +549,61 @@ const Typer = forwardRef<TyperRef, TyperProps>(
                 return
             }
 
+            // If the last char entered is a \n, which is treated as a shortcut to skip the line, this will modify the input to make it
+            // work
+            // This finds the current line, then takes the remainder of the line, replaces all its chars with incorrect values, and
+            // finally updates the input
+            if (newVal.endsWith("\n")) {
+                let endOfLineCharCount = 0
+                let startOfLineCharCount = 0
+                for (const line of lines) {
+                    startOfLineCharCount = endOfLineCharCount
+                    endOfLineCharCount += line.charCount
+                    // Found current line
+                    if (newVal.length <= endOfLineCharCount) {
+                        // Get the remainder of the line by slicing the line.target from howFarIntoLine - 1 (-1 for the \n char), to the
+                        // end of the line.
+                        const howFarIntoLine = newVal.length - startOfLineCharCount
+                        const remainderOfLine = line.target.slice(howFarIntoLine - 1, line.target.length)
+
+                        // It takes the remainder of the line and replaces each char with something else to make it incorrect
+                        // It also replaces the last char with a whitespace because otherwise the input will be a single line, and
+                        // ctrl+backspace will remove everything
+                        const incorrectValues = replaceWithDifferentChar(remainderOfLine).slice(0, -1) + " "
+                        newVal = newVal.replace(/\n/g, incorrectValues)
+                        setSkipLineUsed(true)
+                        break
+                    }
+                }
+            }
+
             setCurrentInput(newVal)
             onInputChange(currentInput, newVal, linesCombinedIntoString)
 
             let count = 0
-            let index = 0
-            for (const line of verses.flat()) {
+            let lineIndex = 0
+            for (const line of lines) {
                 count += line.charCount
                 if (newVal.length <= count) {
-                    if (index == 0) {
+                    if (lineIndex == 0) {
                         // First line
                         setInputHistory([newVal.slice(0, count)])
                     } else {
                         setInputHistory((prev) => {
-                            return [...prev.slice(0, index), newVal.slice(count - line.charCount, count)]
+                            return [...prev.slice(0, lineIndex), newVal.slice(count - line.charCount, count)]
                         })
                     }
                     break
                 }
-                index++
+                lineIndex++
             }
 
             // Stat tracking
             let correct = 0
             let incorrect = 0
             const errorMap = new Set<number>(statTracker.current.errorMap)
+
+            // Go through input and check against the target (that is combined into a single line)
             Array.from(newVal).forEach((ch, index) => {
                 if (ch === linesCombinedIntoString[index]) {
                     correct++
@@ -543,6 +618,7 @@ const Typer = forwardRef<TyperRef, TyperProps>(
                 current: newVal.length,
                 total: totalCharCount,
                 errorMap: errorMap,
+                skipLineUsed: skipLineUsed,
             }
 
             // I don't like how this is done because it starts before game state is in started
@@ -599,6 +675,7 @@ const Typer = forwardRef<TyperRef, TyperProps>(
                 current: 0,
                 total: totalCharCount,
                 errorMap: new Set<number>(),
+                skipLineUsed: false,
             }
             stateActions.handleRestart()
         }, [totalCharCount, stateActions])
