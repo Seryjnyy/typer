@@ -163,7 +163,14 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
 
         onCompletion?.({
             stats: {
-                ...(renderTestProps.current?.getStats() ?? { current: 0, errorMap: new Set(), correct: 0, total: 0, incorrect: 0 }),
+                ...(renderTestProps.current?.getStats() ?? {
+                    current: 0,
+                    errorMap: new Set(),
+                    correct: 0,
+                    total: 0,
+                    incorrect: 0,
+                    skipLineUsed: false,
+                }),
                 time: timerRef.current?.getCurrentTime() ?? 0,
             },
             textMods: txtMods,
@@ -254,7 +261,14 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
             {state === "completed" &&
                 renderWhenComplete?.({
                     gameState: state,
-                    stats: renderTestProps.current?.getStats() ?? { current: 0, total: 0, correct: 0, errorMap: new Set(), incorrect: 0 },
+                    stats: renderTestProps.current?.getStats() ?? {
+                        current: 0,
+                        total: 0,
+                        correct: 0,
+                        errorMap: new Set(),
+                        incorrect: 0,
+                        skipLineUsed: false,
+                    },
                     difficultyModsUsed: txtMods,
                     time: timerRef.current?.getCurrentTime() ?? 0,
                     source: source,
@@ -484,6 +498,8 @@ const Typer = forwardRef<TyperRef, TyperProps>(
         const [inputHistory, setInputHistory] = useState<InputHistory>([])
         const [currentInput, setCurrentInput] = useState("")
 
+        const [skipLineUsed, setSkipLineUsed] = useState(false)
+
         // It's a ref because this component doesn't need the stats, no need to rerender
         // Also because async nature of state it means getStats would be getting old state
         const statTracker = useRef<TypingStats>({
@@ -492,6 +508,7 @@ const Typer = forwardRef<TyperRef, TyperProps>(
             current: 0,
             total: totalCharCount,
             errorMap: new Set<number>(),
+            skipLineUsed: skipLineUsed,
         })
         const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -508,27 +525,29 @@ const Typer = forwardRef<TyperRef, TyperProps>(
             onInputChange(currentInput, newVal, linesCombinedIntoString)
 
             let count = 0
-            let index = 0
-            for (const line of verses.flat()) {
+            let lineIndex = 0
+            for (const line of lines) {
                 count += line.charCount
                 if (newVal.length <= count) {
-                    if (index == 0) {
+                    if (lineIndex == 0) {
                         // First line
                         setInputHistory([newVal.slice(0, count)])
                     } else {
                         setInputHistory((prev) => {
-                            return [...prev.slice(0, index), newVal.slice(count - line.charCount, count)]
+                            return [...prev.slice(0, lineIndex), newVal.slice(count - line.charCount, count)]
                         })
                     }
                     break
                 }
-                index++
+                lineIndex++
             }
 
             // Stat tracking
             let correct = 0
             let incorrect = 0
             const errorMap = new Set<number>(statTracker.current.errorMap)
+
+            // Go through input and check against the target (that is combined into a single line)
             Array.from(newVal).forEach((ch, index) => {
                 if (ch === linesCombinedIntoString[index]) {
                     correct++
@@ -543,6 +562,7 @@ const Typer = forwardRef<TyperRef, TyperProps>(
                 current: newVal.length,
                 total: totalCharCount,
                 errorMap: errorMap,
+                skipLineUsed: skipLineUsed,
             }
 
             // I don't like how this is done because it starts before game state is in started
@@ -599,6 +619,7 @@ const Typer = forwardRef<TyperRef, TyperProps>(
                 current: 0,
                 total: totalCharCount,
                 errorMap: new Set<number>(),
+                skipLineUsed: false,
             }
             stateActions.handleRestart()
         }, [totalCharCount, stateActions])
