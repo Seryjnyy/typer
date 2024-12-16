@@ -32,8 +32,8 @@ const LineBase = forwardRef<HTMLDivElement, LineBaseProps>(({ line, input, isCur
                     }
                 } else {
                     if (ch == " " || ch == "\n") {
-                        variant = "incorrect"
-                        ch = "_"
+                        variant = "incorrectSpace"
+                        // ch = "_"
                     } else {
                         variant = "incorrect"
                     }

@@ -14,6 +14,7 @@ const chVariants = cva("", {
             "not-covered": "text-muted-foreground",
             correct: "text-green-200",
             incorrect: "text-red-200",
+            incorrectSpace: "bg-red-200 opacity-100 brightness-75",
             normal: "",
             normalInvisible: "invisible",
         },
