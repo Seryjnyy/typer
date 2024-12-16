@@ -476,6 +476,21 @@ interface TyperRef {
     getStats: () => TypingStats
 }
 
+function replaceWithDifferentChar(input: string): string {
+    const allChars = "xz"
+
+    return input
+        .split("")
+        .map((char) => {
+            // Filter out the current character from the replacement pool
+            const possibleReplacements = allChars.split("").filter((c) => c !== char)
+
+            // Pick a random replacement from the filtered list
+            return possibleReplacements[Math.floor(Math.random() * possibleReplacements.length)]
+        })
+        .join("")
+}
+
 const Typer = forwardRef<TyperRef, TyperProps>(
     ({ gameState, content, stateActions, source, onInput: onInputChange, renderDisplay }, ref) => {
         const songSplit = useMemo(() => content.split(/\n\s*\n/) || [], [content])
@@ -519,6 +534,34 @@ const Typer = forwardRef<TyperRef, TyperProps>(
         const onInput = (newVal: string) => {
             if (gameState !== "started" && gameState !== "idle") {
                 return
+            }
+
+            // If the last char entered is a \n, which is treated as a shortcut to skip the line, this will modify the input to make it
+            // work
+            // This finds the current line, then takes the remainder of the line, replaces all its chars with incorrect values, and
+            // finally updates the input
+            if (newVal.endsWith("\n")) {
+                let endOfLineCharCount = 0
+                let startOfLineCharCount = 0
+                for (const line of lines) {
+                    startOfLineCharCount = endOfLineCharCount
+                    endOfLineCharCount += line.charCount
+                    // Found current line
+                    if (newVal.length <= endOfLineCharCount) {
+                        // Get the remainder of the line by slicing the line.target from howFarIntoLine - 1 (-1 for the \n char), to the
+                        // end of the line.
+                        const howFarIntoLine = newVal.length - startOfLineCharCount
+                        const remainderOfLine = line.target.slice(howFarIntoLine - 1, line.target.length)
+
+                        // It takes the remainder of the line and replaces each char with something else to make it incorrect
+                        // It also replaces the last char with a whitespace because otherwise the input will be a single line, and
+                        // ctrl+backspace will remove everything
+                        const incorrectValues = replaceWithDifferentChar(remainderOfLine).slice(0, -1) + " "
+                        newVal = newVal.replace(/\n/g, incorrectValues)
+                        setSkipLineUsed(true)
+                        break
+                    }
+                }
             }
 
             setCurrentInput(newVal)
