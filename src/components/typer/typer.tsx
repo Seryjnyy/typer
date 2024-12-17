@@ -18,6 +18,7 @@ import { GameState, TypingStats } from "@/components/typer/types.ts"
 import { CompletionAnim } from "@/components/typer/completion-anim.tsx"
 import { TYPER_SHORTCUTS, useShortcutInfo } from "@/lib/store/shortcuts-store.ts"
 import ShortcutKeys from "@/components/shortcut-keys.tsx"
+import { useSongProgress } from "@/components/typer/progress-state.ts"
 
 enum StateActionKind {
     START = "START",
@@ -152,7 +153,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
     const completeAnimationsRef = useRef<{
         triggerCompleteAnim: () => void
     }>(null)
-    const renderTestProps = useRef<{ getStats: () => TypingStats }>(null)
+    const typerRef = useRef<{ getStats: () => TypingStats }>(null)
 
     const startGame = () => {
         dispatch({ type: StateActionKind.START })
@@ -163,7 +164,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
 
         onCompletion?.({
             stats: {
-                ...(renderTestProps.current?.getStats() ?? {
+                ...(typerRef.current?.getStats() ?? {
                     current: 0,
                     errorMap: new Set(),
                     correct: 0,
@@ -178,7 +179,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
         })
 
         completeAnimationsRef.current?.triggerCompleteAnim()
-    }, [onCompletion, renderTestProps, source, txtMods])
+    }, [onCompletion, typerRef, source, txtMods])
 
     const handleRestart = () => {
         dispatch({ type: StateActionKind.RESTART })
@@ -233,13 +234,11 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
 
     return (
         <div className="relative h-full w-full   rounded-md overflow-hidden">
-            {/*<div className={"fixed top-3 left-3 text-xs text-muted-foreground"}>{state}</div>*/}
+            <div className={"fixed top-3 left-3 text-xs text-muted-foreground"}>{state}</div>
 
             <div className="absolute sm:bottom-2 bottom-14 left-2 text-xs text-muted-foreground flex items-center gap-1 z-0">
                 <Timer gameState={state} ref={timerRef} />
-                {renderTestProps.current && timerRef.current && (
-                    <Stats gameState={state} getStats={renderTestProps.current?.getStats} getTime={getTime} />
-                )}
+                <Stats gameState={state} getStats={typerRef.current?.getStats} getTime={getTime} />
                 <Indicators gameState={state} />
             </div>
             <div className="absolute sm:bottom-1 bottom-14 right-2 z-40 flex items-center gap-2">
@@ -248,7 +247,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
             </div>
             <Typer
                 source={source}
-                ref={renderTestProps}
+                ref={typerRef}
                 content={content}
                 gameState={state}
                 stateActions={actions}
@@ -261,7 +260,7 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
             {state === "completed" &&
                 renderWhenComplete?.({
                     gameState: state,
-                    stats: renderTestProps.current?.getStats() ?? {
+                    stats: typerRef.current?.getStats() ?? {
                         current: 0,
                         total: 0,
                         correct: 0,
@@ -280,29 +279,35 @@ const GameEngine = ({ source, content, renderDisplay, renderWhenComplete, render
     )
 }
 
-const Stats = ({ gameState, getStats, getTime }: { gameState: GameState; getTime: () => number; getStats: () => TypingStats }) => {
+const Stats = ({ gameState, getStats, getTime }: { gameState: GameState; getTime?: () => number; getStats?: () => TypingStats }) => {
     const [isRunning, setIsRunning] = useState(false)
     const [wpm, setWpm] = useState(0)
     const [skippedLine, setSkippedLine] = useState(false)
+    const [, setGlobalSongProgress] = useSongProgress()
 
     useEffect(() => {
         if (gameState === "idle") {
             setWpm(0)
+            setGlobalSongProgress(0)
             setSkippedLine(false)
             setIsRunning(false)
         } else if (gameState === "started") {
             if (!isRunning) setIsRunning(true)
         } else if (gameState === "completed") {
             setIsRunning(false)
+            setGlobalSongProgress(100)
         }
-    }, [gameState, isRunning])
+    }, [gameState, isRunning, setGlobalSongProgress])
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
 
-        // Fetch time and stats every second
+        // Fetch time and stats every half/second
+        // Maybe lower it to make more responsive
         if (isRunning) {
             intervalId = setInterval(() => {
+                if (!getTime || !getStats) return
+
                 const stats = getStats()
 
                 // Update wpm
@@ -315,7 +320,10 @@ const Stats = ({ gameState, getStats, getTime }: { gameState: GameState; getTime
 
                 // Update skip line used
                 setSkippedLine(stats.skipLineUsed)
-            }, 1000)
+
+                const progress = stats.total === 0 ? 0 : (stats.current / stats.total) * 100
+                setGlobalSongProgress(progress)
+            }, 500)
         }
 
         // Cleanup function to clear the interval
@@ -324,7 +332,7 @@ const Stats = ({ gameState, getStats, getTime }: { gameState: GameState; getTime
                 clearInterval(intervalId)
             }
         }
-    }, [getStats, getTime, isRunning])
+    }, [getStats, getTime, isRunning, setGlobalSongProgress])
 
     return (
         <div className={"flex items-center gap-1"}>

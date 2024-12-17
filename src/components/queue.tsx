@@ -67,6 +67,7 @@ const useQueue = () => {
     }
 }
 
+// TODO : I think this should be memoed, it can be a expensive component when lots of songs in queue
 export const MobileQueue = () => {
     const queueWindowOpen = useUiStateStore.use.queueWindowOpen()
     const focus = useUiStateStore.use.focus()
