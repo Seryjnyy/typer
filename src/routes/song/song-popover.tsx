@@ -123,6 +123,7 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
     const playSong = usePlaySong()
     const { exportSongs } = useExportSongs()
     const [open, setOpen] = useState(false)
+    const [openDeleteAlert, setOpenDeleteAlert] = useState(false)
 
     const onAddToQueue = (songId: string) => {
         enqueue(songId)
@@ -134,7 +135,7 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
     }
 
     return (
-        <DropdownMenu open={open} onOpenChange={(val) => setOpen(val)}>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
             <DropdownMenuTrigger className="p-2  rounded-sm">
                 <DotsHorizontalIcon />
             </DropdownMenuTrigger>
@@ -230,9 +231,18 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     <DropdownMenuSeparator />
                     {destructiveMenuItems}
 
-                    <DropdownMenuItem className="space-x-1 text-destructive">
+                    <DropdownMenuItem
+                        className="space-x-1 text-destructive"
+                        onKeyDown={(e) => {
+                            // Need this to open the alert dialog without closing the popover
+                            if (e.key === "Enter") {
+                                e.preventDefault()
+                                setOpenDeleteAlert((prev) => !prev)
+                            }
+                        }}
+                    >
                         {/* TODO: Is this delete stuff duplicate with delete button on songItem? */}
-                        <AlertDialog>
+                        <AlertDialog open={openDeleteAlert} onOpenChange={setOpenDeleteAlert}>
                             <AlertDialogTrigger
                                 asChild
                                 onClick={(e) => {
@@ -244,7 +254,12 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                                     Delete
                                 </div>
                             </AlertDialogTrigger>
-                            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                            <AlertDialogContent
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => {
+                                    e.stopPropagation()
+                                }}
+                            >
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                     <AlertDialogDescription>
