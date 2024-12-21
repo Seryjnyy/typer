@@ -34,25 +34,44 @@ import CreatePlaylistForm from "./create-playlist-form"
 import { PlaylistBanner } from "./playlist-header"
 import { Icons } from "@/components/icons.tsx"
 import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
+import { DialogProps } from "@radix-ui/react-dialog"
 
-const AddToPlaylistDialog = ({ song }: { song: Song }) => {
+interface AddToPlaylistDialogProps extends DialogProps {
+    song: Song
+}
+
+const AddToPlaylistDialog = ({ song, open, onOpenChange }: AddToPlaylistDialogProps) => {
     const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     const playlists = usePlaylistStore.use.playlists()
     const { addToPlaylist, getPlaylistSongs } = usePlaylists()
-    const [open, setOpen] = useState(false)
+    const [_open, _setOpen] = useState(false)
+
+    const actualOpen = open ? open : _open
+
+    const handleOpenChange = (val: boolean) => {
+        _setOpen(val)
+        onOpenChange && onOpenChange(val)
+    }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={actualOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger
                 onClick={(e) => {
                     e.stopPropagation()
                 }}
                 className="flex gap-1 items-center"
+                asChild
             >
-                <PlusIcon />
-                <span>Add to playlist</span>
+                <>
+                    <PlusIcon />
+                    <span>Add to playlist</span>
+                </>
             </DialogTrigger>
-            <DialogContent onClick={(e) => e.stopPropagation()} className="w-[20rem] h-[30rem] flex flex-col justify-start">
+            <DialogContent
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="w-[20rem] h-[30rem] flex flex-col justify-start"
+            >
                 <DialogHeader className="border-b pb-1">
                     <DialogTitle className="text-muted-foreground">Add song to...</DialogTitle>
                     <DialogDescription className="sr-only">
@@ -67,7 +86,7 @@ const AddToPlaylistDialog = ({ song }: { song: Song }) => {
                             onCancel={() => setNewPlaylistOpen(false)}
                             onSave={() => {
                                 setNewPlaylistOpen(false)
-                                setOpen(false)
+                                handleOpenChange(false)
                             }}
                         />
                     </div>
@@ -89,7 +108,7 @@ const AddToPlaylistDialog = ({ song }: { song: Song }) => {
                                         key={playlist.id}
                                         onClick={() => {
                                             addToPlaylist(playlist.id, song.id)
-                                            setOpen(false)
+                                            handleOpenChange(false)
                                         }}
                                     >
                                         <div>
@@ -124,6 +143,7 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
     const { exportSongs } = useExportSongs()
     const [open, setOpen] = useState(false)
     const [openDeleteAlert, setOpenDeleteAlert] = useState(false)
+    const [openAddToPlaylistDialog, setOpenAddToPlaylistDialog] = useState(false)
 
     const onAddToQueue = (songId: string) => {
         enqueue(songId)
@@ -136,13 +156,14 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
 
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTrigger className="p-2  rounded-sm">
-                <DotsHorizontalIcon />
+            <DropdownMenuTrigger asChild>
+                <Button size="icon" variant={"ghost"}>
+                    <DotsHorizontalIcon />
+                </Button>
             </DropdownMenuTrigger>
             {open && (
                 <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
                     <DropdownMenuItem
-                        className="space-x-1"
                         onClick={(e) => {
                             e.stopPropagation()
                             playSong(song.id)
@@ -153,7 +174,6 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                        className="space-x-1"
                         onClick={(e) => {
                             e.stopPropagation()
                             onAddToQueue(song.id)
@@ -178,7 +198,6 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     )}
 
                     <DropdownMenuItem
-                        className="space-x-1"
                         onClick={(e) => {
                             e.stopPropagation()
                             queueNext(song.id)
@@ -191,7 +210,6 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     {!exclude?.viewMore && (
                         <>
                             <DropdownMenuItem
-                                className="space-x-1"
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     navigate(`/songs/${song.id}`)
@@ -204,7 +222,6 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                         </>
                     )}
                     <DropdownMenuItem
-                        className="space-x-1"
                         onClick={(e) => {
                             e.stopPropagation()
                             navigate(`/songs/${song.id}/edit`)
@@ -214,12 +231,25 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                         <span>Edit</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                        <AddToPlaylistDialog song={song} />
+                    <DropdownMenuItem
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                            setOpenAddToPlaylistDialog((prev) => !prev)
+                            console.log("on click")
+                        }}
+                        onKeyDown={(e) => {
+                            // Need this to open the dialog without closing the popover
+                            if (e.key === "Enter") {
+                                e.preventDefault()
+                                setOpenAddToPlaylistDialog((prev) => !prev)
+                            }
+                        }}
+                    >
+                        <AddToPlaylistDialog song={song} open={openAddToPlaylistDialog} onOpenChange={setOpenAddToPlaylistDialog} />
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                        className="space-x-1"
                         onClick={(e) => {
                             e.stopPropagation()
                             handleExportSong()
@@ -232,7 +262,7 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                     {destructiveMenuItems}
 
                     <DropdownMenuItem
-                        className="space-x-1 text-destructive"
+                        className=" text-destructive"
                         onKeyDown={(e) => {
                             // Need this to open the alert dialog without closing the popover
                             if (e.key === "Enter") {
