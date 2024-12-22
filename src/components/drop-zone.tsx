@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Link } from "react-router-dom"
 import { Button } from "./ui/button"
+import { UploadIcon } from "lucide-react"
 
 export default function DropZone() {
     const [fileSelectError, setFileSelectError] = useState("")
@@ -84,10 +85,29 @@ export default function DropZone() {
         <>
             <div
                 {...getRootProps()}
-                className="border p-8 flex justify-center items-center w-full hover:ring ring-primary cursor-pointer rounded-lg"
+                className="border-dashed border p-8 flex justify-center items-center w-full hover:ring ring-primary cursor-pointer rounded-lg"
             >
                 <input {...getInputProps()} className="border" />
-                {isDragActive ? <p>Drop the files here ...</p> : <p>Drag 'n' drop a typer JSON files here, or click to select a file.</p>}
+                {isDragActive ? (
+                    <div className="flex justify-center items-center flex-col gap-4 select-none">
+                        <div className="p-3 border rounded-[var(--radius)] w-fit">
+                            <UploadIcon className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                        <div className="flex items-center justify-center flex-col text-center">
+                            <p>Drop the files here...</p>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center flex-col gap-4 select-none">
+                        <div className="p-3 border rounded-[var(--radius)] w-fit">
+                            <UploadIcon className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                        <div className="flex items-center justify-center flex-col text-center">
+                            <p>Drag 'n' drop the files here, or click to select the files.</p>
+                            <p className="text-muted-foreground text-xs text-center">Only JSON files allowed.</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     )
