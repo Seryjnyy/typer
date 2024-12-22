@@ -45,11 +45,24 @@ export const useSpotifyWebSDK = () => {
         if (!clientSDK) {
             const sdk = SpotifyApi.withUserAuthorization(clientId, window.location.origin + "/settings/spotify", scopes, {})
             setClientSDK(sdk)
-            checkIsSDKAuthenticated()
+
+            sdk?.getAccessToken().then((token) => {
+                if (!token) {
+                    setIsAuthenticated(false)
+                    return
+                }
+
+                if (token.expires && token.expires <= Date.now()) {
+                    setIsAuthenticated(false)
+                    return
+                }
+
+                setIsAuthenticated(true)
+            })
         }
 
         // I don't think you have to "close" this SDK or anything right??
-    }, [checkIsSDKAuthenticated, clientSDK, setClientSDK])
+    }, [clientSDK, setClientSDK, setIsAuthenticated])
 
     // Manual authentication
     const connectSDK = useCallback(async () => {
