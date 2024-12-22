@@ -1,40 +1,46 @@
-import saveAs from "file-saver";
-import { useState } from "react";
-import { usePreferenceStore } from "../store/preferences-store";
-import { Song } from "../types";
+import saveAs from "file-saver"
+import { useMemo, useState } from "react"
+import { songMandatoryExports, usePreferenceStore } from "../store/preferences-store"
+import { Song } from "../types"
+
+type FilterConfig = {
+    [Key in keyof Song]?: boolean // Properties are optional and boolean
+}
+
+// Go through the songs properties and check if that property is true in the config (undefined is false)
+const filterSongProperties = (song: Song, config: FilterConfig): Partial<Song> => {
+    if (config) {
+        return Object.fromEntries(
+            Object.entries(song).filter(([key]) => {
+                return config[key as keyof Song] === true
+            })
+        )
+    }
+    return song
+}
 
 export default function useExportSongs() {
-    const [exported, setExported] = useState(0);
-    const exportSongPreferences = usePreferenceStore.use.exportSongs();
+    const [exported, setExported] = useState(0)
+    const songExportPreferences = usePreferenceStore.use.songExportPreferences()
+    const exportConfig = useMemo(() => ({ ...songExportPreferences, ...songMandatoryExports }) as FilterConfig, [songExportPreferences])
 
     const exportSongs = async (songs: Song[]) => {
-        if (songs.length == 0) return;
+        if (songs.length == 0) return
 
-        const songsConverted = songs.map((song) => ({
-            title: song.title,
-            source: song.source,
-            content: song.content,
-            cover: exportSongPreferences.cover ? song.cover : undefined,
-            completion: exportSongPreferences.completion
-                ? song.completion
-                : undefined,
-            record: exportSongPreferences.record ? song.record : undefined,
-            createdAt: exportSongPreferences.createdAt
-                ? song.createdAt
-                : undefined,
-        }));
+        // Filter song properties so that only the ones the user wants to export are present.
+        const filteredSongs = songs.map((song) => filterSongProperties(song, exportConfig))
 
-        const songsArr = { songs: songsConverted };
-        const json = JSON.stringify(songsArr, null, 2);
+        const songsArr = { songs: filteredSongs }
+        const json = JSON.stringify(songsArr, null, 2)
 
-        const blob = new Blob([json], { type: "application/json" });
-        saveAs(blob, `(${songs.length})-typer-songs.json`);
-        setExported(songs.length);
-    };
+        const blob = new Blob([json], { type: "application/json" })
+        saveAs(blob, `(${songs.length})-typer-songs.json`)
+        setExported(songs.length)
+    }
 
     const clear = () => {
-        setExported(0);
-    };
+        setExported(0)
+    }
 
-    return { clear, exported, exportSongs };
+    return { clear, exported, exportSongs }
 }

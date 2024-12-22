@@ -9,18 +9,34 @@ export type QueueStorage = "localStorage" | "sessionStorage"
 
 type SongList = { listStyle: ListStyle; sortBy: SortBy; order: Order }
 
-type ExportSongs = {
-    cover: boolean
-    completion: boolean
-    record: boolean
-    createdAt: boolean
+export const songMandatoryExports = {
+    title: true,
+    source: true,
+    content: true,
 }
 
-type ImportSongs = {
+export const songMandatoryImports = {
+    title: true,
+    source: true,
+    content: true,
+}
+
+export type SongExportPreferences = {
     cover: boolean
     completion: boolean
     record: boolean
     createdAt: boolean
+    spotifyUri: boolean
+    spotifyCover: boolean
+}
+
+export type SongImportPreferences = {
+    cover: boolean
+    completion: boolean
+    record: boolean
+    createdAt: boolean
+    spotifyUri: boolean
+    spotifyCover: boolean
 }
 
 type State = {
@@ -34,8 +50,8 @@ type State = {
     isOpenEndScreenInitially: boolean
     isOpenEndScreenInitiallyVersePage: boolean
     songList: SongList
-    exportSongs: ExportSongs
-    importSongs: ImportSongs
+    songExportPreferences: SongExportPreferences
+    songImportPreferences: SongImportPreferences
 }
 
 type Actions = {
@@ -49,11 +65,11 @@ type Actions = {
     setSongListPref: (val: SongList) => void
     setOpenEndScreenInitially: (val: boolean) => void
     setOpenEndScreenInitiallyVersePage: (val: boolean) => void
-    setExportSongs: (val: ExportSongs) => void
-    setImportSongs: (val: ImportSongs) => void
+    updateImportPreferences: <K extends keyof SongImportPreferences>(key: K, value: boolean) => void
+    updateExportPreferences: <K extends keyof SongExportPreferences>(key: K, value: boolean) => void
     resetPreferences: () => void
-    resetImportPref: () => void
-    resetExportPref: () => void
+    resetImportPreferences: () => void
+    resetExportPreferences: () => void
 }
 
 const defaults: State = {
@@ -67,23 +83,27 @@ const defaults: State = {
     songList: { listStyle: "list", sortBy: "created", order: "asc" },
     isOpenEndScreenInitially: true,
     isOpenEndScreenInitiallyVersePage: false,
-    exportSongs: {
-        cover: true,
+    songExportPreferences: {
         completion: false,
         record: false,
         createdAt: true,
+        cover: true,
+        spotifyCover: true,
+        spotifyUri: true,
     },
-    importSongs: {
-        cover: true,
+    songImportPreferences: {
         completion: false,
-        createdAt: true,
         record: false,
+        createdAt: true,
+        cover: true,
+        spotifyCover: true,
+        spotifyUri: true,
     },
 }
 
 const usePreferenceStoreBase = create<State & Actions>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             ...defaults,
             setTyperTextDisplay: (val: TyperTextDisplay) =>
                 set(() => {
@@ -125,21 +145,27 @@ const usePreferenceStoreBase = create<State & Actions>()(
                 set(() => {
                     return { isQueueColour: val }
                 }),
-            setExportSongs: (val: ExportSongs) =>
+            updateImportPreferences: (key, value) =>
                 set(() => {
-                    return { exportSongs: val }
+                    return {
+                        ...get(),
+                        songImportPreferences: { ...get().songImportPreferences, [key]: value },
+                    }
                 }),
-            setImportSongs: (val: ImportSongs) =>
+            updateExportPreferences: (key, value) =>
                 set(() => {
-                    return { importSongs: val }
+                    return {
+                        ...get(),
+                        songExportPreferences: { ...get().songExportPreferences, [key]: value },
+                    }
                 }),
-            resetExportPref: () =>
+            resetExportPreferences: () =>
                 set(() => {
-                    return { exportSongs: defaults.exportSongs }
+                    return { songExportPreferences: defaults.songExportPreferences }
                 }),
-            resetImportPref: () =>
+            resetImportPreferences: () =>
                 set(() => {
-                    return { importSongs: defaults.importSongs }
+                    return { songImportPreferences: defaults.songImportPreferences }
                 }),
             resetPreferences: () =>
                 set(() => {

@@ -1,24 +1,18 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { usePreferenceStore } from "@/lib/store/preferences-store"
+import {
+    SongExportPreferences,
+    SongImportPreferences,
+    songMandatoryExports,
+    songMandatoryImports,
+    usePreferenceStore,
+} from "@/lib/store/preferences-store"
 import { Button } from "@/components/ui/button"
 import DropZone from "@/components/drop-zone"
 import { useSongStore } from "@/lib/store/song-store"
 import useExportSongs from "@/lib/hooks/use-export-song"
 import { PlusIcon } from "@radix-ui/react-icons"
-
-const songMandatoryExports = {
-    title: true,
-    source: true,
-    content: true,
-}
-
-const songMandatoryImports = {
-    title: true,
-    source: true,
-    content: true,
-}
 
 const Export = () => {
     const songsList = useSongStore.use.songs()
@@ -50,86 +44,33 @@ const Export = () => {
 
     return (
         <div className="flex justify-evenly gap-4 flex-wrap border rounded-sm p-4">
-            <Button onClick={handleExportAllSongs}>Export all songs</Button>
+            <Button onClick={handleExportAllSongs} disabled={songsList.length === 0}>
+                Export all songs
+            </Button>
 
             <Button disabled>Select songs to export</Button>
         </div>
     )
 }
 
+const formatImportExportFieldLabel = (val: string) => {
+    // split camel case into two words
+    return val.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase()
+}
+
 export default function ImportExport() {
-    const songExportPreferences = usePreferenceStore.use.exportSongs()
-    const setExportSongPreferences = usePreferenceStore.use.setExportSongs()
+    const songExportPreferences = usePreferenceStore.use.songExportPreferences()
+    const updateExportPreferences = usePreferenceStore.use.updateExportPreferences()
 
-    const songImportPreferences = usePreferenceStore.use.importSongs()
-    const setImportSongsPreferences = usePreferenceStore.use.setImportSongs()
+    const songImportPreferences = usePreferenceStore.use.songImportPreferences()
+    const updateImportPreferences = usePreferenceStore.use.updateImportPreferences()
 
-    const resetExportPref = usePreferenceStore.use.resetExportPref()
-    const resetImportPref = usePreferenceStore.use.resetImportPref()
-
-    const handleChangeSongExportPreferences = (option: string, val: boolean) => {
-        console.log(option)
-        switch (option) {
-            case "cover":
-                setExportSongPreferences({
-                    ...songExportPreferences,
-                    cover: val,
-                })
-                break
-            case "completion":
-                setExportSongPreferences({
-                    ...songExportPreferences,
-                    completion: val,
-                })
-                break
-            case "record":
-                setExportSongPreferences({
-                    ...songExportPreferences,
-                    record: val,
-                })
-                break
-            case "createdAt":
-                setExportSongPreferences({
-                    ...songExportPreferences,
-                    createdAt: val,
-                })
-                break
-        }
-    }
-
-    const handleChangeSongImportPreferences = (option: string, val: boolean) => {
-        console.log(option)
-        switch (option) {
-            case "cover":
-                setImportSongsPreferences({
-                    ...songImportPreferences,
-                    cover: val,
-                })
-                break
-            case "completion":
-                setImportSongsPreferences({
-                    ...songImportPreferences,
-                    completion: val,
-                })
-                break
-            case "record":
-                setImportSongsPreferences({
-                    ...songImportPreferences,
-                    record: val,
-                })
-                break
-            case "createdAt":
-                setImportSongsPreferences({
-                    ...songImportPreferences,
-                    createdAt: val,
-                })
-                break
-        }
-    }
+    const resetExportPreferences = usePreferenceStore.use.resetExportPreferences()
+    const resetImportPreferences = usePreferenceStore.use.resetImportPreferences()
 
     const handleResetImportExportPref = () => {
-        resetExportPref()
-        resetImportPref()
+        resetExportPreferences()
+        resetImportPreferences()
     }
 
     return (
@@ -145,8 +86,6 @@ export default function ImportExport() {
                         <CardContent>
                             <Export />
                         </CardContent>
-
-                        <CardFooter></CardFooter>
                     </Card>
                     <Card>
                         <CardHeader>
@@ -160,8 +99,8 @@ export default function ImportExport() {
                                     {Object.entries(songMandatoryExports).map((x) => (
                                         <div className="flex gap-2" key={x[0]}>
                                             <Checkbox disabled checked={x[1]} />
-                                            <Label htmlFor={x[0]} className="capitalize">
-                                                {x[0]}
+                                            <Label htmlFor={x[0]} className="first-letter:capitalize">
+                                                {formatImportExportFieldLabel(x[0])}
                                             </Label>
                                         </div>
                                     ))}
@@ -175,11 +114,11 @@ export default function ImportExport() {
                                                 checked={x[1]}
                                                 onCheckedChange={(val) => {
                                                     if (val == "indeterminate") return
-                                                    handleChangeSongExportPreferences(x[0], val)
+                                                    updateExportPreferences(x[0] as keyof SongExportPreferences, val)
                                                 }}
                                             />
-                                            <Label htmlFor={x[0]} className="capitalize">
-                                                {x[0]}
+                                            <Label htmlFor={x[0]} className="first-letter:capitalize">
+                                                {formatImportExportFieldLabel(x[0])}
                                             </Label>
                                         </div>
                                     ))}
@@ -206,8 +145,6 @@ export default function ImportExport() {
                         <CardContent>
                             <DropZone />
                         </CardContent>
-
-                        <CardFooter></CardFooter>
                     </Card>
                     <Card>
                         <CardHeader>
@@ -221,8 +158,8 @@ export default function ImportExport() {
                                     {Object.entries(songMandatoryImports).map((x) => (
                                         <div className="flex gap-2" key={x[0]}>
                                             <Checkbox disabled checked={x[1]} />
-                                            <Label htmlFor={x[0]} className="capitalize">
-                                                {x[0]}
+                                            <Label htmlFor={x[0]} className="first-letter:capitalize">
+                                                {formatImportExportFieldLabel(x[0])}
                                             </Label>
                                         </div>
                                     ))}
@@ -236,11 +173,12 @@ export default function ImportExport() {
                                                 checked={x[1]}
                                                 onCheckedChange={(val) => {
                                                     if (val == "indeterminate") return
-                                                    handleChangeSongImportPreferences(x[0], val)
+
+                                                    updateImportPreferences(x[0] as keyof SongImportPreferences, val)
                                                 }}
                                             />
-                                            <Label htmlFor={x[0]} className="capitalize">
-                                                {x[0]}
+                                            <Label htmlFor={x[0]} className="first-letter:capitalize">
+                                                {formatImportExportFieldLabel(x[0])}
                                             </Label>
                                         </div>
                                     ))}
