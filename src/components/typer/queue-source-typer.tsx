@@ -18,8 +18,8 @@ export default function QueueSourceTyper() {
     const currentSong = useCurrentSong()
     const navigate = useNavigate()
     const typerDisplayFormat = usePreferenceStore.use.typerTextDisplay()
-    const editSongCompletion = useSongStore.use.editSongCompletion()
-    const editSongRecord = useSongStore.use.editSongRecord()
+    const editSongCompletion = useSongStore.use.updateSongCompletion()
+    const editSongRecord = useSongStore.use.updateSongRecord()
 
     if (!currentSong)
         return (

@@ -7,13 +7,12 @@ import { removeMultipleWhitespacesInARow } from "@/lib/utils.ts"
 
 interface Store {
     songs: Song[]
-    addSong: (song: Song) => void
+    upsertSong: (song: Song) => void
     removeSong: (songId: string) => void
     setSongs: (songs: Song[]) => void
     getSongData: (songId: string) => Song | undefined
-    editSongCompletion: (id: string, completion: number) => void
-    editSongRecord: (id: string, record: { wpm: number; accuracy: number }) => void
-    editSong: (song: Song) => void
+    updateSongCompletion: (id: string, completion: number) => void
+    updateSongRecord: (id: string, record: { wpm: number; accuracy: number }) => void
 }
 
 // Breaks stuff in typer so very important it is done, therefore this is here
@@ -41,22 +40,26 @@ const formatTitleOrSource = (str: string) => {
         .trim()
 }
 
+const removeExtras = (str: string) => {
+    // Removes [Verse 1] [Chorus] etc.
+    return str.replace(/\[.*?]/g, "").trim()
+}
+
 const useSongStoreBase = create<Store>()(
     persist(
         (set, get) => ({
             songs: [],
-            addSong: (song) =>
+            upsertSong: (song) =>
                 set(() => {
-                    if (get().songs.find((x) => x.id == song.id) != null) {
-                        return { songs: get().songs }
-                    }
+                    const songs = get().songs
+                    const filtered = songs.filter((x) => x.id !== song.id)
 
                     return {
                         songs: [
-                            ...get().songs,
+                            ...filtered,
                             {
                                 ...song,
-                                content: trimSongContent(song.content),
+                                content: removeExtras(removeMultipleWhitespacesInARow(trimSongContent(song.content))),
                                 title: formatTitleOrSource(song.title),
                                 source: formatTitleOrSource(song.source),
                             },
@@ -75,19 +78,19 @@ const useSongStoreBase = create<Store>()(
             getSongData: (songId) => {
                 return get().songs.find((song) => song.id == songId)
             },
-            editSongCompletion: (id, completion) =>
+            updateSongCompletion: (id, completion) =>
                 set(() => {
                     const song = get().songs.find((x) => x.id == id)
 
                     if (!song) return {}
 
                     const songs = get().songs.filter((x) => x.id != id)
-                    console.log(completion)
+
                     return {
                         songs: [...songs, { ...song, completion: completion }],
                     }
                 }),
-            editSongRecord: (id, record) =>
+            updateSongRecord: (id, record) =>
                 set(() => {
                     const state = get()
                     const song = state.songs.find((x) => x.id == id)
@@ -98,14 +101,6 @@ const useSongStoreBase = create<Store>()(
 
                     return {
                         songs: [...songs, { ...song, record: record }],
-                    }
-                }),
-            editSong: (song) =>
-                set(() => {
-                    const filtered = get().songs.filter((x) => x.id != song.id)
-
-                    return {
-                        songs: [...filtered, { ...song, content: removeMultipleWhitespacesInARow(trimSongContent(song.content)) }],
                     }
                 }),
         }),
