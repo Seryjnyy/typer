@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
-import useCreateSong from "@/lib/hooks/use-create-song"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 
 import { z } from "zod"
 import { usePreferenceStore } from "../store/preferences-store"
 import { Song } from "@/lib/types.ts"
+import { useUpsertSong } from "@/components/song-form/use-upsert-song.tsx"
 import { importSongSchema } from "@/lib/schemas/song.ts"
 
 // TODO : There is no max value, this shit could blow up, idk what max to set
@@ -17,7 +17,7 @@ const jsonSchema = z.object({
 export default function useImportSongs() {
     const songImportPreferences = usePreferenceStore.use.songImportPreferences()
 
-    const createSong = useCreateSong()
+    const upsertSong = useUpsertSong()
     const [imported, setImported] = useState("")
     const [error, setError] = useState("")
 
@@ -55,7 +55,7 @@ export default function useImportSongs() {
             validSongs.forEach((song) => {
                 // Check with import preferences
                 if (song) {
-                    createSong({
+                    upsertSong({
                         ...song,
                         cover: songImportPreferences.cover ? JSON.stringify(song.cover) : undefined,
                         completion: songImportPreferences.completion ? song.completion : undefined,
