@@ -10,6 +10,7 @@ import { ButtonHTMLAttributes, ReactNode, useState } from "react"
 import { TextModificationOptions } from "@/lib/store/text-modifications-store.tsx"
 import { TypingStats } from "@/components/typer/types.ts"
 import { usePreferenceStore } from "@/lib/store/preferences-store.tsx"
+import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 
 interface QueueControlButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     song: Song | undefined
@@ -18,7 +19,7 @@ interface QueueControlButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
 
 const QueueControlButton = ({ song, controlType, ...props }: QueueControlButtonProps) => {
     return (
-        <Button variant={"ghost"} className="group flex gap-2 items-center rounded-none" disabled={song == null} {...props}>
+        <Button variant={"ghost"} className="group flex gap-2 items-center rounded-none w-full py-8" disabled={song == null} {...props}>
             {controlType == "prev" ? <TrackPreviousIcon /> : <></>}
             <div className="flex flex-col max-w-[12rem] min-w-[2rem] pl-1">
                 {song != null && (
@@ -52,18 +53,16 @@ const EndScreenFooter = ({ onRestart, queueControlButtons }: { onRestart: () => 
     const nextSong = nextSongID ? getSongData(nextSongID) : undefined
 
     return (
-        <div className="sm:w-[22.5rem] md:w-[30rem] sm:flex sm:justify-between sm:flex-row border p-2 flex flex-col items-center gap-4 sm:gap-0 ">
-            <div className="w-[12rem]  flex justify-start">
-                {!queueControlButtons && <QueueControlButton song={prevSong} controlType="prev" onClick={prev} />}
+        <div className={"w-full grid grid-cols-1 gap-3"}>
+            {queueControlButtons && <QueueControlButton song={prevSong} controlType="prev" onClick={prev} />}
+
+            <div className={"w-full flex justify-center"}>
+                <Button variant={"ghost"} size={"icon"} onClick={onRestart} className={"w-full p-8 rounded-none"}>
+                    <ReloadIcon />
+                </Button>
             </div>
 
-            <Button variant={"ghost"} size={"icon"} onClick={onRestart}>
-                <ReloadIcon />
-            </Button>
-
-            <div className="w-[12rem]  flex justify-end">
-                {!queueControlButtons && <QueueControlButton song={nextSong} controlType="next" onClick={next} />}
-            </div>
+            {queueControlButtons && <QueueControlButton song={nextSong} controlType="next" onClick={next} />}
         </div>
     )
 }
@@ -79,8 +78,10 @@ const Stat = ({ title, value }: { title: string; value: string | number }) => {
 
 const EndScreenTitle = ({ song, children }: { song: Song; children?: ReactNode }) => {
     return (
-        <div className="text-center backdrop-brightness-50 rounded-sm p-2 ">
-            <h2 className="text-6xl font-semibold">{song?.title}</h2>
+        <div className="text-center backdrop-brightness-50 rounded-sm p-2">
+            <ScrollArea className={"h-[5rem] md:h-[9rem]"}>
+                <h2 className="md:text-6xl text-xl font-semibold max-w-[90vw] md:max-w-[calc(100vw-30rem)]">{song?.title}</h2>
+            </ScrollArea>
             <span className="text-foreground/50 text-md">{song?.source}</span>
             {children}
         </div>
@@ -100,15 +101,11 @@ const EndScreenStats = ({ stats, txtMods }: { stats: TypingStats & { time: numbe
                     <Stat title="wpm" value={stats.time == 0 ? stats.current : wpm(stats.current, stats.time)} />
                 </div>
             </div>
-            <div className="border p-1 rounded-md px-2 flex gap-4">
+            <div className="border p-1 rounded-md px-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <Stat title="correct" value={stats.correct} />
                 <Stat title="incorrect" value={stats.incorrect} />
-                <div className="border-l  pl-2    ">
-                    <Stat title="acc" value={`${calculateAccuracy(stats.correct, stats.current)}%`} />
-                </div>
-                <div className="border-l pl-2">
-                    <Stat title="errors" value={stats.errorMap.size} />
-                </div>
+                <Stat title="acc" value={`${calculateAccuracy(stats.correct, stats.current)}%`} />
+                <Stat title="errors" value={stats.errorMap.size} />
             </div>
             {/*TODO : This should not appear in verse page, since stats will not be saved either way.*/}
             {isTxtModUsed && <span className="text-xs text-orange-400">*Text modifications are on, so stats will not be saved.</span>}
@@ -129,7 +126,8 @@ function EndScreen({ isOpenInitially, song, children }: { isOpenInitially?: bool
     return (
         <div
             className={cn(
-                "absolute w-[98%] h-[70vh] sm:h-[calc(100vh-10rem)] backdrop-blur-lg border   flex justify-center right-[1%] top-2 z-[300]   rounded-md ",
+                "absolute w-[98%] h-[70vh] sm:h-[calc(100vh-10rem)] backdrop-blur-lg border   flex justify-center right-[1%] top-2" +
+                    " z-[300]   rounded-md overflow-hidden",
                 { "max-h-9 w-9 border-none": !open }
             )}
             style={coverAsBgGradientStyle}
