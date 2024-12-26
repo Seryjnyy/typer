@@ -5,6 +5,7 @@ import { useMemo } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
+// TODO : not used for now
 export default function StatsPage() {
     const songs = useSongStore.use.songs()
 

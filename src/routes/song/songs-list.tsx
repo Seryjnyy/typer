@@ -96,7 +96,7 @@ const sortSongs = (songs: Song[], order: Order, sort: SortBy) => {
     }
 }
 
-const SongLyricHoverCard = memo(({ song }: { song: Song }) => {
+const SongContentHoverCard = memo(({ song }: { song: Song }) => {
     const [open, setOpen] = useState(false)
     return (
         <HoverCard openDelay={500} closeDelay={0} open={open} onOpenChange={setOpen}>
@@ -104,7 +104,7 @@ const SongLyricHoverCard = memo(({ song }: { song: Song }) => {
                 <TextAlignCenterIcon />
             </HoverCardTrigger>
             <HoverCardContent className="w-fit text-xs max-h-[20rem] overflow-hidden bg-background " side="bottom" align={"end"}>
-                <span className="text-muted-foreground font-bold">Lyrics</span>
+                <span className="text-muted-foreground font-bold">Content</span>
                 {open && (
                     <pre>
                         {song.content.slice(0, 256)}
@@ -187,7 +187,7 @@ const SongItem = ({
                 </div>
 
                 <div className="flex gap-1 items-center ">
-                    <SongLyricHoverCard song={song} />
+                    <SongContentHoverCard song={song} />
                     {/*<SongStats song={song} />*/}
                     <SongPopover song={song} />
                 </div>
@@ -219,7 +219,7 @@ const SongItem = ({
 
             <div className="flex justify-between items-center gap-4">
                 <div className="flex items-center  justify-between">
-                    <SongLyricHoverCard song={song} />
+                    <SongContentHoverCard song={song} />
                     {/*<SongStats song={song} />*/}
                 </div>
                 <div className="gap-1 hidden lg:flex">
