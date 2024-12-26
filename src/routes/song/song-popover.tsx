@@ -35,16 +35,18 @@ import { PlaylistBanner } from "./playlist-header"
 import { Icons } from "@/components/icons.tsx"
 import SpotifyFeatureGuard from "@/components/spotify/spotify-feature-guard.tsx"
 import { DialogProps } from "@radix-ui/react-dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx"
+import { SongBanner, SongDetail, SongHeader } from "@/components/ui/song-header.tsx"
 
 interface AddToPlaylistDialogProps extends DialogProps {
     song: Song
 }
 
 const AddToPlaylistDialog = ({ song, open, onOpenChange }: AddToPlaylistDialogProps) => {
-    const [newPlaylistOpen, setNewPlaylistOpen] = useState(false)
     const playlists = usePlaylistStore.use.playlists()
     const { addToPlaylist, getPlaylistSongs } = usePlaylists()
     const [_open, _setOpen] = useState(false)
+    const [currentTab, setCurrentTab] = useState("playlists")
 
     const actualOpen = open ? open : _open
 
@@ -60,7 +62,7 @@ const AddToPlaylistDialog = ({ song, open, onOpenChange }: AddToPlaylistDialogPr
                     e.stopPropagation()
                 }}
                 className="flex gap-1 items-center"
-                asChild
+                asChild={true}
             >
                 <>
                     <PlusIcon />
@@ -71,58 +73,76 @@ const AddToPlaylistDialog = ({ song, open, onOpenChange }: AddToPlaylistDialogPr
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 className="w-[20rem] h-[30rem] flex flex-col justify-start"
+                dialogInputIssueFix={true}
+                controlledDialogInDropdownIssueFix={true}
             >
-                <DialogHeader className="border-b pb-1">
+                <SongHeader>
+                    <SongBanner song={song} />
+                    <SongDetail song={song} />
+                </SongHeader>
+                <DialogHeader className="">
                     <DialogTitle className="text-muted-foreground">Add song to...</DialogTitle>
                     <DialogDescription className="sr-only">
                         Chose a playlist to add the song to, or create a new playlist.
                     </DialogDescription>
                 </DialogHeader>
-                {newPlaylistOpen && (
-                    <div className="w-full  flex-col h-full pt-10 ">
-                        <span className="border-b font-bold text-xl">New playlist</span>
-                        <CreatePlaylistForm
-                            songs={[song.id]}
-                            onCancel={() => setNewPlaylistOpen(false)}
-                            onSave={() => {
-                                setNewPlaylistOpen(false)
-                                handleOpenChange(false)
-                            }}
-                        />
-                    </div>
-                )}
-                {!newPlaylistOpen && (
-                    <ScrollArea className="h-[26.3rem]     pr-3 pl-1 py-1 ">
-                        <div className="flex flex-col gap-3">
-                            <div className="pb-1 border-b">
-                                <Button className="w-full rounded-none" variant={"ghost"} onClick={() => setNewPlaylistOpen(true)}>
-                                    <PlusIcon /> New playlist
-                                </Button>
-                            </div>
-                            {playlists.map((playlist) => {
-                                const playlistSongs = getPlaylistSongs(playlist.id)
-                                return (
+
+                <Tabs defaultValue="playlists" value={currentTab} onValueChange={setCurrentTab}>
+                    <TabsList className={"w-full"}>
+                        <TabsTrigger value="playlists" className={"w-full"}>
+                            Playlists
+                        </TabsTrigger>
+                        <TabsTrigger value="create-playlist" className={"w-full"}>
+                            Create new +
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="playlists">
+                        <ScrollArea className="h-[19rem]  pr-3 pl-1 py-1 ">
+                            <ul className="flex flex-col gap-3">
+                                {playlists.map((playlist) => {
+                                    const playlistSongs = getPlaylistSongs(playlist.id)
+                                    return (
+                                        <li key={playlist.id}>
+                                            <Button
+                                                className="w-full rounded-none"
+                                                variant={"ghost"}
+                                                onClick={() => {
+                                                    addToPlaylist(playlist.id, song.id)
+                                                    handleOpenChange(false)
+                                                }}
+                                            >
+                                                <div>
+                                                    <PlaylistBanner size={"sm"} playlist={playlist} />
+                                                </div>
+                                                <span className="w-full ">
+                                                    {playlist.title} - {playlistSongs.length}
+                                                </span>
+                                            </Button>
+                                        </li>
+                                    )
+                                })}
+                                <li>
                                     <Button
                                         className="w-full rounded-none"
                                         variant={"ghost"}
-                                        key={playlist.id}
-                                        onClick={() => {
-                                            addToPlaylist(playlist.id, song.id)
-                                            handleOpenChange(false)
-                                        }}
+                                        onClick={() => setCurrentTab("create-playlist")}
                                     >
-                                        <div>
-                                            <PlaylistBanner size={"sm"} playlist={playlist} />
-                                        </div>
-                                        <span className="w-full ">
-                                            {playlist.title} - {playlistSongs.length}
-                                        </span>
+                                        <PlusIcon /> New playlist
                                     </Button>
-                                )
-                            })}
-                        </div>
-                    </ScrollArea>
-                )}
+                                </li>
+                            </ul>
+                        </ScrollArea>
+                    </TabsContent>
+                    <TabsContent value="create-playlist">
+                        <CreatePlaylistForm
+                            songs={[song.id]}
+                            onCancel={() => setCurrentTab("playlists")}
+                            onSave={() => {
+                                setCurrentTab("playlists")
+                            }}
+                        />
+                    </TabsContent>
+                </Tabs>
             </DialogContent>
         </Dialog>
     )
@@ -236,7 +256,6 @@ export default function SongPopover({ song, exclude, destructiveMenuItems }: Son
                             e.stopPropagation()
                             e.preventDefault()
                             setOpenAddToPlaylistDialog((prev) => !prev)
-                            console.log("on click")
                         }}
                         onKeyDown={(e) => {
                             // Need this to open the dialog without closing the popover
