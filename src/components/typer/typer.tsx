@@ -99,12 +99,14 @@ export const SongProviderForTyper = ({
 }: SongProviderForTyperProps) => {
     const song = useSong(sourceID)
     const txtMods = useTextModificationsStore.use.textModifications()
+    const txtHarderMods = useTextModificationsStore.use.harderOptions()
 
     const contentRes = useMemo(() => {
         if (!song) return content ?? ""
         const res = content ? content : ""
         return textModification(res, txtMods)
-    }, [song, content, txtMods])
+        // Added the harder txt modifications as dependency so it restarts everything on a change
+    }, [song, content, txtMods, txtHarderMods])
 
     if (!song) return <div>something went wrong...</div>
 
