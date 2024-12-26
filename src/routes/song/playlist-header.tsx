@@ -37,22 +37,22 @@ const PlaylistBanner = ({ playlist, className, size, playButton = false, playBut
 
     const playlistSongs = useMemo(() => {
         return getPlaylistSongs(playlist.id)
-    }, [playlist])
+    }, [getPlaylistSongs, playlist.id])
 
     const renderBanner = () => {
         switch (playlistSongs.length) {
             case 0:
                 return <div className="w-full h-full bg-popover/50"></div>
             case 1: {
-                const s = songsList.find((x) => x.id == playlistSongs[0])
+                const s1 = songsList.find((x) => x.id == playlistSongs[0])
                 return (
                     <div
                         className="w-full h-full"
                         style={
-                            s && {
-                                ...coverAsStyle(parseGeneratedCoverString(s.cover)),
-                                backgroundImage: `url(${s.spotifyCover})`,
+                            s1 && {
+                                ...coverAsStyle(parseGeneratedCoverString(s1.cover)),
                                 backgroundSize: "cover",
+                                ...(s1.spotifyCover && { backgroundImage: `url(${s1.spotifyCover})` }),
                             }
                         }
                     ></div>
@@ -79,8 +79,8 @@ const PlaylistBanner = ({ playlist, className, size, playButton = false, playBut
                                 style={
                                     s1 && {
                                         ...coverAsStyle(parseGeneratedCoverString(s1.cover)),
-                                        backgroundImage: `url(${s1.spotifyCover})`,
                                         backgroundSize: "cover",
+                                        ...(s1.spotifyCover && { backgroundImage: `url(${s1.spotifyCover})` }),
                                     }
                                 }
                             ></div>
@@ -89,8 +89,8 @@ const PlaylistBanner = ({ playlist, className, size, playButton = false, playBut
                                 style={
                                     s2 && {
                                         ...coverAsStyle(parseGeneratedCoverString(s2.cover)),
-                                        backgroundImage: `url(${s2.spotifyCover})`,
                                         backgroundSize: "cover",
+                                        ...(s2.spotifyCover && { backgroundImage: `url(${s2.spotifyCover})` }),
                                     }
                                 }
                             ></div>
@@ -111,8 +111,8 @@ const PlaylistBanner = ({ playlist, className, size, playButton = false, playBut
                                 style={
                                     s1 && {
                                         ...coverAsStyle(parseGeneratedCoverString(s1.cover)),
-                                        backgroundImage: `url(${s1.spotifyCover})`,
                                         backgroundSize: "cover",
+                                        ...(s1.spotifyCover && { backgroundImage: `url(${s1.spotifyCover})` }),
                                     }
                                 }
                             ></div>
@@ -121,15 +121,33 @@ const PlaylistBanner = ({ playlist, className, size, playButton = false, playBut
                                 style={
                                     s2 && {
                                         ...coverAsStyle(parseGeneratedCoverString(s2.cover)),
-                                        backgroundImage: `url(${s2.spotifyCover})`,
                                         backgroundSize: "cover",
+                                        ...(s2.spotifyCover && { backgroundImage: `url(${s2.spotifyCover})` }),
                                     }
                                 }
                             ></div>
                         </div>
                         <div className="grid grid-cols-2 w-full">
-                            <div className="w-full h-full" style={s3 && coverAsStyle(parseGeneratedCoverString(s3.cover))}></div>
-                            <div className="w-full h-full" style={s4 && coverAsStyle(parseGeneratedCoverString(s4.cover))}></div>
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s3 && {
+                                        ...coverAsStyle(parseGeneratedCoverString(s3.cover)),
+                                        backgroundSize: "cover",
+                                        ...(s3.spotifyCover && { backgroundImage: `url(${s3.spotifyCover})` }),
+                                    }
+                                }
+                            ></div>
+                            <div
+                                className="w-full h-full"
+                                style={
+                                    s4 && {
+                                        ...coverAsStyle(parseGeneratedCoverString(s4.cover)),
+                                        backgroundSize: "cover",
+                                        ...(s4.spotifyCover && { backgroundImage: `url(${s4.spotifyCover})` }),
+                                    }
+                                }
+                            ></div>
                         </div>
                     </div>
                 )
