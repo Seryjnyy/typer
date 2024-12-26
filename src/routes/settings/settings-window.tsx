@@ -103,7 +103,7 @@ export default function SettingsWindow() {
             <SettingsMobileMenu links={links} current={current} className="block sm:hidden" />
 
             <div className="w-full max-w-6xl items-start gap-6 h-full rounded-tr-md rounded-br-md overflow-hidden">
-                <ScrollArea className="h-[calc(100vh-5rem)]  w-full px-3 sm:pr-3 sm:pl-0    ">
+                <ScrollArea className="h-[calc(100vh-5.1rem)]  w-full px-3 sm:pr-3 sm:pl-0  pb-20 sm:pb-0  ">
                     <div className="w-full py-12  lg:px-20">
                         <Outlet />
                     </div>
